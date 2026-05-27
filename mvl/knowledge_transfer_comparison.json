@@ -1,0 +1,12 @@
+{
+  "no_transfer": {
+    "final_error": 0.1041743590987181,
+    "final_symbols": 4,
+    "switch_point": 100
+  },
+  "with_transfer": {
+    "final_error": 0.26090848914507103,
+    "final_symbols": 3,
+    "switch_point": 100
+  }
+}

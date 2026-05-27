@@ -1,0 +1,12 @@
+{
+  "simple": {
+    "final_error": 1.0030381796583158e-14,
+    "final_symbols": 0,
+    "final_progress": 0.9976165336433206
+  },
+  "real": {
+    "final_error": 2.542615808051745e-13,
+    "final_symbols": 0,
+    "final_progress": 0.9965949699877931
+  }
+}

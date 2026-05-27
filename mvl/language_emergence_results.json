@@ -1,0 +1,50 @@
+{
+  "final_stats": {
+    "single": {
+      "vocabulary_size": 3,
+      "total_games": 500,
+      "total_successes": 113,
+      "success_rate": 0.226,
+      "combination_rate": 0.0,
+      "order_consistency": 0.0,
+      "preferred_order": "modifier_first",
+      "grammar_rules": 0
+    },
+    "compositional": {
+      "vocabulary_size": 7,
+      "total_games": 500,
+      "total_successes": 500,
+      "success_rate": 1.0,
+      "combination_rate": 1.0,
+      "order_consistency": 1.0,
+      "preferred_order": "modifier_first",
+      "grammar_rules": 0
+    }
+  },
+  "convergence": {
+    "compositional_successes": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "order_consistency": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  }
+}

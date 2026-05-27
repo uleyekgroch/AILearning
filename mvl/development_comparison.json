@@ -1,0 +1,37 @@
+{
+  "condition_a": {
+    "stage_transitions": [
+      [
+        0,
+        "sensorimotor"
+      ],
+      [
+        128,
+        "pre_operational"
+      ],
+      [
+        1004,
+        "concrete_operational"
+      ],
+      [
+        1170,
+        "formal_operational"
+      ]
+    ],
+    "final_stage": "formal_operational",
+    "final_error": 0.011868975083586373,
+    "final_symbols": 3,
+    "final_abstract_reasoning": 0.0,
+    "final_hypothesis_confirmed": 0.96,
+    "final_counterfactual_diversity": 0.25,
+    "final_meta_cognition": 0.3
+  },
+  "condition_b": {
+    "final_error": 0.001373582139428578,
+    "final_symbols": 3
+  },
+  "generalization": {
+    "a": 2.330380330723051,
+    "b": 3.9085652723251014
+  }
+}

@@ -1,0 +1,194 @@
+{
+  "action": {
+    "success_rates": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "vocab_sizes": [
+      19,
+      20,
+      21,
+      22,
+      22,
+      23,
+      23,
+      23,
+      23,
+      23
+    ],
+    "action_symbols": [
+      "pull",
+      "go",
+      "stop",
+      "drop",
+      "move",
+      "turn",
+      "push",
+      "grab"
+    ],
+    "effect_symbols": [
+      "rotation",
+      "displacement"
+    ],
+    "static_symbols": [
+      "yellow",
+      "triangle",
+      "red",
+      "blue",
+      "green",
+      "circle",
+      "square",
+      "big",
+      "small"
+    ],
+    "final_vocab_size": 23,
+    "combination_rate": 0.06504065040650407,
+    "ngram_patterns": 23
+  },
+  "emotion": {
+    "success_rates": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "vocab_sizes": [
+      17,
+      17,
+      17,
+      17,
+      17,
+      17,
+      17,
+      17,
+      17,
+      17
+    ],
+    "emotion_symbols": [
+      "confident",
+      "frustrated",
+      "calm",
+      "bored",
+      "happy",
+      "curious",
+      "surprised",
+      "scared"
+    ],
+    "static_symbols": [
+      "circle",
+      "red",
+      "square",
+      "yellow",
+      "small",
+      "triangle",
+      "blue",
+      "green",
+      "big"
+    ],
+    "emotion_usage": {
+      "curious": 382,
+      "bored": 357,
+      "scared": 368,
+      "confident": 384,
+      "happy": 385,
+      "frustrated": 356,
+      "calm": 398,
+      "surprised": 370
+    },
+    "final_vocab_size": 17,
+    "combination_rate": 0.284
+  },
+  "causal": {
+    "success_rates": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "vocab_sizes": [
+      16,
+      19,
+      23,
+      24,
+      24,
+      25,
+      25,
+      25,
+      25
+    ],
+    "causal_symbols": [
+      "then"
+    ],
+    "static_symbols": [
+      "yellow",
+      "triangle",
+      "square",
+      "red",
+      "circle",
+      "green",
+      "small",
+      "big",
+      "blue"
+    ],
+    "causal_stats": {
+      "total_rules": 0,
+      "confident_rules": 0,
+      "strongest": [],
+      "event_history_length": 0
+    },
+    "final_vocab_size": 25,
+    "combination_rate": 0.4218009478672986
+  },
+  "unified": {
+    "success_rate": 1.0,
+    "vocab_size": 30,
+    "combination_rate": 0.286,
+    "tri_symbol_rate": 0.01,
+    "ngram_patterns": 53,
+    "category_usage": {
+      "shape": 169,
+      "action": 130,
+      "color": 242,
+      "size": 60,
+      "action_effect": 27,
+      "causal": 1
+    },
+    "stats": {
+      "vocabulary_size": 30,
+      "total_games": 500,
+      "total_successes": 500,
+      "success_rate": 1.0,
+      "combination_rate": 0.286,
+      "tri_symbol_rate": 0.01,
+      "order_consistency": 0.0,
+      "preferred_order": "modifier_first",
+      "preferred_modifier_order": [
+        "size",
+        "color",
+        "material"
+      ],
+      "grammar_rules": 0,
+      "ngram_patterns": 53,
+      "games_played": 500
+    }
+  }
+}

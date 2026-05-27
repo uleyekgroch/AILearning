@@ -1,0 +1,17 @@
+{
+  "固定线性": {
+    "final_error": 0.06086397059999605,
+    "final_symbols": 2,
+    "switch_count": 0
+  },
+  "固定神经网络": {
+    "final_error": 0.11473602078823042,
+    "final_symbols": 6,
+    "switch_count": 0
+  },
+  "自适应（误差驱动）": {
+    "final_error": 0.04946251568111413,
+    "final_symbols": 3,
+    "switch_count": 1
+  }
+}

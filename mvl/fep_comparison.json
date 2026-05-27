@@ -1,0 +1,26 @@
+{
+  "mse": {
+    "final_error": 0.07426626666784505,
+    "final_symbols": 1,
+    "final_stage": "pre_operational"
+  },
+  "fep": {
+    "final_error": 0.23354630943292506,
+    "final_symbols": 3,
+    "final_stage": "pre_operational",
+    "avg_precision": 3.704155324471186,
+    "initial_fe": 101.7336059270695,
+    "final_fe": 24.41817854523598
+  },
+  "generalization": {
+    "mse": 10.906421130404494,
+    "fep": 10.939827321994105
+  },
+  "calibration": {
+    "coverage_1sigma": 0.4425,
+    "coverage_2sigma": 0.6075,
+    "mean_calibration_error": 1.1996318386963174,
+    "ideal_1sigma": 0.683,
+    "ideal_2sigma": 0.954
+  }
+}

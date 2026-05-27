@@ -1,0 +1,22 @@
+{
+  "structured": {
+    "final_error": 5.6326645086882416e-30,
+    "final_progress": 0.7153306634442228,
+    "final_symbols": 0
+  },
+  "visual_only": {
+    "final_error": 0.11367219872136676,
+    "final_progress": 0.28540358709098473,
+    "final_symbols": 0
+  },
+  "visual_plus_audio": {
+    "final_error": 0.012424031715012822,
+    "final_progress": 0.0,
+    "final_symbols": 0
+  },
+  "generalization": {
+    "structured_mean_error": 4.589777152947833,
+    "visual_mean_error": 0.25739578893425297,
+    "multimodal_mean_error": 0.32904214211961447
+  }
+}

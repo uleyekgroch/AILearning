@@ -1,0 +1,177 @@
+{
+  "negation": {
+    "success_rates": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "negation_rates": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "negation_symbols": [],
+    "other_symbols": [
+      "red",
+      "yellow",
+      "blue",
+      "green"
+    ],
+    "final_vocab_size": 4,
+    "negation_used": 0,
+    "negation_success": 0,
+    "combination_rate": 0.0
+  },
+  "temporal": {
+    "success_rates": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "vocab_sizes": [
+      18,
+      21,
+      24,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26
+    ],
+    "tense_symbols": [
+      "future",
+      "past",
+      "present"
+    ],
+    "action_symbols": [
+      "grab",
+      "turn",
+      "move",
+      "pull",
+      "stop",
+      "push",
+      "go",
+      "drop"
+    ],
+    "other_symbols": [
+      "blue",
+      "yellow",
+      "red",
+      "circle",
+      "green",
+      "square",
+      "triangle",
+      "halt",
+      "big",
+      "small",
+      "attraction"
+    ],
+    "final_vocab_size": 26,
+    "combination_rate": 0.06613226452905811
+  },
+  "recursive": {
+    "success_rates": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "relative_rates": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "relative_symbols": [],
+    "action_symbols": [
+      "stop",
+      "drop",
+      "push",
+      "grab",
+      "go"
+    ],
+    "static_symbols": [],
+    "final_vocab_size": 5,
+    "relative_used": 0,
+    "relative_success": 0,
+    "combination_rate": 0.0
+  },
+  "unified": {
+    "success_rates": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "vocab_sizes": [
+      18,
+      19,
+      24,
+      25,
+      27,
+      27,
+      27,
+      27,
+      27,
+      27
+    ],
+    "negation_symbols": [],
+    "tense_symbols": [
+      "past",
+      "future",
+      "present"
+    ],
+    "relative_symbols": [],
+    "category_usage": {
+      "action": 211,
+      "color": 233,
+      "action_effect": 7,
+      "shape": 73,
+      "size": 14,
+      "tense": 10
+    },
+    "final_vocab_size": 27,
+    "combination_rate": 0.126
+  }
+}

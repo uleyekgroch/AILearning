@@ -1,0 +1,24 @@
+{
+  "condition_a": {
+    "final_error": 1.0798360823353315e-29,
+    "final_progress": 0.9457743410838862,
+    "final_symbols": 0
+  },
+  "condition_b": {
+    "final_error": 3.17826292790468e-17,
+    "final_progress": 0.9846233123201912,
+    "final_symbols": 0,
+    "success_rate": 0.0
+  },
+  "condition_c": {
+    "final_error": 2.0839646792124265e-15,
+    "final_progress": 0.9788819893714267,
+    "final_symbols": 0,
+    "success_rate": 0.0
+  },
+  "generalization": {
+    "agent_a_mean_error": 9.54753158495458,
+    "agent_b_mean_error": 3.63046810100027,
+    "agent_c_mean_error": 3.458745777373378
+  }
+}

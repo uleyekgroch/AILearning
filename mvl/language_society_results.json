@@ -1,0 +1,71 @@
+{
+  "isolation": {
+    "final_metrics": {
+      "intra_group_similarity": 0.9014800339165996,
+      "inter_group_similarity": 0.7807020197766525,
+      "dialect_divergence": 0.13397746993376092,
+      "num_intra_pairs": 6,
+      "num_inter_pairs": 9
+    }
+  },
+  "topology": {
+    "full": {
+      "final_metrics": {
+        "avg_overall_similarity": 0.9494622247501292,
+        "avg_vocab_freq_similarity": 0.9939514198426947,
+        "avg_collocation_freq_similarity": 0.9229388560435045,
+        "avg_order_match": 1.0
+      }
+    },
+    "star": {
+      "final_metrics": {
+        "avg_overall_similarity": 0.9172292772832346,
+        "avg_vocab_freq_similarity": 0.9897418333240113,
+        "avg_collocation_freq_similarity": 0.8806322893692425,
+        "avg_order_match": 1.0
+      }
+    },
+    "line": {
+      "final_metrics": {
+        "avg_overall_similarity": 0.8850553183116381,
+        "avg_vocab_freq_similarity": 0.9894050432068923,
+        "avg_collocation_freq_similarity": 0.8095490986676994,
+        "avg_order_match": 1.0
+      }
+    }
+  },
+  "population": {
+    "2": {
+      "final_metrics": {
+        "avg_overall_similarity": 1.0000000000000002,
+        "avg_vocab_freq_similarity": 1.0000000000000002,
+        "avg_collocation_freq_similarity": 0.9999999999999999,
+        "avg_order_match": 1.0
+      }
+    },
+    "4": {
+      "final_metrics": {
+        "avg_overall_similarity": 0.9339409467005941,
+        "avg_vocab_freq_similarity": 0.9986720537872179,
+        "avg_collocation_freq_similarity": 0.9482404172856901,
+        "avg_order_match": 1.0
+      }
+    },
+    "8": {
+      "final_metrics": {
+        "avg_overall_similarity": 0.9494622247501292,
+        "avg_vocab_freq_similarity": 0.9939514198426947,
+        "avg_collocation_freq_similarity": 0.9229388560435045,
+        "avg_order_match": 1.0
+      }
+    },
+    "16": {
+      "final_metrics": {
+        "avg_overall_similarity": 0.9004027983102413,
+        "avg_vocab_freq_similarity": 0.986672812542016,
+        "avg_collocation_freq_similarity": 0.8385566887558941,
+        "avg_order_match": 1.0
+      }
+    }
+  }
+}

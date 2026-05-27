@@ -1,0 +1,258 @@
+{
+  "single_gen": {
+    "control": {
+      "success_rate": 1.0,
+      "vocabulary_size": 7,
+      "avg_collocations": 4.0
+    },
+    "experiment": {
+      "success_rate": 1.0,
+      "vocabulary_size": 12,
+      "avg_collocations": 105.66666666666667
+    }
+  },
+  "accumulation": [
+    {
+      "generation": 0,
+      "evaluation": {
+        "success_rate": 1.0,
+        "vocabulary_size": 6,
+        "avg_collocations": 4.0
+      }
+    },
+    {
+      "generation": 1,
+      "evaluation": {
+        "success_rate": 1.0,
+        "vocabulary_size": 7,
+        "avg_collocations": 2.0
+      }
+    },
+    {
+      "generation": 2,
+      "evaluation": {
+        "success_rate": 1.0,
+        "vocabulary_size": 7,
+        "avg_collocations": 2.0
+      }
+    },
+    {
+      "generation": 3,
+      "evaluation": {
+        "success_rate": 1.0,
+        "vocabulary_size": 6,
+        "avg_collocations": 2.0
+      }
+    }
+  ],
+  "mechanism": {
+    "direct": [
+      {
+        "generation": 0,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 6,
+          "avg_collocations": 4.0
+        }
+      },
+      {
+        "generation": 1,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 7,
+          "avg_collocations": 2.0
+        }
+      },
+      {
+        "generation": 2,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 7,
+          "avg_collocations": 2.0
+        }
+      },
+      {
+        "generation": 3,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 6,
+          "avg_collocations": 2.0
+        }
+      }
+    ],
+    "seed": [
+      {
+        "generation": 0,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 6,
+          "avg_collocations": 4.0
+        }
+      },
+      {
+        "generation": 1,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 9,
+          "avg_collocations": 10.0
+        }
+      },
+      {
+        "generation": 2,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 10,
+          "avg_collocations": 16.0
+        }
+      },
+      {
+        "generation": 3,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 11,
+          "avg_collocations": 21.333333333333332
+        }
+      }
+    ],
+    "none": [
+      {
+        "generation": 0,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 6,
+          "avg_collocations": 4.0
+        }
+      },
+      {
+        "generation": 1,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 7,
+          "avg_collocations": 4.0
+        }
+      },
+      {
+        "generation": 2,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 7,
+          "avg_collocations": 4.0
+        }
+      },
+      {
+        "generation": 3,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 5,
+          "avg_collocations": 4.0
+        }
+      }
+    ]
+  },
+  "duration": {
+    "1": [
+      {
+        "generation": 0,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 6,
+          "avg_collocations": 4.0
+        }
+      },
+      {
+        "generation": 1,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 4,
+          "avg_collocations": 1.0
+        }
+      },
+      {
+        "generation": 2,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 4,
+          "avg_collocations": 1.0
+        }
+      }
+    ],
+    "2": [
+      {
+        "generation": 0,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 6,
+          "avg_collocations": 4.0
+        }
+      },
+      {
+        "generation": 1,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 7,
+          "avg_collocations": 2.0
+        }
+      },
+      {
+        "generation": 2,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 7,
+          "avg_collocations": 2.0
+        }
+      }
+    ],
+    "5": [
+      {
+        "generation": 0,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 6,
+          "avg_collocations": 4.0
+        }
+      },
+      {
+        "generation": 1,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 10,
+          "avg_collocations": 5.0
+        }
+      },
+      {
+        "generation": 2,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 10,
+          "avg_collocations": 5.0
+        }
+      }
+    ],
+    "10": [
+      {
+        "generation": 0,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 6,
+          "avg_collocations": 4.0
+        }
+      },
+      {
+        "generation": 1,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 12,
+          "avg_collocations": 9.666666666666666
+        }
+      },
+      {
+        "generation": 2,
+        "evaluation": {
+          "success_rate": 1.0,
+          "vocabulary_size": 12,
+          "avg_collocations": 9.666666666666666
+        }
+      }
+    ]
+  }
+}

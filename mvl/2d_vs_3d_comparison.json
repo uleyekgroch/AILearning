@@ -1,0 +1,12 @@
+{
+  "2d": {
+    "final_error": 0.07306489321700957,
+    "final_symbols": 0,
+    "final_progress": 0.2729735125804645
+  },
+  "3d": {
+    "final_error": 4.5826991565096045e-17,
+    "final_symbols": 0,
+    "final_progress": 0.9992936287402234
+  }
+}

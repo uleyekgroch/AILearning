@@ -1,0 +1,60 @@
+{
+  "independent": {
+    "simple": {
+      "success_rate": 1.0,
+      "vocabulary_size": 7,
+      "combination_rate": 1.0,
+      "tri_symbol_rate": 0.0,
+      "order_consistency": 1.0,
+      "ngram_patterns": 12,
+      "preferred_modifier_order": [
+        "size",
+        "color",
+        "material"
+      ]
+    },
+    "medium": {
+      "success_rate": 1.0,
+      "vocabulary_size": 9,
+      "combination_rate": 1.0,
+      "tri_symbol_rate": 1.0,
+      "order_consistency": 0.0,
+      "ngram_patterns": 27,
+      "preferred_modifier_order": [
+        "size"
+      ]
+    },
+    "complex": {
+      "success_rate": 1.0,
+      "vocabulary_size": 9,
+      "combination_rate": 1.0,
+      "tri_symbol_rate": 1.0,
+      "order_consistency": 0.0,
+      "ngram_patterns": 27,
+      "preferred_modifier_order": [
+        "size"
+      ]
+    },
+    "extreme": {
+      "success_rate": 1.0,
+      "vocabulary_size": 12,
+      "combination_rate": 1.0,
+      "tri_symbol_rate": 1.0,
+      "order_consistency": 0.0,
+      "ngram_patterns": 75,
+      "preferred_modifier_order": [
+        "size",
+        "color"
+      ]
+    }
+  },
+  "progressive": {
+    "success_rate": 1.0,
+    "vocabulary_size": 12,
+    "tri_symbol_rate": 0.8,
+    "preferred_modifier_order": [
+      "size",
+      "color"
+    ]
+  }
+}
