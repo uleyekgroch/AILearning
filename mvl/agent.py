@@ -28,6 +28,8 @@ from knowledge_transfer import KnowledgeTransferSystem
 
 # 导入语言涌现系统
 from language_emergence import CommunicationGame, EmergingLanguage
+from environment_language_bridge import EnvironmentLanguageBridge, ExperienceDrivenScenarioGenerator
+from adaptive_strategy import AdaptiveCommunicationGame
 
 
 @dataclass
@@ -217,6 +219,7 @@ class DevelopmentEngine:
         'sensorimotor': {
             'name': '感知运动阶段',
             'description': '通过感觉和运动与世界交互',
+            'age': '0-2',
             'abilities': ['basic_perception', 'simple_action', 'object_permanence'],
             'limitations': ['no_symbolic', 'no_abstract'],
             'promotion_criteria': {
@@ -225,36 +228,92 @@ class DevelopmentEngine:
                 'total_steps': 50,
             }
         },
-        'pre_operational': {
-            'name': '前运算阶段',
-            'description': '符号功能出现，但思维是自我中心的',
-            'abilities': ['symbolic_representation', 'simple_language', 'egocentric_thinking'],
-            'limitations': ['no_reversible_ops', 'no_abstract_logic'],
+        'early_preoperational': {
+            'name': '前运算早期',
+            'description': '符号功能出现，简单沟通',
+            'age': '2-4',
+            'abilities': ['symbolic_representation', 'simple_communication', 'egocentric_thinking'],
+            'limitations': ['no_reversible_ops', 'no_abstract_logic', 'no_grammar'],
             'promotion_criteria': {
                 'symbol_count': 2,
                 'social_reference': True,
-                'experience_count': 200,
-                'hypothesis_confirmed': 0.3,
+                'total_steps': 200,
             }
         },
-        'concrete_operational': {
-            'name': '具体运算阶段',
-            'description': '逻辑推理能力出现，但局限于具体事物',
-            'abilities': ['logical_reasoning', 'classification', 'conservation'],
-            'limitations': ['concrete_only'],
+        'late_preoperational': {
+            'name': '前运算后期',
+            'description': '语法、否定、时态、基本叙事',
+            'age': '4-6',
+            'abilities': ['grammar', 'negation', 'tense', 'basic_narrative', 'simple_classification'],
+            'limitations': ['no_conservation', 'no_transitivity'],
             'promotion_criteria': {
-                'classification_accuracy': 0.6,
+                'symbol_count': 4,
+                'experience_count': 300,
+                'classification_accuracy': 0.3,
+                'total_steps': 500,
+            }
+        },
+        'early_concrete': {
+            'name': '具体运算早期',
+            'description': '守恒、分类、序列化',
+            'age': '6-8',
+            'abilities': ['conservation', 'classification', 'seriation', 'logical_reasoning'],
+            'limitations': ['concrete_only', 'no_hypothetical'],
+            'promotion_criteria': {
+                'classification_accuracy': 0.5,
                 'conservation_test': True,
-                'abstract_reasoning_score': 0.2,
+                'seriation_score': 0.3,
                 'symbol_count': 3,
                 'experience_count': 500,
+                'total_steps': 800,
             }
         },
-        'formal_operational': {
-            'name': '形式运算阶段',
-            'description': '抽象推理和假设检验能力出现',
-            'abilities': ['abstract_reasoning', 'hypothesis_testing',
-                          'counterfactual_thinking', 'meta_cognition'],
+        'late_concrete': {
+            'name': '具体运算后期',
+            'description': '传递性、多步规划、类比推理',
+            'age': '8-11',
+            'abilities': ['transitivity', 'multi_step_planning', 'analogy', 'abstract_reasoning'],
+            'limitations': ['no_hypothetical_deductive'],
+            'promotion_criteria': {
+                'abstract_reasoning_score': 0.3,
+                'planning_score': 0.4,
+                'classification_accuracy': 0.6,
+                'experience_count': 800,
+                'total_steps': 1200,
+            }
+        },
+        'early_formal': {
+            'name': '形式运算早期',
+            'description': '假设检验、反事实推理、系统性推理',
+            'age': '11-13',
+            'abilities': ['hypothesis_testing', 'counterfactual_thinking', 'systematic_reasoning'],
+            'limitations': [],
+            'promotion_criteria': {
+                'hypothesis_confirmed': 0.5,
+                'counterfactual_diversity': 0.3,
+                'abstract_reasoning_score': 0.4,
+                'total_steps': 1800,
+            }
+        },
+        'late_formal': {
+            'name': '形式运算后期',
+            'description': '科学推理、视角协调、元认知',
+            'age': '13-15',
+            'abilities': ['scientific_reasoning', 'perspective_coordination', 'meta_cognition'],
+            'limitations': [],
+            'promotion_criteria': {
+                'meta_cognition': 0.5,
+                'perspective_coordination': 0.4,
+                'hypothesis_confirmed': 0.6,
+                'total_steps': 2500,
+            }
+        },
+        'adolescent': {
+            'name': '青少年阶段',
+            'description': '抽象问题解决、道德推理、身份认同',
+            'age': '15-17',
+            'abilities': ['abstract_problem_solving', 'moral_reasoning', 'identity_formation',
+                          'hypothetical_deductive', 'scientific_thinking'],
             'limitations': [],
             'promotion_criteria': {}
         }
@@ -496,6 +555,12 @@ class LearningAgent:
         self.language_game = CommunicationGame()
         self.language = self.language_game.language
 
+        # Phase 26: 环境-语言整合
+        self.bridge = EnvironmentLanguageBridge()
+        self.scenario_gen = ExperienceDrivenScenarioGenerator(self.bridge)
+        self.adaptive_game = AdaptiveCommunicationGame()
+        self.communication_stats = {'total': 0, 'success': 0}
+
     def _init_predictive_model(self, model_type: str):
         """初始化预测模型"""
         if model_type == 'neural_network':
@@ -573,9 +638,13 @@ class LearningAgent:
         if self._last_teacher_demo_action is not None:
             imitation_probs = {
                 'sensorimotor': 0.3,
-                'pre_operational': 0.15,
-                'concrete_operational': 0.05,
-                'formal_operational': 0.02,
+                'early_preoperational': 0.2,
+                'late_preoperational': 0.15,
+                'early_concrete': 0.1,
+                'late_concrete': 0.05,
+                'early_formal': 0.03,
+                'late_formal': 0.02,
+                'adolescent': 0.01,
             }
             imitate_prob = imitation_probs.get(
                 self.development.current_stage, 0.1
@@ -617,9 +686,10 @@ class LearningAgent:
         base_actions = [0, 1, 2, 3]  # 上下左右
 
         stage = self.development.current_stage
-        if stage in ['pre_operational', 'concrete_operational']:
+        if stage in ('early_preoperational', 'late_preoperational',
+                     'early_concrete', 'late_concrete'):
             base_actions.append(4)  # 推
-        elif stage == 'formal_operational':
+        elif stage in ('early_formal', 'late_formal', 'adolescent'):
             base_actions = list(range(self.action_dim))  # 全部动作
 
         return base_actions
@@ -763,18 +833,10 @@ class LearningAgent:
     def communicate(self, partner: 'LearningAgent',
                     scene_objects: list, target_idx: int) -> bool:
         """
-        与伙伴进行参照游戏
+        与伙伴进行参照游戏（兼容接口）
 
         两个 agent 通过语言描述和识别物体，
         交流成功促进语言的组合性和语法涌现。
-
-        参数：
-            partner: 另一个 LearningAgent
-            scene_objects: 场景中的物体列表
-            target_idx: 目标物体索引
-
-        返回：
-            是否交流成功
         """
         # 提取所有物体的特征
         scene_features = []
@@ -790,6 +852,60 @@ class LearningAgent:
         partner.record_social_interaction()
 
         return success
+
+    def communicate_from_observation(self, partner: 'LearningAgent',
+                                      observation: dict) -> bool:
+        """
+        从环境观测直接通信（Phase 26 核心方法）
+
+        将环境观测转换为统一场景，用自适应语言系统通信。
+        语言从真实探索经验中涌现。
+        """
+        scene = self.bridge.observation_to_scene(observation)
+        if scene is None:
+            return False
+
+        # 记录经验（用于经验驱动的场景生成）
+        self.scenario_gen.record_observation(observation)
+
+        # 用自适应语言系统通信
+        success = self.adaptive_game.play_round(scene)
+
+        self.communication_stats['total'] += 1
+        if success:
+            self.communication_stats['success'] += 1
+
+        self.record_social_interaction()
+        partner.record_social_interaction()
+
+        return success
+
+    def explore_and_communicate(self, env, partner: 'LearningAgent',
+                                 steps: int = 100) -> dict:
+        """
+        探索环境，遇到多物体场景时触发通信
+
+        返回：通信统计
+        """
+        comm_stats = {'total': 0, 'success': 0}
+
+        for _ in range(steps):
+            obs = env.get_observation()
+
+            # 随机动作（探索）
+            import random as _rand
+            action = _rand.randint(0, self.action_dim - 1)
+            env.step(action)
+
+            # 视野中有 2+ 物体时触发通信
+            visible = obs.get('visible_objects', [])
+            if len(visible) >= 2:
+                success = self.communicate_from_observation(partner, obs)
+                comm_stats['total'] += 1
+                if success:
+                    comm_stats['success'] += 1
+
+        return comm_stats
 
     def observe_teacher_demo(self, action: int):
         """观察教师的示范动作（用于模仿学习）"""
@@ -818,6 +934,10 @@ class LearningAgent:
             'hypothesis_confirmed': self._compute_hypothesis_confirmed(),
             'counterfactual_diversity': self._compute_counterfactual_diversity(),
             'meta_cognition': self._compute_meta_cognition(),
+            'seriation_score': self._compute_seriation_score(),
+            'planning_score': self._compute_planning_score(),
+            'perspective_coordination': self._compute_perspective_coordination(),
+            'moral_reasoning': self._compute_moral_reasoning(),
         }
 
         # 检查是否满足晋升条件
@@ -980,6 +1100,127 @@ class LearningAgent:
         else:
             # 误差在减少，说明策略有效
             return 0.7
+
+    def _compute_seriation_score(self) -> float:
+        """
+        序列化能力：沿维度排序的预测一致性
+
+        检查 agent 对不同重量物体的预测是否呈现单调关系。
+        如果重量大的物体预测位移也大，说明具备序列化能力。
+        """
+        if len(self.experiences) < 30:
+            return 0.0
+
+        recent = self.experiences[-60:]
+
+        # 按物体重量分组，计算各组的平均预测误差
+        # 观测向量结构: [agent_pos(2), color(4), shape(3), pos_weight(3)]
+        # 重量在 obs[11]（pos_weight 的第3个元素）
+        weight_groups = {}
+        for exp in recent:
+            weight_key = round(float(exp.observation[11]) * 2) / 2 if len(exp.observation) > 11 else 1.0
+            if weight_key not in weight_groups:
+                weight_groups[weight_key] = []
+            weight_groups[weight_key].append(exp.prediction_error)
+
+        if len(weight_groups) < 3:
+            return 0.0
+
+        # 检查重量与预测误差的排序一致性
+        sorted_weights = sorted(weight_groups.keys())
+        mean_errors = [np.mean(weight_groups[w]) for w in sorted_weights]
+
+        # 计算排序一致性（相邻比较的单调性）
+        correct_orderings = 0
+        total_pairs = 0
+        for i in range(len(mean_errors)):
+            for j in range(i + 1, len(mean_errors)):
+                total_pairs += 1
+                # 重量越大，预测应该越准确（误差越小）
+                if mean_errors[i] >= mean_errors[j]:
+                    correct_orderings += 1
+
+        return correct_orderings / max(1, total_pairs)
+
+    def _compute_planning_score(self) -> float:
+        """
+        规划能力：多步目标导向行为
+
+        检测 agent 是否执行了连续相同动作序列（目标追求）
+        然后切换动作（目标完成）。这是多步规划的标志。
+        """
+        if len(self.experiences) < 50:
+            return 0.0
+
+        recent = self.experiences[-100:]
+        actions = [e.action for e in recent]
+
+        # 寻找连续相同动作序列（长度>=3）后跟切换
+        goal_sequences = 0
+        i = 0
+        while i < len(actions) - 3:
+            # 检查连续相同动作
+            seq_len = 1
+            while i + seq_len < len(actions) and actions[i + seq_len] == actions[i]:
+                seq_len += 1
+
+            if seq_len >= 3:
+                goal_sequences += 1
+                i += seq_len
+            else:
+                i += 1
+
+        # 归一化：最多可能的序列数
+        max_sequences = len(actions) / 3
+        return min(1.0, goal_sequences / max(1, max_sequences))
+
+    def _compute_perspective_coordination(self) -> float:
+        """
+        视角协调：区分自己和他人的视角
+
+        基于通信成功率和社会交互频率。
+        成功的跨视角沟通需要理解他人的知识状态。
+        """
+        total_comm = self.communication_stats.get('total', 0)
+        success_comm = self.communication_stats.get('success', 0)
+
+        if total_comm < 10:
+            return 0.0
+
+        comm_rate = success_comm / total_comm
+        # 社会交互因子：交互越多，视角协调越成熟
+        interaction_factor = min(1.0, total_comm / 100)
+
+        return comm_rate * interaction_factor
+
+    def _compute_moral_reasoning(self) -> float:
+        """
+        道理推理：动作分布的均衡度
+
+        在多 Agent 场景中，检测 agent 的行为是否平衡
+        （不是总是采取"自私"的动作）。
+        基于动作分布的熵。
+        """
+        if len(self.experiences) < 50:
+            return 0.0
+
+        recent = self.experiences[-100:]
+        action_counts = {}
+        for exp in recent:
+            action_counts[exp.action] = action_counts.get(exp.action, 0) + 1
+
+        total = len(recent)
+        entropy = 0.0
+        for count in action_counts.values():
+            p = count / total
+            if p > 0:
+                entropy -= p * np.log2(p)
+
+        # 归一化熵（最大熵 = log2(action_dim)）
+        max_entropy = np.log2(self.action_dim) if self.action_dim > 1 else 1.0
+        normalized_entropy = entropy / max_entropy
+
+        return normalized_entropy
 
     def get_stats(self) -> Dict:
         """获取统计信息"""

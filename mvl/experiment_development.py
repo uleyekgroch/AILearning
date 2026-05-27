@@ -1,8 +1,9 @@
 """
 发展阶段对比实验
 
-验证完整的 Piaget 四阶段发展轨迹：
-sensorimotor → pre_operational → concrete_operational → formal_operational
+验证完整的 Piaget 八阶段发展轨迹：
+sensorimotor → early_preoperational → late_preoperational → early_concrete
+→ late_concrete → early_formal → late_formal → adolescent
 
 对比：
 A. 有阶段限制（渐进解锁能力）
@@ -176,9 +177,13 @@ def analyze_results(trajectory_a, agent_a, stage_transitions,
     for step, stage in stage_transitions:
         stage_names = {
             'sensorimotor': '感知运动',
-            'pre_operational': '前运算',
-            'concrete_operational': '具体运算',
-            'formal_operational': '形式运算',
+            'early_preoperational': '前运算早期',
+            'late_preoperational': '前运算晚期',
+            'early_concrete': '具体运算早期',
+            'late_concrete': '具体运算晚期',
+            'early_formal': '形式运算早期',
+            'late_formal': '形式运算晚期',
+            'adolescent': '青少年期',
         }
         print(f"   步骤 {step:>4d}: → {stage_names.get(stage, stage)}")
 
@@ -222,7 +227,7 @@ def analyze_results(trajectory_a, agent_a, stage_transitions,
 def main():
     """主函数"""
     print("开始发展阶段对比实验...")
-    print("目标：验证完整的 Piaget 四阶段发展轨迹\n")
+    print("目标：验证完整的 Piaget 八阶段发展轨迹\n")
 
     num_steps = 2000
 

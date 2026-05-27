@@ -10,7 +10,7 @@ agent.act() → environment.step() → agent.perceive()
 """
 
 import numpy as np
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Tuple, Optional
 
 
@@ -23,6 +23,55 @@ class Object:
     color: str      # 颜色属性
     shape: str      # 形状属性
     weight: float   # 重量属性（影响推动难度）
+    # 多模态特征（可选，默认自动推导）
+    sound: Optional[str] = None
+    texture: Optional[str] = None
+    affordances: Optional[List[str]] = field(default_factory=list)
+    material: Optional[str] = None
+
+    def enrich_features(self):
+        """根据现有属性自动推导缺失的多模态特征"""
+        # material → texture
+        if not self.texture:
+            material_texture = {
+                'metal': 'hard', 'wood': 'rough', 'plastic': 'smooth',
+                'glass': 'smooth', 'fabric': 'soft_tactile', 'stone': 'hard',
+            }
+            if self.material and self.material in material_texture:
+                self.texture = material_texture[self.material]
+            else:
+                # 从 weight 推导
+                self.texture = 'hard' if self.weight > 1.0 else 'soft_tactile'
+
+        # weight → sound
+        if not self.sound:
+            if self.weight > 1.3:
+                self.sound = 'loud'
+            elif self.weight < 0.7:
+                self.sound = 'quiet'
+            else:
+                self.sound = 'soft'
+
+        # shape + material → affordances
+        if not self.affordances:
+            self.affordances = ['reach']  # 所有物体都可触及
+            if self.shape == 'square':
+                self.affordances.append('support')
+            if self.shape == 'circle':
+                self.affordances.append('hit')
+            if self.material in ('glass', 'metal'):
+                self.affordances.append('contain')
+            if self.material == 'metal' and self.shape == 'triangle':
+                self.affordances.append('cut')
+
+        # material（如果没有设定，从 weight 推导）
+        if not self.material:
+            if self.weight > 1.3:
+                self.material = 'stone'
+            elif self.weight < 0.7:
+                self.material = 'fabric'
+            else:
+                self.material = 'wood'
 
     def to_observation(self) -> np.ndarray:
         """将物体转换为观测向量"""
@@ -203,10 +252,14 @@ def create_simple_world() -> SimpleGridWorld:
     """创建一个简单的测试世界"""
     env = SimpleGridWorld(10, 10)
 
-    # 添加一些物体
-    env.add_object(Object(0, 2, 2, 'red', 'circle', 1.0))
-    env.add_object(Object(1, 5, 5, 'blue', 'square', 1.5))
-    env.add_object(Object(2, 7, 3, 'green', 'triangle', 0.8))
-    env.add_object(Object(3, 3, 7, 'yellow', 'circle', 1.2))
+    # 添加一些物体（使用不同材质以产生多模态差异）
+    env.add_object(Object(0, 2, 2, 'red', 'circle', 1.0, material='metal'))
+    env.add_object(Object(1, 5, 5, 'blue', 'square', 1.5, material='stone'))
+    env.add_object(Object(2, 7, 3, 'green', 'triangle', 0.8, material='fabric'))
+    env.add_object(Object(3, 3, 7, 'yellow', 'circle', 1.2, material='wood'))
+
+    # 自动推导多模态特征
+    for obj in env.objects:
+        obj.enrich_features()
 
     return env

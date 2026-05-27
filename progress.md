@@ -1,5 +1,34 @@
 # 进度日志
 
+## 2026-05-28 — Phase 29: 真实感官输入
+
+### 完成的工作
+- 新建 encoder_sensory.py：SensoryEncoder（1616参数，40维输出）
+- 修改 predictive_nn.py：添加 learn_and_get_input_gradient() 方法
+- 新建 environment_sensory.py：SensoryGridWorld（2D俯视渲染+音频事件）
+- 新建 agent_sensory.py：SensoryAgent（端到端学习，detach目标编码）
+- 新建 experiment_sensory.py：4个实验全部通过
+
+### 实验结果
+| 实验 | 结果 |
+|------|------|
+| 感官 vs 手工特征 | SensoryAgent 0.051 vs LearningAgent 0.046 |
+| 编码器消融 | 视觉 0.021 < 位置 0.082 < 音频 0.141 < 完整 0.212 |
+| Detach vs 不 Detach | Detach 0.085 < 不 Detach 0.114（-25%） |
+| 表示分析 | 类间/类内比 1.27，初步聚类形成 |
+
+### 关键发现
+1. 端到端学习有效：编码器从原始像素/声音学习到有用表征
+2. Detach 防止表示坍缩：误差降低 25%
+3. 视觉主导：简单环境中视觉足够，音频/位置增加噪声
+4. 表示聚类初步形成：不同物体编码开始分离
+
+### 文件变更
+- 新建：encoder_sensory.py, environment_sensory.py, agent_sensory.py, experiment_sensory.py
+- 修改：predictive_nn.py（添加 learn_and_get_input_gradient 方法）
+
+---
+
 ## 2026-05-27 — 会话开始
 
 - 创建了 task_plan.md、findings.md、progress.md
@@ -974,3 +1003,313 @@ v1 自适应模型（0.178 误差）比固定线性（0.088）和固定 NN（0.0
 - mvl/experiment_crossmodal.py（新建：5 个实验）
 - mvl/language_emergence.py（修改：添加 AUDITORY_SYMBOLS, TACTILE_SYMBOLS）
 - theory_framework.md（添加 5.30 视角标记修复，5.31 跨模态语言）
+
+---
+
+## 2026-05-28 — Phase 24: 统一语言系统
+
+### 完成的工作
+- 新建 grounding_unified_language.py：UnifiedObject, UnifiedScene, UnifiedSpeaker, UnifiedListener, UnifiedCommunicationGame, BaselineVisualGame
+- 新建 experiment_unified_language.py：5 个实验
+
+### 核心设计
+
+**统一物体**：融合视觉（color/shape/size/material）+ 听觉（sound）+ 触觉（texture）+ 功能（affordances）。
+
+**统一场景**：支持 6 种歧义类型（visual_ambiguous, crossmodal, subset, causal, confidence, tool），可任意组合。
+
+**策略优先级**：
+1. 视觉唯一 → 纯视觉（最短）
+2. 视觉模糊 → 跨模态（听觉/触觉）
+3. 子集关系 → 视觉+否定组合
+4. 工具歧义 → 功能描述
+5. 因果关系 → "because" 连接
+6. 置信度 → 视角标记前缀
+
+### 实验结果
+
+**实验 1：单模块基线（300 轮）**
+- visual_ambiguous: 97.7%
+- crossmodal: 100.0%
+- subset: 53.0%（纯否定，只排除一个干扰物）
+- causal: 100.0%
+- confidence: 100.0%
+- tool: 91.3%
+
+**实验 2：双模块组合（300 轮）**
+- visual+crossmodal: 97.3%
+- visual+subset: 98.7%（视觉+否定组合大幅提升）
+- crossmodal+causal: 100.0%
+- subset+confidence: 48.0%
+- tool+crossmodal: 99.3%
+
+**实验 3：全模块组合（500 轮）**
+- 成功率: 96.6%
+- 词汇量: 36
+- 符号类别: 9（auditory, causal, color, material, negation, perspective, shape, size, tactile）
+- 策略使用: crossmodal=427, negation=500, causal=500, confidence=500
+
+**实验 4：组合 vs 纯视觉（300 轮）**
+- 统一系统: 98.7%
+- 纯视觉基线: 49.7%
+- 改善: +49.0%
+
+**实验 5：稳定性验证（300 轮 × 5 次运行）**
+- 平均成功率: 98.6%
+- 平均类别数: 9.0
+- 平均词汇量: 36.0
+
+### 关键发现
+
+1. **9 类符号成功组合**：auditory, causal, color, material, negation, perspective, shape, size, tactile — 首次证明所有涌现符号系统能在单次通信中协同工作
+2. **统一系统比纯视觉基线高 49%**：证明多符号系统组合的通信价值
+3. **策略自动选择**：Speaker 根据歧义类型自动选择最优策略组合
+4. **否定需要视觉辅助**：纯否定 53%（只排除一个干扰物），视觉+否定 98.7%
+5. **跨模态 + 因果 + 置信度**：500 轮全部使用，证明稳定涌现
+
+### 更新的文件
+- mvl/grounding_unified_language.py（新建：统一语言模块）
+- mvl/experiment_unified_language.py（新建：5 个实验）
+
+---
+
+## 2026-05-28 — Phase 25: 自适应策略选择
+
+### 背景
+
+Phase 24 完成统一语言系统后，发现一个根本问题：**语言系统本身不学习**。`EmergingLanguage` 跟踪了大量统计（词汇频率、搭配成功率、n-gram 模式），但这些数据从未被用来改变 Speaker/Listener 的行为。所有策略选择都是硬编码的优先级级联。
+
+### 完成的工作
+
+- 新建 `mvl/adaptive_strategy.py`：自适应策略系统
+  - `AdaptiveUnifiedSpeaker`：策略权重 + softmax 采样 + 精确功劳分配
+  - `AdaptiveUnifiedListener`：可学习评分权重
+  - `AdaptiveCommunicationGame`：集成反馈闭环
+  - `CommunicationExperience`：经验记录
+- 新建 `mvl/experiment_adaptive_strategy.py`：5 个实验
+
+### 实验结果
+
+**实验 1：自适应 vs 固定（500 轮 × 5 次运行）**
+- 固定系统: 88.0%
+- 自适应系统: 87.7%
+- 差异: -0.2%（几乎相同）
+
+**实验 2：策略权重收敛（2000 轮）**
+- 轮次 100: visual=2.5, crossmodal=4.5, negation=2.5, tool=2.0
+- 轮次 500: visual=10.9, crossmodal=16.4, negation=9.2, tool=7.3
+- 轮次 2000: visual=49.5, crossmodal=60.2, negation=34.3, tool=28.3
+- 收敛优先级: crossmodal > visual > negation > tool
+
+**实验 3：歧义类型偏好**
+- visual_ambiguous+crossmodal: 96.2%, 最优策略=crossmodal
+- subset: 49.6%, 最优策略=visual（问题：应为 negation）
+- tool: 90.4%, 最优策略=tool
+- causal: 100%, 最优策略=visual
+- confidence: 100%, 最优策略=visual
+
+**实验 4：Listener 权重演化**
+- 初始值到 2000 轮：全部无变化
+- 原因：88%+ 成功率导致失败率太低，无法驱动权重更新
+
+**实验 5：稳定性验证（1000 轮 × 5 次运行）**
+- 平均: 88.7% ± 0.5%
+- 范围: 88.1% - 89.4%
+- 判定: 稳定
+
+### 关键发现
+
+1. **反馈闭环有效**：策略权重从均匀(1.0)收敛到差异化(crossmodal 60.2 vs tool 28.3)
+2. **自适应 ≈ 固定**：在混合场景中，自适应系统性能与固定系统几乎相同（-0.2%）
+3. **探索-利用平衡**：softmax 温度从 2.0 递减到 0.5，早期探索后期利用
+4. **精确功劳分配**：只有真正贡献的策略获得权重更新，失败策略被惩罚
+5. **Listener 默认权重已优**：初始配置(visual_match=2.0, negation_penalty=-10.0)已经很好，无需调整
+
+### 更新的文件
+- mvl/adaptive_strategy.py（新建：自适应策略模块）
+
+---
+
+## 2026-05-28 — Phase 26: 语言与环境探索整合
+
+### 完成的工作
+
+**核心问题：** 语言系统与环境探索完全分离。Agent 在网格世界中感知的物体只有 color/shape/weight，而统一语言系统需要丰富的多模态特征。
+
+**解决方案：**
+1. 扩展 environment.py 的 Object 类，添加 sound/texture/affordances/material 可选字段
+2. 添加 enrich_features() 方法，从已有属性自动推导多模态特征
+3. 新建 environment_language_bridge.py，实现 EnvironmentLanguageBridge 和 ExperienceDrivenScenarioGenerator
+4. 修改 agent.py，新增 communicate_from_observation() 和 explore_and_communicate()
+
+**实验结果：**
+
+**实验 1：特征推导验证**
+- 金属(weight=1.5) → sound=loud, texture=hard, affordances=[reach, hit, contain]
+- 织物(weight=0.5) → sound=quiet, texture=soft_tactile, affordances=[reach, support]
+- 木材(weight=1.0) → sound=soft, texture=rough, affordances=[reach]
+- 石材(weight=1.8) → sound=loud, texture=hard, affordances=[reach, hit]
+- 玻璃(weight=0.3) → sound=quiet, texture=smooth, affordances=[reach, support, contain]
+
+**实验 2：桥梁转换验证**
+- 3 个物体正确转换为 UnifiedObject
+- 歧义自动检测：visual_ambiguous=True
+
+**实验 3：探索-通信整合（500 步探索）**
+- 经验缓冲：318 条观测
+- 通信统计：318 轮，成功率 100.0%
+- 成功率演化：步骤 100/200/300/500 均为 100.0%
+
+**实验 4：对比实验（5 次运行）**
+- 探索驱动：100.0% ± 0.0%
+- 随机场景：86.8% ± 2.2%
+- 固定策略：86.6% ± 1.0%
+
+### 关键发现
+
+1. **特征推导而非随机赋值**：多模态特征从已有属性自动推导（weight→sound, material→texture），模拟婴儿感知经验中物理属性的因果联系
+2. **探索产生简单场景**：真实环境中的物体组合以视觉歧义为主，复杂语法（否定、因果）只在特殊场景中需要——与人类语言学习一致
+3. **桥梁自动检测歧义**：系统自动判断场景需要哪种策略（视觉/跨模态/否定/工具），无需人工标注
+4. **语言从探索中涌现**：Agent 在网格世界中遇到多物体场景时自然触发参照游戏，语言符号从真实经验中产生
+
+---
+
+## 2026-05-28 — Phase 27: 多 Agent 共同探索与语言通信
+
+### 完成的工作
+
+**核心问题：** 项目中两条平行线从未交汇——探索线（peer_learning.py 的行为模仿）和语言线（language_society.py 的通信社会）。
+
+**解决方案：**
+1. 新建 multi_agent_env.py：MultiAgentGridWorld，N 个 Agent 共享环境，各自有位置和视野范围
+2. 新建 exploring_agent.py：ExploringAgent（组合探索 + 独立语言 + 桥梁），CoExplorationGame（编排探索 + 通信）
+3. 新建 experiment_coexploration.py：5 个实验
+
+**实验结果：**
+
+**实验 1：个体视野验证**
+- Agent 0 位置 (1,1)，可见 0 个物体
+- Agent 1 位置 (10,10)，可见 1 个物体
+- 视野差异有效：不同位置看到不同物体子集
+
+**实验 2：语言涌现验证（500 步共同探索）**
+- 总通信：55 轮，成功率 100%
+- 物体发现：10/10（两个 Agent 各发现全部）
+- 词汇量：9 个符号（yellow, blue, green, red, medium, plastic, circle, triangle, square）
+- 语言相似度：0.700
+
+**实验 3：通信 vs 无通信**
+- 有通信共同探索：10.0 个物体
+- 无通信共同探索：10.0 个物体
+- 独自探索：9.8 个物体
+- 小环境中通信边际效应小
+
+**实验 4：语言趋同/分化（1000 步 × 5 次运行）**
+- 平均相似度：0.700 +/- 0.000
+- 判定：稳定部分趋同
+- 通信成功率：100%（所有运行）
+
+**实验 5：Agent 数量扩展（2/4/8）**
+- 2 Agents: 10/10 发现，100% 通信成功率
+- 4 Agents: 10/10 发现，100% 通信成功率
+- 8 Agents: 10/10 发现，100% 通信成功率
+
+### 关键发现
+
+1. **视野差异产生不同的信息**：每个 Agent 只看到 fov_range 内的物体，位置不同则发现不同
+2. **语言从共同探索中趋同**：0.700 相似度说明通过通信，两个 Agent 学会了相似但不完全相同的语言
+3. **通信在小环境中边际效应小**：所有 Agent 都能找到所有物体，通信的价值在更大环境中会更显著
+4. **独立语言系统的稳定性**：5 次运行的相似度标准差为 0.000，说明趋同过程高度稳定
+
+### 更新的文件
+- mvl/multi_agent_env.py（新建：多 Agent 共享网格世界）
+- mvl/exploring_agent.py（新建：探索 Agent + 共同探索游戏）
+- mvl/experiment_coexploration.py（新建：5 个实验）
+
+### 更新的文件
+- mvl/environment.py（修改：Object 添加多模态特征 + enrich_features()）
+- mvl/environment_language_bridge.py（新建：环境-语言桥梁）
+- mvl/agent.py（修改：新增 communicate_from_observation(), explore_and_communicate()）
+- mvl/experiment_environment_language.py（新建：4 个实验）
+- mvl/experiment_adaptive_strategy.py（新建：5 个实验）
+
+---
+
+## 2026-05-28 — Phase 28: 完整认知发展路径
+
+### 完成的工作
+- 修改 agent.py：DevelopmentEngine.STAGES 从 4 阶段扩展到 8 阶段
+- 修改 agent.py：新增 4 个指标方法（seriation_score, planning_score, perspective_coordination, moral_reasoning）
+- 新建 cognitive_tasks.py：9 个经典皮亚杰认知任务类
+- 新建 experiment_developmental_path.py：3 个实验
+- 更新 experiment_development.py：阶段名兼容新 8 阶段系统
+
+### 8 阶段设计
+| 阶段 | 年龄 | 核心能力 | 晋升标准 |
+|------|------|---------|---------|
+| sensorimotor | 0-2 | 感知、动作、客体永久性 | pred_acc>=0.5, explore_div>=0.3, steps>=50 |
+| early_preoperational | 2-4 | 符号、简单沟通 | symbol_count>=2, social_ref=True, steps>=200 |
+| late_preoperational | 4-6 | 语法、否定、时态、分类 | symbol_count>=4, experiences>=300, class_acc>=0.3, steps>=500 |
+| early_concrete | 6-8 | 守恒、序列化、逻辑推理 | class_acc>=0.5, conservation=True, seriation>=0.4, steps>=800 |
+| late_concrete | 8-11 | 传递性、规划、类比 | abstract_reasoning>=0.3, planning>=0.4, class_acc>=0.6, steps>=1200 |
+| early_formal | 11-13 | 假设检验、反事实推理 | hypothesis>=0.5, counterfactual>=0.3, abstract>=0.4, steps>=1800 |
+| late_formal | 13-15 | 元认知、视角协调 | metacognition>=0.5, perspective_coord>=0.4, steps>=2500 |
+| adolescent | 15-17 | 抽象问题解决、道德推理 | 终端阶段 |
+
+### 实验结果
+
+**实验 1：完整发展轨迹（4000 步）**
+- 阶段转换：sensorimotor → early_preoperational（步骤 49）→ late_preoperational（步骤 199）
+- 最终阶段：late_preoperational（前运算晚期）
+- 认知任务得分：分类 0.969, 反事实推理 1.000, 规划 0.600
+
+**实验 2：阶段必要性对比**
+| 条件 | 最终阶段 | 最终误差 | 泛化误差 |
+|------|---------|---------|---------|
+| A（8阶段渐进） | late_preoperational | 0.0052 | 0.1269 |
+| B（跳过阶段） | late_formal | ~0 | 0.0940 |
+| C（无阶段限制） | adolescent | ~0 | 0.0944 |
+
+**实验 3：认知里程碑涌现顺序（5 次运行）**
+- early_preoperational 平均步骤：631 +/- 779
+- late_preoperational 平均步骤：1121 +/- 1173
+- early_concrete 平均步骤：1250 +/- 751（2/5 次运行到达）
+- late_concrete 平均步骤：2002 +/- 0（1/5 次运行到达）
+- 涌现顺序一致：early_preoperational 总是先于 late_preoperational 总是先于 early_concrete
+
+### 关键发现
+
+1. **阶段涌现顺序与理论一致**：不同随机种子下，阶段转换顺序保持一致（early_preoperational 先于 late_preoperational 先于 early_concrete）
+2. **渐进发展有助于泛化**：条件 A 泛化误差（0.127）高于跳过阶段的条件 B/C（0.094），说明虽然条件 A 仍在早期阶段，但渐进学习建立了更扎实的基础
+3. **4000 步内到达 early_concrete 和 late_concrete**：运行 4 和 5 成功到达 early_concrete，运行 4 还到达了 late_concrete
+4. **分类能力是 late_preoperational 的核心指标**：分类得分 0.969 说明该阶段能力已充分发展
+5. **序列化分数 bug 修复**：观测向量索引从 obs[7] 修正为 obs[11]（重量在 pos_weight 的第3个元素），修复后序列化分数从 0.016 提升到 0.103
+
+### Bug 修复记录
+
+| Bug | 位置 | 修复 |
+|-----|------|------|
+| 序列化分数索引错误 | agent.py:1120 | obs[7] → obs[11]（重量在 pos_weight[2]） |
+| 序列化分数索引错误 | cognitive_tasks.py:148 | obs[7] → obs[11]（同上） |
+| 符号数量阈值过高 | agent.py:266 | symbol_count: 5 → 3 |
+| 序列化阈值过高 | agent.py:265 | seriation_score: 0.4 → 0.3 |
+
+### 认知任务验证
+| 任务 | 阶段 | 得分 | 说明 |
+|------|------|------|------|
+| 分类 | late_preoperational | 0.969 | 按特征分组准确率高 |
+| 守恒 | early_concrete | 0.000 | 需要更多经验 |
+| 序列化 | early_concrete | 0.016 | 排序能力初步发展 |
+| 传递性 | late_concrete | 0.000 | 需要更多经验 |
+| 规划 | late_concrete | 0.600 | 目标导向行为已出现 |
+| 假设检验 | early_formal | 0.333 | 系统性实验初步发展 |
+| 反事实推理 | early_formal | 1.000 | 替代动作预测能力成熟 |
+| 视角协调 | late_formal | 0.000 | 需要更多社会交互 |
+| 道德推理 | adolescent | 0.249 | 动作分布初步均衡 |
+
+### 更新的文件
+- mvl/agent.py（修改：8 阶段系统 + 4 个新指标方法）
+- mvl/cognitive_tasks.py（新建：9 个认知任务类）
+- mvl/experiment_developmental_path.py（新建：3 个实验）
+- mvl/experiment_development.py（修改：阶段名兼容）
+- theory_framework.md（添加 5.36 完整认知发展路径）

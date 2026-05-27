@@ -156,6 +156,58 @@ class NeuralNetworkPredictor:
 
         return prediction_error
 
+    def learn_and_get_input_gradient(self, obs: np.ndarray, action: int,
+                                      actual_next_obs: np.ndarray) -> Tuple[float, np.ndarray]:
+        """
+        学习并返回输入梯度
+
+        与 learn() 相同的反向传播，但额外返回 d_loss/d_obs。
+        这个梯度传回编码器，实现端到端学习。
+
+        Returns: (prediction_error, d_obs)
+        """
+        # 前向传播
+        prediction = self.predict(obs, action)
+
+        # 计算误差
+        error = actual_next_obs - prediction
+        prediction_error = np.mean(error ** 2)
+
+        # 反向传播（与 learn() 相同）
+        d_output = -2 * error / len(error)
+
+        d_W3 = np.outer(self._cache['h2'], d_output)
+        d_b3 = d_output
+
+        d_h2 = d_output @ self.W3.T
+        d_z2 = d_h2 * self._relu_derivative(self._cache['z2'])
+
+        d_W2 = np.outer(self._cache['h1'], d_z2)
+        d_b2 = d_z2
+
+        d_h1 = d_z2 @ self.W2.T
+        d_z1 = d_h1 * self._relu_derivative(self._cache['z1'])
+
+        d_W1 = np.outer(self._cache['x'], d_z1)
+        d_b1 = d_z1
+
+        # 计算输入梯度（端到端关键，必须在权重更新前）
+        d_x = d_z1 @ self.W1.T
+        d_obs = d_x[:self.obs_dim]
+
+        # 更新权重
+        self.W3 -= self.lr * d_W3
+        self.b3 -= self.lr * d_b3
+        self.W2 -= self.lr * d_W2
+        self.b2 -= self.lr * d_b2
+        self.W1 -= self.lr * d_W1
+        self.b1 -= self.lr * d_b1
+
+        # 记录误差
+        self.error_history.append(prediction_error)
+
+        return prediction_error, d_obs
+
     def get_learning_progress(self) -> float:
         """
         计算学习进度
