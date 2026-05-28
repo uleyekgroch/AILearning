@@ -1,0 +1,81 @@
+{
+  "exp1": {
+    "teaching": {
+      "vocab_size": 20,
+      "success_rate": 0.91
+    },
+    "passive": {
+      "vocab_size": 27,
+      "success_rate": 0.906
+    },
+    "success_rate_diff": 0.0040000000000000036,
+    "vocab_diff": -7
+  },
+  "exp2": {
+    "scaffolded": [
+      {
+        "round": 100,
+        "vocab_size": 19,
+        "success_rate": 0.94
+      },
+      {
+        "round": 200,
+        "vocab_size": 19,
+        "success_rate": 0.93
+      },
+      {
+        "round": 300,
+        "vocab_size": 19,
+        "success_rate": 0.9166666666666666
+      },
+      {
+        "round": 400,
+        "vocab_size": 19,
+        "success_rate": 0.91
+      },
+      {
+        "round": 500,
+        "vocab_size": 20,
+        "success_rate": 0.902
+      }
+    ],
+    "unscaffolded": [
+      {
+        "round": 100,
+        "vocab_size": 22,
+        "success_rate": 0.87
+      },
+      {
+        "round": 200,
+        "vocab_size": 23,
+        "success_rate": 0.885
+      },
+      {
+        "round": 300,
+        "vocab_size": 23,
+        "success_rate": 0.8966666666666666
+      },
+      {
+        "round": 400,
+        "vocab_size": 23,
+        "success_rate": 0.8925
+      },
+      {
+        "round": 500,
+        "vocab_size": 23,
+        "success_rate": 0.9
+      }
+    ]
+  },
+  "exp3": {
+    "with_correction": {
+      "success_rate": 0.902,
+      "error_count": 49
+    },
+    "without_correction": {
+      "success_rate": 0.894,
+      "error_count": 53
+    },
+    "success_rate_diff": 0.008000000000000007
+  }
+}

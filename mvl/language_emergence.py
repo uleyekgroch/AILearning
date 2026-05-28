@@ -175,6 +175,7 @@ class EmergingLanguage:
         self.total_successes = 0
         self.multi_symbol_games = 0  # 使用多符号描述的游戏数
         self.tri_symbol_games = 0    # 使用 3 符号描述的游戏数
+        self.inner_speech_games = 0  # 使用内部语言的游戏数
 
     def save_state(self) -> dict:
         """导出所有学习到的状态（用于迁移学习）"""
@@ -193,6 +194,7 @@ class EmergingLanguage:
             'total_successes': self.total_successes,
             'multi_symbol_games': self.multi_symbol_games,
             'tri_symbol_games': self.tri_symbol_games,
+            'inner_speech_games': self.inner_speech_games,
         }
 
     def load_state(self, state: dict):
@@ -258,6 +260,7 @@ class EmergingLanguage:
         self.total_successes = state.get('total_successes', 0)
         self.multi_symbol_games = state.get('multi_symbol_games', 0)
         self.tri_symbol_games = state.get('tri_symbol_games', 0)
+        self.inner_speech_games = state.get('inner_speech_games', 0)
 
     def record_usage(self, symbols: List[str], success: bool):
         """记录一次符号使用（符号级 + 维度级 + 复合符号更新）"""
@@ -419,6 +422,54 @@ class EmergingLanguage:
         for sym in to_remove:
             del self.compounds[sym]
 
+    def mutate(self, mutation_rate: float = 0.05,
+               borrow_from: Optional['EmergingLanguage'] = None):
+        """
+        语言变异算子（用于文化演化模拟）
+
+        三种变异：
+        1. 简化：高频复合符号被简化为新符号
+        2. 借词：从另一个语言中采纳符号
+        3. 语义漂移：符号成功率随机偏移
+
+        参数：
+            mutation_rate: 变异概率（0-1）
+            borrow_from: 借词来源语言（可选）
+        """
+        import random as _random
+
+        # 1. 简化：高频复合符号 → 缩写
+        for sym, data in list(self.compounds.items()):
+            if data['frequency'] >= 10 and _random.random() < mutation_rate:
+                components = data['components']
+                # 取每个组件的前 2 个字符
+                short = ''.join(c[:2] for c in components)
+                if short not in self.vocabulary and short not in self.compounds:
+                    self.compounds[short] = {
+                        'components': components,
+                        'frequency': data['frequency'],
+                        'successes': data['successes'],
+                        'success_rate': data['success_rate'],
+                        'last_used': self.total_games,
+                    }
+
+        # 2. 借词
+        if borrow_from and _random.random() < mutation_rate * 2:
+            for sym, data in borrow_from.vocabulary.items():
+                if sym not in self.vocabulary and _random.random() < 0.1:
+                    self.vocabulary[sym] = {
+                        'frequency': max(1, data['frequency'] // 4),
+                        'successes': max(1, data['successes'] // 4),
+                        'success_rate': data['success_rate'],
+                    }
+
+        # 3. 语义漂移
+        for sym, data in self.vocabulary.items():
+            if _random.random() < mutation_rate:
+                drift = _random.gauss(0, 0.05)
+                data['success_rate'] = max(0.0, min(1.0,
+                    data['success_rate'] + drift))
+
     def record_modifier_order(self, cat_a: str, cat_b: str, success: bool):
         """记录形容词层级偏好（相邻词对的类别关系）"""
         key = (cat_a, cat_b)
@@ -537,9 +588,17 @@ class Speaker:
 
     def describe(self, target_features: Dict[str, str],
                  scene_features: List[Dict[str, str]],
-                 target_idx: int = -1) -> List[str]:
+                 target_idx: int = -1,
+                 scene_model: Optional[Dict] = None,
+                 listener_vocab: Optional[Dict] = None) -> List[str]:
         """
         描述目标物体，返回符号列表
+
+        参数：
+            scene_model: 可选的场景心理模型（来自 inner_describe），
+                        提供符号区分度信息，帮助选择更优描述
+            listener_vocab: 可选的听者词汇表（教学模式），
+                           优先使用听者已知的符号，每次最多引入 1 个新符号
 
         策略：
         1. 单符号能唯一标识 → 用单符号
@@ -602,7 +661,30 @@ class Speaker:
 
         # 选择最短的候选描述（同长度时优先选词汇成功率高的）
         if candidates:
-            candidates.sort(key=lambda c: (len(c), -self._candidate_score(c)))
+            if listener_vocab:
+                # 教学模式：优先选听者已知的符号，最多引入 1 个新符号
+                def _teaching_key(c):
+                    unknown = sum(1 for s in c if s not in listener_vocab)
+                    return (unknown, len(c), -self._candidate_score(c))
+                candidates.sort(key=_teaching_key)
+                # 如果最佳候选引入 >1 个新符号，尝试精简
+                best = candidates[0]
+                unknown_count = sum(1 for s in best if s not in listener_vocab)
+                if unknown_count > 1:
+                    # 尝试只保留听者已知的符号 + 1 个新符号
+                    known = [s for s in best if s in listener_vocab]
+                    new_syms = [s for s in best if s not in listener_vocab]
+                    if known and new_syms:
+                        return known + [new_syms[0]]
+                return best
+            elif scene_model:
+                # 有内部语言：优先选区分度高的描述
+                candidates.sort(key=lambda c: (
+                    len(c),
+                    -self._candidate_score_with_model(c, scene_model)
+                ))
+            else:
+                candidates.sort(key=lambda c: (len(c), -self._candidate_score(c)))
             return candidates[0]
 
         # 所有策略都失败，返回最佳正向组合
@@ -707,6 +789,25 @@ class Speaker:
                 else:
                     rates.append(0.0)
         return sum(rates) / len(rates) if rates else 0.0
+
+    def _candidate_score_with_model(self, symbols: List[str],
+                                     scene_model: Dict) -> float:
+        """
+        结合场景心理模型的候选评分
+
+        综合词汇成功率和符号区分度：
+        - 词汇成功率：历史交流经验
+        - 符号区分度：该符号在当前场景中能区分多少物体
+        """
+        base_score = self._candidate_score(symbols)
+        disc = scene_model.get('symbol_discriminability', {})
+        if not disc:
+            return base_score
+        # 区分度越高越好（1.0 = 唯一，0.5 = 2个物体共享）
+        disc_scores = [disc.get(s, 0.0) for s in symbols]
+        avg_disc = sum(disc_scores) / len(disc_scores) if disc_scores else 0.0
+        # 综合：60% 词汇成功率 + 40% 区分度
+        return 0.6 * base_score + 0.4 * avg_disc
 
     def _is_unique(self, symbol: str, scene: List[Dict[str, str]]) -> bool:
         """检查符号是否唯一标识场景中的一个物体（支持复合符号展开）"""
@@ -815,6 +916,43 @@ class Speaker:
             result.extend(remaining)
 
         return result
+
+    def inner_describe(self, scene_features: List[Dict[str, str]]) -> Dict:
+        """
+        内部语言：对场景中每个物体进行内部描述，建立心理模型
+
+        返回 scene_model:
+        - obj_descriptions: {obj_idx: [symbols]} 每个物体的最佳描述
+        - symbol_discriminability: {symbol: score} 符号的区分度
+        - shared_symbols: set 多个物体共享的符号
+        - unique_symbols: {obj_idx: set} 每个物体独有的符号
+        """
+        obj_descriptions = {}
+        symbol_usage = defaultdict(int)  # 每个符号被几个物体使用
+
+        for idx, obj in enumerate(scene_features):
+            symbols = [v for v in obj.values() if v]
+            obj_descriptions[idx] = symbols
+            for s in symbols:
+                symbol_usage[s] += 1
+
+        # 区分度：只被 1 个物体使用的符号区分度最高
+        shared_symbols = {s for s, count in symbol_usage.items() if count > 1}
+        unique_symbols = {}
+        for idx, symbols in obj_descriptions.items():
+            unique_symbols[idx] = {s for s in symbols if s not in shared_symbols}
+
+        # 符号区分度 = 1 / 使用该符号的物体数
+        symbol_discriminability = {
+            s: 1.0 / count for s, count in symbol_usage.items()
+        }
+
+        return {
+            'obj_descriptions': obj_descriptions,
+            'symbol_discriminability': symbol_discriminability,
+            'shared_symbols': shared_symbols,
+            'unique_symbols': unique_symbols,
+        }
 
 
 class Listener:
@@ -984,8 +1122,13 @@ class CommunicationGame:
 
         target = scene_features[target_idx]
 
-        # Speaker 描述目标
-        utterance = self.speaker.describe(target, scene_features)
+        # 内部语言：Speaker 先对场景进行心理建模
+        scene_model = self.speaker.inner_describe(scene_features)
+        self.language.inner_speech_games += 1
+
+        # Speaker 描述目标（使用场景心理模型辅助）
+        utterance = self.speaker.describe(target, scene_features,
+                                          scene_model=scene_model)
 
         if not utterance:
             return False
@@ -1043,6 +1186,115 @@ class CommunicationGame:
             'utterance': utterance,
             'chosen': chosen_idx,
             'success': success,
+        })
+
+        return success
+
+    def play_meta_round(self, scene_features: List[Dict[str, str]],
+                        target_idx: int,
+                        other_game: 'CommunicationGame',
+                        failed_utterance: List[str] = None,
+                        failed_chosen_idx: int = None) -> bool:
+        """
+        元语言回合：两个 Agent 讨论语言映射
+
+        核心机制：当通信失败时，双方通过元语言反馈共同学习
+
+        流程：
+        1. Speaker 描述目标
+        2. Listener 解释
+        3. 如果失败，双方都从这次交互中学习：
+           - Speaker 记录这次描述（失败）
+           - Listener 记录这次描述（成功——因为描述确实指向了目标）
+           - 双方记录相同的共现模式
+        4. 重试：Speaker 用教学模式（优先 Listener 已知的符号）
+
+        参数：
+            other_game: 另一个 Agent 的 CommunicationGame
+            failed_utterance: 之前失败的描述
+            failed_chosen_idx: 之前 Listener 的错误选择
+
+        返回：
+            是否成功（包括元语言纠正后的成功）
+        """
+        if target_idx >= len(scene_features) or not scene_features:
+            return False
+
+        target = scene_features[target_idx]
+
+        # Step 1: 获取描述
+        if failed_utterance is not None:
+            utterance = failed_utterance
+        else:
+            utterance = self.speaker.describe(target, scene_features)
+            if not utterance:
+                return False
+
+        # Step 2: 获取解释结果
+        if failed_chosen_idx is not None:
+            chosen_idx = failed_chosen_idx
+            success = False
+        else:
+            chosen_idx = other_game.listener.interpret(utterance, scene_features)
+            success = (chosen_idx == target_idx)
+
+        # 更新 Speaker 统计（失败）
+        self.language.total_games += 1
+        if success:
+            self.language.total_successes += 1
+        self.language.record_usage(utterance, success)
+
+        if not success and chosen_idx is not None:
+            # Step 3: 元语言反馈——双方共同学习
+
+            # Speaker 记录：这个描述失败了
+            # Listener 记录：这个描述其实是正确的（因为 Speaker 说的是对的）
+            # 这样双方都从这次交互中学习，词汇逐渐趋同
+            other_game.language.record_usage(utterance, True)
+
+            # 双方记录相同的共现模式
+            if len(utterance) >= 2:
+                for i in range(len(utterance) - 1):
+                    # Speaker 记录失败的共现
+                    self.language.record_collocation(
+                        utterance[i], utterance[i + 1], False
+                    )
+                    # Listener 记录成功的共现（元语言反馈告诉他这是正确的）
+                    other_game.language.record_collocation(
+                        utterance[i], utterance[i + 1], True
+                    )
+                self.language.record_ngram(utterance, False)
+                other_game.language.record_ngram(utterance, True)
+
+            # Step 4: 重试——用教学模式（优先 Listener 已知的符号）
+            new_utterance = self.speaker.describe(
+                target, scene_features,
+                listener_vocab=other_game.language.vocabulary
+            )
+            if new_utterance:
+                new_chosen = other_game.listener.interpret(new_utterance, scene_features)
+                new_success = (new_chosen == target_idx)
+                # 更新双方
+                self.language.record_usage(new_utterance, new_success)
+                other_game.language.record_usage(new_utterance, new_success)
+                if len(new_utterance) >= 2:
+                    for i in range(len(new_utterance) - 1):
+                        self.language.record_collocation(
+                            new_utterance[i], new_utterance[i + 1], new_success
+                        )
+                        other_game.language.record_collocation(
+                            new_utterance[i], new_utterance[i + 1], new_success
+                        )
+                if new_success:
+                    success = True
+
+        # 记录日志
+        self.game_log.append({
+            'target': target,
+            'utterance': utterance,
+            'chosen': chosen_idx,
+            'success': success,
+            'meta': True,
         })
 
         return success

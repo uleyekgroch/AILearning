@@ -1,0 +1,104 @@
+{
+  "exp1": {
+    "snapshots": [
+      {
+        "round": 100,
+        "success_rate": 0.92,
+        "vocab_size": 16,
+        "inner_speech_games": 100,
+        "length_diff": 0
+      },
+      {
+        "round": 200,
+        "success_rate": 0.925,
+        "vocab_size": 17,
+        "inner_speech_games": 200,
+        "length_diff": 0
+      },
+      {
+        "round": 300,
+        "success_rate": 0.9233333333333333,
+        "vocab_size": 21,
+        "inner_speech_games": 300,
+        "length_diff": 0
+      },
+      {
+        "round": 400,
+        "success_rate": 0.9225,
+        "vocab_size": 32,
+        "inner_speech_games": 400,
+        "length_diff": 0
+      },
+      {
+        "round": 500,
+        "success_rate": 0.916,
+        "vocab_size": 36,
+        "inner_speech_games": 500,
+        "length_diff": 0
+      }
+    ],
+    "total_games": 500
+  },
+  "exp2": {
+    "with_inner": {
+      "avg_length": 1.49,
+      "success_rate": 0.92
+    },
+    "without_inner": {
+      "avg_length": 1.56,
+      "success_rate": 0.88
+    },
+    "success_rate_diff": 0.040000000000000036,
+    "length_diff": -0.07000000000000006
+  },
+  "exp3": {
+    "8": {
+      "with_inner": {
+        "avg_length": 1.5,
+        "success_rate": 0.92
+      },
+      "without_inner": {
+        "avg_length": 1.44,
+        "success_rate": 0.9
+      },
+      "success_diff": 0.020000000000000018,
+      "length_diff": 0.06000000000000005
+    },
+    "12": {
+      "with_inner": {
+        "avg_length": 1.76,
+        "success_rate": 0.88
+      },
+      "without_inner": {
+        "avg_length": 1.53,
+        "success_rate": 0.97
+      },
+      "success_diff": -0.08999999999999997,
+      "length_diff": 0.22999999999999998
+    },
+    "20": {
+      "with_inner": {
+        "avg_length": 1.95,
+        "success_rate": 0.82
+      },
+      "without_inner": {
+        "avg_length": 1.81,
+        "success_rate": 0.81
+      },
+      "success_diff": 0.009999999999999898,
+      "length_diff": 0.1399999999999999
+    },
+    "30": {
+      "with_inner": {
+        "avg_length": 2.28,
+        "success_rate": 0.84
+      },
+      "without_inner": {
+        "avg_length": 2.3,
+        "success_rate": 0.78
+      },
+      "success_diff": 0.05999999999999994,
+      "length_diff": -0.020000000000000018
+    }
+  }
+}

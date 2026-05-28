@@ -1,0 +1,214 @@
+{
+  "exp1": {
+    "generations": [
+      {
+        "generation": 1,
+        "vocab_size": 31,
+        "compound_count": 14,
+        "success_rate": 0.9166666666666666,
+        "avg_length": 1.69,
+        "total_games": 300
+      },
+      {
+        "generation": 2,
+        "vocab_size": 37,
+        "compound_count": 23,
+        "success_rate": 0.9083333333333333,
+        "avg_length": 1.49,
+        "total_games": 600
+      },
+      {
+        "generation": 3,
+        "vocab_size": 44,
+        "compound_count": 22,
+        "success_rate": 0.9033333333333333,
+        "avg_length": 1.56,
+        "total_games": 900
+      },
+      {
+        "generation": 4,
+        "vocab_size": 47,
+        "compound_count": 15,
+        "success_rate": 0.9058333333333334,
+        "avg_length": 1.67,
+        "total_games": 1200
+      },
+      {
+        "generation": 5,
+        "vocab_size": 53,
+        "compound_count": 30,
+        "success_rate": 0.9073333333333333,
+        "avg_length": 1.45,
+        "total_games": 1500
+      },
+      {
+        "generation": 6,
+        "vocab_size": 56,
+        "compound_count": 20,
+        "success_rate": 0.9011111111111111,
+        "avg_length": 1.45,
+        "total_games": 1800
+      },
+      {
+        "generation": 7,
+        "vocab_size": 62,
+        "compound_count": 23,
+        "success_rate": 0.9004761904761904,
+        "avg_length": 1.52,
+        "total_games": 2100
+      },
+      {
+        "generation": 8,
+        "vocab_size": 73,
+        "compound_count": 30,
+        "success_rate": 0.90125,
+        "avg_length": 1.37,
+        "total_games": 2400
+      },
+      {
+        "generation": 9,
+        "vocab_size": 79,
+        "compound_count": 26,
+        "success_rate": 0.9018518518518519,
+        "avg_length": 1.44,
+        "total_games": 2700
+      },
+      {
+        "generation": 10,
+        "vocab_size": 81,
+        "compound_count": 24,
+        "success_rate": 0.9006666666666666,
+        "avg_length": 1.57,
+        "total_games": 3000
+      }
+    ]
+  },
+  "exp2": {
+    "overlaps": [
+      {
+        "generation": 1,
+        "overlap": 0.6470588235294118,
+        "vocab_a": 28,
+        "vocab_b": 28
+      },
+      {
+        "generation": 2,
+        "overlap": 0.7804878048780488,
+        "vocab_a": 35,
+        "vocab_b": 38
+      },
+      {
+        "generation": 3,
+        "overlap": 0.7551020408163265,
+        "vocab_a": 41,
+        "vocab_b": 45
+      },
+      {
+        "generation": 4,
+        "overlap": 0.7857142857142857,
+        "vocab_a": 51,
+        "vocab_b": 49
+      },
+      {
+        "generation": 5,
+        "overlap": 0.7777777777777778,
+        "vocab_a": 55,
+        "vocab_b": 57
+      },
+      {
+        "generation": 6,
+        "overlap": 0.7391304347826086,
+        "vocab_a": 60,
+        "vocab_b": 60
+      },
+      {
+        "generation": 7,
+        "overlap": 0.7012987012987013,
+        "vocab_a": 65,
+        "vocab_b": 66
+      },
+      {
+        "generation": 8,
+        "overlap": 0.7023809523809523,
+        "vocab_a": 72,
+        "vocab_b": 71
+      },
+      {
+        "generation": 9,
+        "overlap": 0.7159090909090909,
+        "vocab_a": 78,
+        "vocab_b": 73
+      },
+      {
+        "generation": 10,
+        "overlap": 0.6881720430107527,
+        "vocab_a": 79,
+        "vocab_b": 78
+      }
+    ]
+  },
+  "exp3": {
+    "drift": [
+      {
+        "generation": 1,
+        "avg_drift": 0.001079005568816215,
+        "success_rate": 0.9133333333333333,
+        "vocab_size": 24
+      },
+      {
+        "generation": 2,
+        "avg_drift": 0.00034047673767642454,
+        "success_rate": 0.9,
+        "vocab_size": 34
+      },
+      {
+        "generation": 3,
+        "avg_drift": 0.001316978010099079,
+        "success_rate": 0.8966666666666666,
+        "vocab_size": 40
+      },
+      {
+        "generation": 4,
+        "avg_drift": 4.816975575794807e-05,
+        "success_rate": 0.9016666666666666,
+        "vocab_size": 44
+      },
+      {
+        "generation": 5,
+        "avg_drift": 0.0012179333687418726,
+        "success_rate": 0.9046666666666666,
+        "vocab_size": 51
+      },
+      {
+        "generation": 6,
+        "avg_drift": 0.001140774312087632,
+        "success_rate": 0.9033333333333333,
+        "vocab_size": 62
+      },
+      {
+        "generation": 7,
+        "avg_drift": 0.0011042393239103112,
+        "success_rate": 0.9042857142857142,
+        "vocab_size": 66
+      },
+      {
+        "generation": 8,
+        "avg_drift": 0.002179314440781753,
+        "success_rate": 0.9029166666666667,
+        "vocab_size": 70
+      },
+      {
+        "generation": 9,
+        "avg_drift": 0.0023838729906824896,
+        "success_rate": 0.9044444444444445,
+        "vocab_size": 72
+      },
+      {
+        "generation": 10,
+        "avg_drift": 0.001867690718559843,
+        "success_rate": 0.9046666666666666,
+        "vocab_size": 78
+      }
+    ]
+  }
+}

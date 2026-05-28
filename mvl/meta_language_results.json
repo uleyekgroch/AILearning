@@ -1,0 +1,144 @@
+{
+  "exp1": {
+    "snapshots": [
+      {
+        "round": 100,
+        "success_rate_a": 0.93,
+        "vocab_a": 16,
+        "overlap": 0.9375,
+        "meta_rounds": 10,
+        "meta_successes": 0
+      },
+      {
+        "round": 200,
+        "success_rate_a": 0.9353233830845771,
+        "vocab_a": 18,
+        "overlap": 0.6818181818181818,
+        "meta_rounds": 20,
+        "meta_successes": 0
+      },
+      {
+        "round": 300,
+        "success_rate_a": 0.9238410596026491,
+        "vocab_a": 23,
+        "overlap": 0.4166666666666667,
+        "meta_rounds": 30,
+        "meta_successes": 0
+      },
+      {
+        "round": 400,
+        "success_rate_a": 0.9228855721393034,
+        "vocab_a": 29,
+        "overlap": 0.30612244897959184,
+        "meta_rounds": 40,
+        "meta_successes": 0
+      },
+      {
+        "round": 500,
+        "success_rate_a": 0.9087301587301587,
+        "vocab_a": 31,
+        "overlap": 0.2830188679245283,
+        "meta_rounds": 50,
+        "meta_successes": 0
+      }
+    ],
+    "meta_rounds": 50,
+    "meta_successes": 0
+  },
+  "exp2": {
+    "with_meta": [
+      {
+        "round": 100,
+        "success_rate": 0.8,
+        "vocab_size": 14,
+        "overlap": 0.7142857142857143
+      },
+      {
+        "round": 200,
+        "success_rate": 0.8592233009708737,
+        "vocab_size": 19,
+        "overlap": 0.5263157894736842
+      },
+      {
+        "round": 300,
+        "success_rate": 0.8827361563517915,
+        "vocab_size": 26,
+        "overlap": 0.46153846153846156
+      },
+      {
+        "round": 400,
+        "success_rate": 0.8804878048780488,
+        "vocab_size": 30,
+        "overlap": 0.4
+      },
+      {
+        "round": 500,
+        "success_rate": 0.8830409356725146,
+        "vocab_size": 31,
+        "overlap": 0.3870967741935484
+      }
+    ],
+    "without_meta": [
+      {
+        "round": 100,
+        "success_rate": 0.85,
+        "vocab_size": 14,
+        "overlap": 0.9333333333333333
+      },
+      {
+        "round": 200,
+        "success_rate": 0.885,
+        "vocab_size": 20,
+        "overlap": 1.0
+      },
+      {
+        "round": 300,
+        "success_rate": 0.8833333333333333,
+        "vocab_size": 27,
+        "overlap": 0.8666666666666667
+      },
+      {
+        "round": 400,
+        "success_rate": 0.885,
+        "vocab_size": 31,
+        "overlap": 0.90625
+      },
+      {
+        "round": 500,
+        "success_rate": 0.886,
+        "vocab_size": 34,
+        "overlap": 0.9411764705882353
+      }
+    ]
+  },
+  "exp3": {
+    "initial_overlap": 0.7142857142857143,
+    "final_overlap": 0.28846153846153844,
+    "overlaps": [
+      {
+        "round": 50,
+        "overlap": 0.5555555555555556
+      },
+      {
+        "round": 100,
+        "overlap": 0.45454545454545453
+      },
+      {
+        "round": 150,
+        "overlap": 0.3409090909090909
+      },
+      {
+        "round": 200,
+        "overlap": 0.3191489361702128
+      },
+      {
+        "round": 250,
+        "overlap": 0.3
+      },
+      {
+        "round": 300,
+        "overlap": 0.28846153846153844
+      }
+    ]
+  }
+}
