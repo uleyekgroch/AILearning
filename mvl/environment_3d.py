@@ -7,6 +7,8 @@
 3. 丰富材质：7 种（metal, wood, plastic, glass, rubber, stone, fabric）
 4. 增强渲染：不同形状不同投影
 5. 增强特征：14 维物体特征向量
+6. 流体粒子系统（Phase 48）
+7. 软体弹簧-质点系统（Phase 48）
 """
 
 import numpy as np
@@ -185,6 +187,10 @@ class PhysicsWorld3D:
         self._far = 20.0
         self._render_size = 64
 
+        # 流体/软体系统（Phase 48）
+        self._fluid_system = None
+        self._soft_bodies = []
+
     def add_object(self, position: np.ndarray, mass: float = 1.0,
                    radius: float = 0.3, material: str = 'wood',
                    shape: str = 'sphere', size: Optional[np.ndarray] = None,
@@ -245,6 +251,54 @@ class PhysicsWorld3D:
                                        material=mat, shape=shape, size=size))
         return ids
 
+    # ----------------------------------------------------------
+    # 流体/软体接口（Phase 48）
+    # ----------------------------------------------------------
+
+    def add_fluid(self, center: np.ndarray, count: int = 50,
+                  spread: float = 0.5, viscosity: float = 0.1) -> str:
+        """添加流体粒子系统，返回 'fluid'"""
+        from physics_fluid import FluidParticleSystem
+        if self._fluid_system is None:
+            self._fluid_system = FluidParticleSystem(
+                bounds=tuple(self.bounds), viscosity=viscosity
+            )
+        self._fluid_system.add_particles(np.array(center, dtype=np.float32), count, spread)
+        return 'fluid'
+
+    def add_soft_body(self, center: np.ndarray, size: np.ndarray,
+                      shape: str = 'box', mass: float = 1.0,
+                      stiffness: float = 50.0) -> int:
+        """添加软体，返回索引"""
+        from physics_soft import SoftBox
+        if shape == 'box':
+            sb = SoftBox(center.tolist(), size.tolist(), mass, stiffness)
+        else:
+            sb = SoftBox(center.tolist(), size.tolist(), mass, stiffness)
+        self._soft_bodies.append(sb)
+        return len(self._soft_bodies) - 1
+
+    def get_fluid_features(self) -> Optional[dict]:
+        """获取流体特征"""
+        if self._fluid_system and self._fluid_system.particles:
+            return self._fluid_system.get_features()
+        return None
+
+    def get_soft_body_features(self) -> list:
+        """获取所有软体特征"""
+        features = []
+        for i, sb in enumerate(self._soft_bodies):
+            deform = sb.get_deformation() if hasattr(sb, 'get_deformation') else 0
+            center = sb.get_center() if hasattr(sb, 'get_center') else np.zeros(3)
+            features.append({
+                'type': 'soft_body',
+                'index': i,
+                'deformation': 'deformed' if deform > 0.1 else 'stable',
+                'height': 'high' if center[2] > self.bounds[2] * 0.6 else
+                          'low' if center[2] < self.bounds[2] * 0.3 else 'mid',
+            })
+        return features
+
     def step(self, action) -> Observation3D:
         """
         执行一步物理模拟
@@ -288,6 +342,29 @@ class PhysicsWorld3D:
 
         # 8. 更新持有物体位置
         self._update_held_object()
+
+        # 8.5 流体/软体更新（Phase 48）
+        if self._fluid_system:
+            self._fluid_system.step(self.dt)
+            # 流体与刚体碰撞
+            for obj in self.objects:
+                if not obj.is_static:
+                    self._fluid_system.collide_with_sphere(
+                        obj.position, obj.get_bounding_radius(), obj.velocity
+                    )
+            # 流体与 Agent 碰撞
+            self._fluid_system.collide_with_sphere(
+                self.agent_pos, self.agent_radius, self.agent_vel
+            )
+        for sb in self._soft_bodies:
+            sb.update(self.dt, abs(self.gravity))
+            # 软体与刚体碰撞
+            for obj in self.objects:
+                if not obj.is_static:
+                    sb.collide_with_sphere(
+                        obj.position, obj.get_bounding_radius(), obj.velocity,
+                        obj.get_effective_mass()
+                    )
 
         # 9. 渲染
         visual, depth = self._render()
@@ -802,6 +879,74 @@ class PhysicsWorld3D:
             else:  # cylinder
                 self._draw_cylinder(visual, depth_buf, px, py, proj_radius, z_cam, color)
 
+        # 流体粒子渲染（Phase 48）
+        if self._fluid_system:
+            fluid_color = np.array([0.2, 0.4, 0.9])  # 蓝色
+            for p in self._fluid_system.particles:
+                to_pt = p.position - cam_pos
+                z_cam = np.dot(to_pt, forward)
+                if self._near < z_cam < self._far:
+                    x_screen = f * np.dot(to_pt, right) / z_cam
+                    y_screen = f * np.dot(to_pt, up) / z_cam
+                    px = int((x_screen + 1) * size / 2)
+                    py = int((1 - y_screen) * size / 2)
+                    pr = max(1, int(0.1 * f / z_cam))
+                    for dy in range(-pr, pr + 1):
+                        for dx in range(-pr, pr + 1):
+                            if dx*dx + dy*dy <= pr*pr:
+                                sx, sy = px + dx, py + dy
+                                if 0 <= sx < size and 0 <= sy < size:
+                                    if z_cam < depth_buf[sy, sx]:
+                                        brightness = max(0.3, 1.0 - z_cam / self._far)
+                                        visual[sy, sx] = fluid_color * brightness
+                                        depth_buf[sy, sx] = z_cam
+
+        # 软体渲染（Phase 48）— 绘制节点和弹簧
+        for sb in self._soft_bodies:
+            soft_color = np.array([0.8, 0.5, 0.3])  # 橙色
+            spring_color = np.array([0.5, 0.3, 0.2])  # 暗橙色
+            # 绘制弹簧（线段）
+            if hasattr(sb, 'springs') and hasattr(sb, 'points'):
+                for spring in sb.springs:
+                    p1 = sb.points[spring.point1_idx]
+                    p2 = sb.points[spring.point2_idx]
+                    pos1 = np.array([p1.x, p1.y, p1.z])
+                    pos2 = np.array([p2.x, p2.y, p2.z])
+                    # 简化：只绘制中点
+                    mid = (pos1 + pos2) / 2
+                    to_pt = mid - cam_pos
+                    z_cam = np.dot(to_pt, forward)
+                    if self._near < z_cam < self._far:
+                        x_screen = f * np.dot(to_pt, right) / z_cam
+                        y_screen = f * np.dot(to_pt, up) / z_cam
+                        px = int((x_screen + 1) * size / 2)
+                        py = int((1 - y_screen) * size / 2)
+                        if 0 <= px < size and 0 <= py < size:
+                            if z_cam < depth_buf[py, px]:
+                                brightness = max(0.3, 1.0 - z_cam / self._far)
+                                visual[py, px] = spring_color * brightness
+                                depth_buf[py, px] = z_cam
+                # 绘制节点
+                for pt in sb.points:
+                    pos = np.array([pt.x, pt.y, pt.z])
+                    to_pt = pos - cam_pos
+                    z_cam = np.dot(to_pt, forward)
+                    if self._near < z_cam < self._far:
+                        x_screen = f * np.dot(to_pt, right) / z_cam
+                        y_screen = f * np.dot(to_pt, up) / z_cam
+                        px = int((x_screen + 1) * size / 2)
+                        py = int((1 - y_screen) * size / 2)
+                        pr = max(1, int(0.15 * f / z_cam))
+                        for dy in range(-pr, pr + 1):
+                            for dx in range(-pr, pr + 1):
+                                if dx*dx + dy*dy <= pr*pr:
+                                    sx, sy = px + dx, py + dy
+                                    if 0 <= sx < size and 0 <= sy < size:
+                                        if z_cam < depth_buf[sy, sx]:
+                                            brightness = max(0.3, 1.0 - z_cam / self._far)
+                                            visual[sy, sx] = soft_color * brightness
+                                            depth_buf[sy, sx] = z_cam
+
         # 地面网格
         for gx in range(int(self.bounds[0]) + 1):
             for gy in range(int(self.bounds[1]) + 1):
@@ -984,3 +1129,5 @@ class PhysicsWorld3D:
         self.grip_strength = 0.0
         self.throw_ready = 0.0
         self._audio_events = []
+        self._fluid_system = None
+        self._soft_bodies = []

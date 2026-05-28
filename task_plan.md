@@ -1028,3 +1028,35 @@ Region 0 vs Region 1 差异最大（0.48），Region 2 vs Region 4 最相似（0
 - mvl/active_inference.py（改写：添加 select_action_batch）
 - mvl/language_society_large.py（改写：GPU 批量相似度）
 - mvl/experiment_large_society_cuda.py（新建：1000+ Agent 实验）
+
+## Phase 48: 流体与软体物理
+**Status:** complete ✅
+
+在 3D 物理世界中加入流体（SPH 粒子）和软体（弹簧-质点），让 Agent 学习更丰富的物理直觉。
+
+### 新增模块
+| 模块 | 变更 | 功能 |
+|------|------|------|
+| physics_fluid.py | 扩展 SPH 粒子系统 | 流体阻力、浮力、粘性、压力 |
+| physics_soft.py | 扩展软体系统 | 弹簧-质点、形变恢复 |
+| environment_3d.py | 集成流体/软体 | add_fluid(), add_soft_body() |
+
+### 实验结果
+| 实验 | 结果 | 状态 |
+|------|------|------|
+| 流体物理发现 | 流体扩散 0.295, 刚体聚集 | PASS |
+| 流体语言涌现 | 学习 `liquid` 符号 | PASS |
+| 软体碰撞实验 | 软体形变 0.309 | PASS |
+| 混合场景语言 | `liquid`/`deformed`/`metal` 涌现 | PASS |
+
+### 关键发现
+1. 流体粒子在重力下自然下落并扩散，与刚体行为形成鲜明对比
+2. 软体受压后形变（0.309），释放后恢复
+3. 语言系统从物理特征中涌现材质相关词汇
+4. 去掉 type 标签后，Agent 必须通过物理属性区分物体类型
+
+### 更新的文件
+- mvl/physics_fluid.py（扩展：SPH 粒子流体系统）
+- mvl/physics_soft.py（扩展：软体弹簧-质点系统）
+- mvl/environment_3d.py（集成流体/软体）
+- mvl/experiment_fluid_soft.py（新建：4 个实验）

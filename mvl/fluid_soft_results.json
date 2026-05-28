@@ -1,0 +1,51 @@
+{
+  "fluid_discovery": {
+    "rigid": {
+      "initial_height": 2.451359714244515,
+      "final_height": 0.24202700960344056,
+      "height_drop": 2.2093327046410747,
+      "spread": 0
+    },
+    "fluid": {
+      "initial_height": 2.4762623852700925,
+      "final_height": 0.0,
+      "height_drop": 2.4762623852700925,
+      "spread": 0.29485324769285387
+    }
+  },
+  "fluid_language": {
+    "success_rate": 1.0,
+    "fluid_symbols": [
+      "liquid"
+    ],
+    "total_symbols": 3
+  },
+  "soft_collision": {
+    "rigid": {
+      "collision_events": 0,
+      "avg_deformation": 0,
+      "avg_movement": 0.009850349020920328
+    },
+    "soft": {
+      "collision_events": 0,
+      "avg_deformation": 0.3094886622180199,
+      "avg_movement": 0
+    }
+  },
+  "mixed_language": {
+    "success_rate": 1.0,
+    "material_vocab": {
+      "liquid": [
+        "liquid"
+      ],
+      "rubber": [
+        "deformed",
+        "small"
+      ],
+      "metal": [
+        "metal"
+      ]
+    },
+    "total_symbols": 4
+  }
+}

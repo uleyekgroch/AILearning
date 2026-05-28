@@ -118,4 +118,31 @@
 1. 单 Agent CUDA 转换开销 > 计算收益：批量相似度计算（跨 Agent）比逐对计算快 9x
 2. encoder_sensory Conv2D 使用 PyTorch 后 0.7ms/step（含 GPU warmup）
 3. 1000 Agent 在小世界网络下语言快速趋同，形成 1 个主导语言家族
+
+## 2026-05-28: Phase 48 流体与软体物理
+
+### 完成的工作
+1. 扩展 `mvl/physics_fluid.py` — 添加 SPH 粒子流体系统（FluidParticleSystem）
+   - 空间哈希加速邻域查找 O(n)
+   - 密度-压力-粘性力-重力完整 SPH 管线
+   - `collide_with_sphere()` 流体与刚体碰撞
+2. 扩展 `mvl/physics_soft.py` — 添加软体弹簧-质点系统（SoftBox, SoftBodySystem）
+   - 8 角节点 + 22 弹簧（12 边 + 6 面对角 + 4 体对角）
+   - 形变恢复力 + 碰撞检测
+3. 集成到 `mvl/environment_3d.py` — `add_fluid()`, `add_soft_body()`, 渲染扩展
+4. 新建 `mvl/experiment_fluid_soft.py` — 4 个实验
+
+### 实验结果
+| 实验 | 结果 | 状态 |
+|------|------|------|
+| 流体物理发现 | 流体扩散 0.295, 刚体聚集 | PASS |
+| 流体语言涌现 | 学习 `liquid` 符号, 100% 成功 | PASS |
+| 软体碰撞实验 | 软体形变 0.309, 刚体移动 0.010 | PASS |
+| 混合场景语言 | `liquid`/`deformed`/`metal` 材质词汇涌现 | PASS |
+
+### 关键发现
+1. 流体粒子在重力下自然下落并扩散，与刚体行为形成鲜明对比
+2. 软体受压后形变（0.309），释放后恢复，验证弹簧-质点模型有效
+3. 语言系统从物理特征中涌现材质相关词汇：liquid（流体）、deformed（软体）、metal（刚体）
+4. 去掉 type 标签后，Agent 必须通过物理属性（material, behavior, hardness）区分物体类型
 4. 小世界网络拓扑阻止方言分化：短路径长度使信息快速传播

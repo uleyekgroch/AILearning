@@ -416,3 +416,242 @@ def create_soft_body_scene() -> SoftBody:
     soft_body = SoftBody(5.0, 5.0, 3.0, radius=1.0, num_points=20,
                         mass=2.0, stiffness=150.0)
     return soft_body
+
+
+# ============================================================
+# SoftBodySystem：软体管理器 + 增强功能（Phase 48 新增）
+# ============================================================
+
+class SoftBox:
+    """
+    软体盒子：8 角节点 + 弹簧连接
+
+    受压时形变，释放后恢复。
+    结构：12 条边弹簧 + 6 条面对角线 + 4 条体对角线 = 22 条弹簧。
+    """
+
+    def __init__(self, center: List[float], size: List[float],
+                 mass: float = 1.0, stiffness: float = 50.0,
+                 damping: float = 0.5, recovery_rate: float = 0.01):
+        cx, cy, cz = center
+        sx, sy, sz = size
+        self.recovery_rate = recovery_rate
+
+        # 8 个角节点
+        self.points: List[MassPoint] = []
+        corners = [
+            (cx - sx, cy - sy, cz - sz), (cx + sx, cy - sy, cz - sz),
+            (cx - sx, cy + sy, cz - sz), (cx + sx, cy + sy, cz - sz),
+            (cx - sx, cy - sy, cz + sz), (cx + sx, cy - sy, cz + sz),
+            (cx - sx, cy + sy, cz + sz), (cx + sx, cy + sy, cz + sz),
+        ]
+        node_mass = mass / 8
+        for x, y, z in corners:
+            self.points.append(MassPoint(x, y, z, node_mass))
+
+        # 弹簧连接
+        self.springs: List[Spring] = []
+
+        # 边弹簧（12 条）
+        edges = [
+            (0, 1), (2, 3), (4, 5), (6, 7),  # x 方向
+            (0, 2), (1, 3), (4, 6), (5, 7),  # y 方向
+            (0, 4), (1, 5), (2, 6), (3, 7),  # z 方向
+        ]
+        for i, j in edges:
+            rest = self._dist(i, j)
+            self.springs.append(Spring(i, j, rest, stiffness, damping))
+
+        # 面对角线弹簧（6 条）
+        face_diags = [
+            (0, 3), (1, 2),  # 底面
+            (4, 7), (5, 6),  # 顶面
+            (0, 5), (1, 4),  # 前面
+            (2, 7), (3, 6),  # 后面
+        ]
+        # 去重：取前 6 条
+        seen = set()
+        for i, j in face_diags:
+            key = (min(i, j), max(i, j))
+            if key not in seen:
+                seen.add(key)
+                rest = self._dist(i, j)
+                self.springs.append(Spring(i, j, rest, stiffness * 0.5, damping))
+                if len(seen) >= 6:
+                    break
+
+        # 体对角线弹簧（4 条）
+        body_diags = [(0, 7), (1, 6), (2, 5), (3, 4)]
+        for i, j in body_diags:
+            rest = self._dist(i, j)
+            self.springs.append(Spring(i, j, rest, stiffness * 0.3, damping))
+
+        # 保存原始位置用于恢复力
+        self.rest_positions = [(p.x, p.y, p.z) for p in self.points]
+
+    def _dist(self, i: int, j: int) -> float:
+        p1, p2 = self.points[i], self.points[j]
+        return np.sqrt((p2.x - p1.x)**2 + (p2.y - p1.y)**2 + (p2.z - p1.z)**2)
+
+    def update(self, dt: float, gravity: float = 9.81):
+        """更新软体盒子"""
+        # 重力
+        for p in self.points:
+            if not p.is_fixed:
+                p.vz -= gravity * dt
+
+        # 弹簧力
+        for spring in self.springs:
+            p1 = self.points[spring.point1_idx]
+            p2 = self.points[spring.point2_idx]
+            dx, dy, dz = p2.x - p1.x, p2.y - p1.y, p2.z - p1.z
+            dist = np.sqrt(dx**2 + dy**2 + dz**2)
+            if dist < 0.001:
+                continue
+
+            displacement = dist - spring.rest_length
+            force_mag = spring.stiffness * displacement
+
+            rel_vel = np.array([p2.vx - p1.vx, p2.vy - p1.vy, p2.vz - p1.vz])
+            direction = np.array([dx, dy, dz]) / dist
+            damp_force = spring.damping * np.dot(rel_vel, direction)
+
+            total = (force_mag + damp_force) * direction
+            if not p1.is_fixed:
+                p1.vx += total[0] / p1.mass * dt
+                p1.vy += total[1] / p1.mass * dt
+                p1.vz += total[2] / p1.mass * dt
+            if not p2.is_fixed:
+                p2.vx -= total[0] / p2.mass * dt
+                p2.vy -= total[1] / p2.mass * dt
+                p2.vz -= total[2] / p2.mass * dt
+
+        # 恢复力：缓慢恢复原始形状
+        for i, p in enumerate(self.points):
+            if p.is_fixed:
+                continue
+            rx, ry, rz = self.rest_positions[i]
+            p.vx += (rx - p.x) * self.recovery_rate
+            p.vy += (ry - p.y) * self.recovery_rate
+            p.vz += (rz - p.z) * self.recovery_rate
+
+        # 积分 + 约束
+        for p in self.points:
+            if not p.is_fixed:
+                p.x += p.vx * dt
+                p.y += p.vy * dt
+                p.z += p.vz * dt
+                if p.z < 0:
+                    p.z = 0
+                    p.vz = -p.vz * 0.5
+                p.vx *= 0.99
+                p.vy *= 0.99
+                p.vz *= 0.99
+
+    def get_deformation(self) -> float:
+        """形变程度 = 当前形状与原始形状的平均距离"""
+        total = 0.0
+        for i, p in enumerate(self.points):
+            rx, ry, rz = self.rest_positions[i]
+            total += np.sqrt((p.x - rx)**2 + (p.y - ry)**2 + (p.z - rz)**2)
+        return total / len(self.points)
+
+    def collide_with_sphere(self, center: np.ndarray, radius: float,
+                            velocity: np.ndarray = None, mass: float = 2.0):
+        """软体节点与球形物体碰撞"""
+        if velocity is None:
+            velocity = np.zeros(3)
+        for p in self.points:
+            dx = p.x - center[0]
+            dy = p.y - center[1]
+            dz = p.z - center[2]
+            dist = np.sqrt(dx**2 + dy**2 + dz**2)
+            min_dist = radius + 0.05  # 节点半径
+            if dist < min_dist and dist > 1e-6:
+                nx, ny, nz = dx / dist, dy / dist, dz / dist
+                # 推出
+                p.x = center[0] + nx * min_dist
+                p.y = center[1] + ny * min_dist
+                p.z = center[2] + nz * min_dist
+                # 反射速度
+                v_rel = np.array([p.vx, p.vy, p.vz]) - velocity
+                v_n = v_rel[0] * nx + v_rel[1] * ny + v_rel[2] * nz
+                if v_n < 0:
+                    p.vx -= 1.2 * v_n * nx
+                    p.vy -= 1.2 * v_n * ny
+                    p.vz -= 1.2 * v_n * nz
+
+    def get_center(self) -> np.ndarray:
+        return np.array([
+            np.mean([p.x for p in self.points]),
+            np.mean([p.y for p in self.points]),
+            np.mean([p.z for p in self.points]),
+        ])
+
+
+class SoftBodySystem:
+    """
+    软体系统管理器
+
+    管理多个软体，提供统一接口。
+    """
+
+    def __init__(self, bounds: Tuple[float, float, float] = (10.0, 10.0, 5.0),
+                 gravity: float = 9.81):
+        self.bounds = bounds
+        self.gravity = gravity
+        self.bodies: List[SoftBox] = []
+        self.cloth: Optional[Cloth] = None
+        self.rope: Optional[Rope] = None
+
+    def add_box(self, center: List[float], size: List[float],
+                mass: float = 1.0, stiffness: float = 50.0) -> int:
+        """添加一个软体盒子"""
+        box = SoftBox(center, size, mass, stiffness)
+        self.bodies.append(box)
+        return len(self.bodies) - 1
+
+    def add_blob(self, center: List[float], radius: float,
+                 mass: float = 1.0, stiffness: float = 150.0) -> int:
+        """添加一个球形软体"""
+        blob = SoftBody(center[0], center[1], center[2], radius,
+                        num_points=16, mass=mass, stiffness=stiffness)
+        # 包装为 SoftBox 兼容接口
+        self.bodies.append(blob)
+        return len(self.bodies) - 1
+
+    def add_cloth(self, width: float, height: float,
+                  num_x: int = 10, num_y: int = 10) -> int:
+        """添加布料"""
+        self.cloth = Cloth(width, height, num_x, num_y)
+        return -1  # 特殊索引
+
+    def add_rope(self, length: float, num_points: int = 20) -> int:
+        """添加绳子"""
+        self.rope = Rope(length, num_points)
+        return -2
+
+    def step(self, dt: float = 0.02):
+        """更新所有软体"""
+        for body in self.bodies:
+            body.update(dt, self.gravity)
+        if self.cloth:
+            self.cloth.update(dt, self.gravity)
+        if self.rope:
+            self.rope.update(dt, self.gravity)
+
+    def get_all_features(self) -> List[dict]:
+        """提取所有软体特征"""
+        features = []
+        for i, body in enumerate(self.bodies):
+            deform = body.get_deformation() if hasattr(body, 'get_deformation') else 0
+            center = body.get_center() if hasattr(body, 'get_center') else np.zeros(3)
+            features.append({
+                'type': 'soft_body',
+                'index': i,
+                'deformation': 'deformed' if deform > 0.1 else 'stable',
+                'height': 'high' if center[2] > self.bounds[2] * 0.6 else
+                          'low' if center[2] < self.bounds[2] * 0.3 else 'mid',
+                'deformation_value': deform,
+            })
+        return features

@@ -258,3 +258,245 @@ def create_layered_fluid_world() -> FluidEngine:
     # 上层：空气（默认）
 
     return engine
+
+
+# ============================================================
+# SPH 粒子流体系统（Phase 48 新增）
+# ============================================================
+
+from collections import defaultdict
+
+
+@dataclass
+class FluidParticle:
+    """流体粒子"""
+    position: np.ndarray   # (3,)
+    velocity: np.ndarray   # (3,)
+    density: float = 0.0
+    pressure: float = 0.0
+    radius: float = 0.1
+    mass: float = 0.1
+
+
+class SpatialHash:
+    """
+    空间哈希：加速粒子邻域查找
+
+    将空间划分为网格，每个粒子只与同格及相邻格的粒子交互。
+    """
+
+    def __init__(self, cell_size: float):
+        self.cell_size = cell_size
+        self.cells = defaultdict(list)
+
+    def _key(self, pos: np.ndarray) -> Tuple[int, int, int]:
+        return (
+            int(np.floor(pos[0] / self.cell_size)),
+            int(np.floor(pos[1] / self.cell_size)),
+            int(np.floor(pos[2] / self.cell_size)),
+        )
+
+    def clear(self):
+        self.cells.clear()
+
+    def insert(self, idx: int, pos: np.ndarray):
+        self.cells[self._key(pos)].append(idx)
+
+    def query_neighbors(self, pos: np.ndarray, radius: float) -> List[int]:
+        """查找 pos 附近 radius 范围内的所有粒子索引"""
+        key = self._key(pos)
+        r_cells = int(np.ceil(radius / self.cell_size))
+        neighbors = []
+        for dx in range(-r_cells, r_cells + 1):
+            for dy in range(-r_cells, r_cells + 1):
+                for dz in range(-r_cells, r_cells + 1):
+                    cell = (key[0] + dx, key[1] + dy, key[2] + dz)
+                    neighbors.extend(self.cells.get(cell, []))
+        return neighbors
+
+
+class FluidParticleSystem:
+    """
+    SPH 粒子流体系统
+
+    简化光滑粒子流体动力学：
+    1. 密度估计：核函数加权求和
+    2. 压力计算：密度偏差 × 刚度
+    3. 力计算：压力梯度 + 粘性 + 重力
+    4. 积分：半隐式欧拉
+
+    Agent 可学到的物理直觉：
+    - 流体向下流动（重力）
+    - 流体聚集在底部（压力平衡）
+    - 流体遇到障碍物分流（粘附力）
+    """
+
+    def __init__(self, bounds: Tuple[float, float, float] = (10.0, 10.0, 5.0),
+                 gravity: float = -9.8,
+                 viscosity: float = 0.1,
+                 rest_density: float = 1.0,
+                 stiffness: float = 50.0,
+                 smoothing_radius: float = 0.5,
+                 particle_mass: float = 0.1,
+                 damping: float = 0.98):
+        self.bounds = np.array(bounds, dtype=np.float32)
+        self.gravity = gravity
+        self.viscosity = viscosity
+        self.rest_density = rest_density
+        self.stiffness = stiffness
+        self.smoothing_radius = smoothing_radius
+        self.particle_mass = particle_mass
+        self.damping = damping
+
+        self.particles: List[FluidParticle] = []
+        self.spatial_hash = SpatialHash(smoothing_radius)
+        self.step_count = 0
+
+    def add_particles(self, center: np.ndarray, count: int,
+                      spread: float = 0.5) -> List[int]:
+        """在 center 附近添加 count 个粒子"""
+        start_idx = len(self.particles)
+        for _ in range(count):
+            pos = center + np.random.uniform(-spread, spread, 3).astype(np.float32)
+            pos = np.clip(pos, [0, 0, 0], self.bounds - 0.01)
+            vel = np.zeros(3, dtype=np.float32)
+            self.particles.append(FluidParticle(
+                position=pos, velocity=vel, mass=self.particle_mass
+            ))
+        return list(range(start_idx, len(self.particles)))
+
+    def step(self, dt: float = 0.02):
+        """一步流体模拟"""
+        if not self.particles:
+            return
+
+        # 1. 构建空间哈希
+        self.spatial_hash.clear()
+        for i, p in enumerate(self.particles):
+            self.spatial_hash.insert(i, p.position)
+
+        # 2. 计算密度和压力
+        h = self.smoothing_radius
+        for i, p in enumerate(self.particles):
+            p.density = 0.0
+            for j in self.spatial_hash.query_neighbors(p.position, h):
+                if i == j:
+                    continue
+                dist = np.linalg.norm(p.position - self.particles[j].position)
+                if dist < h:
+                    w = (1.0 - dist / h) ** 2
+                    p.density += self.particle_mass * w
+            p.pressure = self.stiffness * max(0, p.density - self.rest_density)
+
+        # 3. 计算力并更新速度
+        for i, p in enumerate(self.particles):
+            force = np.array([0.0, 0.0, self.gravity * p.mass], dtype=np.float32)
+
+            for j in self.spatial_hash.query_neighbors(p.position, h):
+                if i == j:
+                    continue
+                q = self.particles[j]
+                diff = q.position - p.position
+                dist = np.linalg.norm(diff)
+                if dist < 1e-6 or dist >= h:
+                    continue
+
+                direction = diff / dist
+                w = (1.0 - dist / h) ** 2
+
+                # 压力梯度力
+                force += -self.particle_mass * (
+                    p.pressure + q.pressure
+                ) / (2.0 * max(q.density, 1e-6)) * w * direction
+
+                # 粘性力
+                force += self.viscosity * self.particle_mass * (
+                    q.velocity - p.velocity
+                ) / max(q.density, 1e-6) * w
+
+            p.velocity += (force / p.mass) * dt
+            p.velocity *= self.damping
+            p.position += p.velocity * dt
+
+        # 4. 边界约束
+        self._apply_boundaries()
+        self.step_count += 1
+
+    def _apply_boundaries(self):
+        """边界约束：粒子碰到容器壁反弹"""
+        bounce = 0.3
+        for p in self.particles:
+            for axis in range(3):
+                if p.position[axis] < 0:
+                    p.position[axis] = 0
+                    p.velocity[axis] = abs(p.velocity[axis]) * bounce
+                elif p.position[axis] > self.bounds[axis] - p.radius:
+                    p.position[axis] = self.bounds[axis] - p.radius
+                    p.velocity[axis] = -abs(p.velocity[axis]) * bounce
+
+    def get_state(self) -> list:
+        return [{
+            'position': p.position.tolist(),
+            'velocity': p.velocity.tolist(),
+            'density': p.density,
+            'pressure': p.pressure,
+        } for p in self.particles]
+
+    def get_level(self) -> float:
+        """流体平均高度"""
+        if not self.particles:
+            return 0.0
+        return float(np.mean([p.position[2] for p in self.particles]))
+
+    def get_flow_direction(self) -> np.ndarray:
+        """流体平均流动方向"""
+        if not self.particles:
+            return np.zeros(3)
+        avg_vel = np.mean([p.velocity for p in self.particles], axis=0)
+        norm = np.linalg.norm(avg_vel)
+        return avg_vel / norm if norm > 1e-6 else np.zeros(3)
+
+    def get_spread(self) -> float:
+        """流体扩散程度"""
+        if len(self.particles) < 2:
+            return 0.0
+        positions = np.array([p.position for p in self.particles])
+        return float(np.mean(np.std(positions, axis=0)))
+
+    def get_avg_speed(self) -> float:
+        if not self.particles:
+            return 0.0
+        return float(np.mean([np.linalg.norm(p.velocity) for p in self.particles]))
+
+    def get_features(self) -> dict:
+        """提取流体特征（用于语言涌现）"""
+        level = self.get_level()
+        speed = self.get_avg_speed()
+        spread = self.get_spread()
+        return {
+            'type': 'fluid',
+            'level': 'high' if level > self.bounds[2] * 0.6 else
+                     'low' if level < self.bounds[2] * 0.3 else 'mid',
+            'motion': 'fast' if speed > 1.0 else
+                      'moving' if speed > 0.1 else 'still',
+            'spread': 'wide' if spread > 1.0 else
+                      'narrow' if spread < 0.3 else 'medium',
+            'particle_count': len(self.particles),
+        }
+
+    def collide_with_sphere(self, center: np.ndarray, radius: float,
+                            velocity: np.ndarray = None):
+        """流体粒子与球形物体碰撞"""
+        if velocity is None:
+            velocity = np.zeros(3)
+        for p in self.particles:
+            diff = p.position - center
+            dist = np.linalg.norm(diff)
+            min_dist = radius + p.radius
+            if dist < min_dist and dist > 1e-6:
+                normal = diff / dist
+                p.position = center + normal * min_dist
+                v_rel = p.velocity - velocity
+                v_n = np.dot(v_rel, normal)
+                if v_n < 0:
+                    p.velocity = p.velocity - 1.5 * v_n * normal
