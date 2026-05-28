@@ -54,15 +54,18 @@ mvl/
 │   └── agent_sensory.py               # 端到端感官Agent
 │
 ├── 大规模社会模块
-│   ├── language_society_large.py       # 100+ Agent 语言社会
+│   ├── language_society_large.py       # 100+ Agent 语言社会（GPU 加速相似度）
 │   └── multi_agent_env.py             # 自适应网格环境 + 空间索引
+
+├── CUDA 加速模块
+│   └── cuda_utils.py                  # 设备管理、NumPy↔PyTorch、批量操作
 │
 ├── 3D 多 Agent 模块
 │   ├── multi_agent_3d_env.py          # 多 Agent 共享 3D 环境
 │   ├── agent_social.py               # 社会学习 Agent
 │   └── instruction_grounding.py      # 指令 Grounding（动词+物体描述）
 │
-└── 实验模块（25 个 experiment_*.py）
+└── 实验模块（26 个 experiment_*.py）
 ```
 
 ## 快速开始
@@ -126,6 +129,7 @@ python experiment_tool_use.py
 | 44 | 主动教学（根据学习者调整描述）| ✅ |
 | 45 | 文化演化（语言跨代变化）| ✅ |
 | 46 | 元语言（语言谈论语言本身）| ✅ |
+| 47 | CUDA 加速 + 1000+ Agent 大社会 | ✅ |
 
 ## 关键论文
 

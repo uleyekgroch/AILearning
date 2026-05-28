@@ -2,7 +2,7 @@
 可学习感官编码器：从原始像素/声音到内部表征
 
 核心思想：
-- 视觉分支：卷积层提取空间特征
+- 视觉分支：卷积层提取空间特征（PyTorch 加速）
 - 音频分支：MLP 提取声音特征
 - 位置分支：线性层编码坐标
 - 三路融合为统一的 40 维表征
@@ -11,6 +11,8 @@
 """
 
 import numpy as np
+import torch
+import torch.nn.functional as F
 from typing import Dict, Tuple
 
 
@@ -48,7 +50,7 @@ class SensoryEncoder:
         self.conv_out_w = (visual_shape[1] - self.conv_kernel_size) // self.conv_stride + 1  # 3
         self.conv_flat_dim = self.conv_out_h * self.conv_out_w * self.conv_out_channels  # 72
 
-        # Conv weights: (kernel_h, kernel_w, in_ch, out_ch)
+        # Conv weights: (kernel_h, kernel_w, in_ch, out_ch) — numpy interface
         fan_in = self.conv_kernel_size * self.conv_kernel_size * self.conv_in_channels
         self.conv_W = np.random.randn(
             self.conv_kernel_size, self.conv_kernel_size,
@@ -71,6 +73,9 @@ class SensoryEncoder:
         # Cache for backward
         self._cache = {}
 
+        # PyTorch device
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
         self.lr = 0.001
 
     def get_param_count(self) -> int:
@@ -79,56 +84,84 @@ class SensoryEncoder:
                 self.aud_W.size + self.aud_b.size +
                 self.pos_W.size + self.pos_b.size)
 
+    def _to_torch_conv_W(self) -> torch.Tensor:
+        """numpy conv_W (kh, kw, C_in, C_out) → torch (C_out, C_in, kh, kw)"""
+        return torch.from_numpy(
+            self.conv_W.transpose(3, 2, 0, 1)
+        ).float().to(self.device)
+
+    def _from_torch_conv_W(self, t: torch.Tensor):
+        """torch (C_out, C_in, kh, kw) → numpy (kh, kw, C_in, C_out)"""
+        self.conv_W = t.detach().cpu().numpy().transpose(2, 3, 1, 0)
+
     def _conv2d_forward(self, x: np.ndarray) -> np.ndarray:
         """
-        Conv2D forward pass.
+        Conv2D forward pass (PyTorch accelerated).
 
         x: (H, W, C_in)
         returns: (out_h, out_w, C_out)
         """
-        H, W, C_in = x.shape
-        kh, kw = self.conv_kernel_size, self.conv_kernel_size
-        oh, ow = self.conv_out_h, self.conv_out_w
-        C_out = self.conv_out_channels
+        # numpy HWC → torch NCHW
+        x_t = torch.from_numpy(x).float().permute(2, 0, 1).unsqueeze(0).to(self.device)
+        w_t = self._to_torch_conv_W()
+        b_t = torch.from_numpy(self.conv_b).float().to(self.device)
 
-        output = np.zeros((oh, ow, C_out))
-        for i in range(oh):
-            for j in range(ow):
-                patch = x[i*self.conv_stride:i*self.conv_stride+kh,
-                          j*self.conv_stride:j*self.conv_stride+kw, :]
-                for f in range(C_out):
-                    output[i, j, f] = np.sum(patch * self.conv_W[:, :, :, f]) + self.conv_b[f]
-        return output
+        out_t = F.conv2d(x_t, w_t, b_t, stride=self.conv_stride)
+
+        # torch NCHW → numpy HWC
+        return out_t.squeeze(0).permute(1, 2, 0).cpu().numpy()
 
     def _conv2d_backward(self, x: np.ndarray, d_out: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
-        Conv2D backward pass.
+        Conv2D backward pass (PyTorch accelerated).
 
         x: (H, W, C_in) - input
         d_out: (out_h, out_w, C_out) - gradient of loss w.r.t. output
         returns: (d_x, d_W, d_b)
         """
-        H, W, C_in = x.shape
+        # numpy → torch NCHW
+        x_t = torch.from_numpy(x).float().permute(2, 0, 1).unsqueeze(0).to(self.device)
+        dout_t = torch.from_numpy(d_out).float().permute(2, 0, 1).unsqueeze(0).to(self.device)
+        w_t = self._to_torch_conv_W()
+
+        # Input gradient via transpose convolution
+        dx_t = F.conv_transpose2d(dout_t, w_t, stride=self.conv_stride)
+
+        # Weight gradient: conv input with output gradient
+        # Reshape for batch matrix multiply approach
         kh, kw = self.conv_kernel_size, self.conv_kernel_size
-        oh, ow = self.conv_out_h, self.conv_out_w
+        C_in = self.conv_in_channels
         C_out = self.conv_out_channels
+        oh, ow = self.conv_out_h, self.conv_out_w
 
-        d_W = np.zeros_like(self.conv_W)
-        d_b = np.zeros_like(self.conv_b)
-        d_x = np.zeros_like(x)
-
+        # Extract patches from input: (oh*ow, C_in*kh*kw)
+        patches = []
         for i in range(oh):
             for j in range(ow):
                 patch = x[i*self.conv_stride:i*self.conv_stride+kh,
                           j*self.conv_stride:j*self.conv_stride+kw, :]
-                for f in range(C_out):
-                    d_W[:, :, :, f] += patch * d_out[i, j, f]
-                    d_b[f] += d_out[i, j, f]
-                    d_x[i*self.conv_stride:i*self.conv_stride+kh,
-                        j*self.conv_stride:j*self.conv_stride+kw, :] += \
-                        self.conv_W[:, :, :, f] * d_out[i, j, f]
+                patches.append(patch.flatten())
+        patches_t = torch.from_numpy(np.array(patches)).float().to(self.device)  # (oh*ow, C_in*kh*kw)
 
-        return d_x, d_W, d_b
+        # d_out flattened: (oh*ow, C_out)
+        dout_flat = torch.from_numpy(
+            d_out.reshape(oh * ow, C_out)
+        ).float().to(self.device)
+
+        # d_W_flat = patches.T @ dout_flat: (C_in*kh*kw, C_out)
+        dw_flat = patches_t.t() @ dout_flat
+        d_W = dw_flat.reshape(C_in, kh, kw, C_out).cpu().numpy()
+        # Convert back to (kh, kw, C_in, C_out) layout
+        d_W = d_W.transpose(1, 2, 0, 3)
+
+        d_b = d_out.sum(axis=(0, 1))
+
+        # Crop dx to input size (conv_transpose2d may produce larger output)
+        H, W = x.shape[:2]
+        dx_np = dx_t.squeeze(0).permute(1, 2, 0).cpu().numpy()
+        dx_np = dx_np[:H, :W, :]
+
+        return dx_np, d_W, d_b
 
     def forward(self, visual: np.ndarray, audio: np.ndarray,
                 position: np.ndarray) -> np.ndarray:
@@ -217,7 +250,7 @@ class SensoryEncoder:
         d_conv_relu = d_conv_flat.reshape(self.conv_out_h, self.conv_out_w, self.conv_out_channels)
         d_conv_out = d_conv_relu * (self._cache['conv_out'] > 0).astype(float)
 
-        # Step 3: Conv2D backward (compute BEFORE weight update)
+        # Step 3: Conv2D backward (PyTorch accelerated, compute BEFORE weight update)
         d_x, d_conv_W, d_conv_b = self._conv2d_backward(
             self._cache['visual'], d_conv_out
         )

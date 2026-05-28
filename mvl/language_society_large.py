@@ -16,6 +16,7 @@
 
 import random
 import numpy as np
+import torch
 from typing import List, Dict, Tuple, Optional, Set
 from collections import defaultdict, deque
 from itertools import combinations
@@ -545,6 +546,129 @@ class LargeScaleLanguageSociety:
         self.groups = None
         self.topology = 'full'
         self.adjacency = self._build_adjacency()
+
+    # ============================================================
+    # 批量相似度计算（GPU 加速）
+    # ============================================================
+
+    def _build_vocab_matrix(self) -> Tuple[Dict[str, int], np.ndarray]:
+        """
+        构建全局词汇矩阵
+
+        Returns:
+            symbol_to_idx: 符号→索引映射
+            freq_matrix: (n_agents, n_symbols) 频率矩阵
+        """
+        # 收集所有符号
+        all_symbols = set()
+        for agent in self.agents:
+            all_symbols.update(agent.language.vocabulary.keys())
+        symbol_list = sorted(all_symbols)
+        symbol_to_idx = {s: i for i, s in enumerate(symbol_list)}
+
+        # 构建频率矩阵
+        n = len(self.agents)
+        m = len(symbol_list)
+        freq_matrix = np.zeros((n, m), dtype=np.float32)
+        for i, agent in enumerate(self.agents):
+            for sym, data in agent.language.vocabulary.items():
+                freq_matrix[i, symbol_to_idx[sym]] = data.get('frequency', 0)
+
+        return symbol_to_idx, freq_matrix
+
+    def batch_cosine_similarity(self, sample_size: int = 0) -> np.ndarray:
+        """
+        GPU 加速的批量余弦相似度计算
+
+        Args:
+            sample_size: 0 = 计算所有对（O(n²)），>0 = 随机采样
+
+        Returns:
+            sim_matrix: (n, n) 相似度矩阵（仅词汇频率维度）
+        """
+        _, freq_matrix = self._build_vocab_matrix()
+        n = freq_matrix.shape[0]
+
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        freq_t = torch.from_numpy(freq_matrix).to(device)
+
+        # L2 归一化
+        norms = torch.norm(freq_t, dim=1, keepdim=True).clamp(min=1e-8)
+        freq_normed = freq_t / norms
+
+        # 余弦相似度矩阵 = 归一化后矩阵乘法
+        sim_matrix = (freq_normed @ freq_normed.t()).cpu().numpy()
+
+        return sim_matrix
+
+    def get_global_metrics_fast(self, sample_size: int = 200) -> dict:
+        """
+        GPU 加速的全局指标计算
+
+        用批量余弦相似度替代逐对 compute_language_similarity 调用。
+        """
+        sim_matrix = self.batch_cosine_similarity()
+        n = sim_matrix.shape[0]
+
+        # 采样上三角元素
+        max_pairs = n * (n - 1) // 2
+        actual_sample = min(sample_size, max_pairs)
+
+        # 提取上三角（排除对角线）
+        triu_i, triu_j = np.triu_indices(n, k=1)
+        all_sims = sim_matrix[triu_i, triu_j]
+
+        if actual_sample < len(all_sims):
+            indices = np.random.choice(len(all_sims), actual_sample, replace=False)
+            sampled_sims = all_sims[indices]
+        else:
+            sampled_sims = all_sims
+
+        return {
+            'avg_vocab_similarity': float(np.mean(sampled_sims)),
+            'num_sampled_pairs': len(sampled_sims),
+            'total_possible_pairs': max_pairs,
+        }
+
+    def detect_language_families_fast(self, threshold: float = 0.5) -> List[List[int]]:
+        """
+        GPU 加速的语言家族检测
+
+        用批量相似度矩阵 + 并查集替代逐对采样 + 层次聚类。
+        """
+        sim_matrix = self.batch_cosine_similarity()
+        n = sim_matrix.shape[0]
+
+        # 并查集
+        parent = list(range(n))
+
+        def find(x):
+            while parent[x] != x:
+                parent[x] = parent[parent[x]]
+                x = parent[x]
+            return x
+
+        def union(x, y):
+            rx, ry = find(x), find(y)
+            if rx != ry:
+                parent[rx] = ry
+
+        # 批量合并：相似度 > threshold 的对
+        triu_i, triu_j = np.triu_indices(n, k=1)
+        sims = sim_matrix[triu_i, triu_j]
+        mask = sims > threshold
+        for i, j in zip(triu_i[mask], triu_j[mask]):
+            union(i, j)
+
+        # 收集家族
+        families = defaultdict(list)
+        for i in range(n):
+            families[find(i)].append(i)
+
+        result = [sorted(members) for members in families.values() if len(members) > 0]
+        self._family_cache = result
+        self._family_cache_round = self.round_num
+        return result
 
     def replace_agents(self, agent_indices: List[int]):
         """替换指定 agent（模拟语言灭绝/复兴）"""

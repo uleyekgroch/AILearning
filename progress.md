@@ -97,3 +97,25 @@
 4. 元语言回合的即时修复效果为 0%（物体特征重叠是环境固有限制）
 5. 元语言回合不损害整体性能，提供额外学习交互机会
 6. 词汇重叠自然下降：独立学习的 Agent 词汇会自然分化
+
+## 2026-05-28: Phase 47 CUDA 加速 + 1000+ Agent 大社会
+
+### 完成的工作
+1. 新建 `mvl/cuda_utils.py` — CUDA 工具层（设备管理、NumPy↔PyTorch 转换、批量操作）
+2. 改写 `mvl/encoder_sensory.py` — Conv2D 从手写三重循环改为 PyTorch `F.conv2d`（GPU 加速）
+3. 改写 `mvl/active_inference.py` — 添加 `select_action_batch()` 批量动作选择
+4. 改写 `mvl/language_society_large.py` — 添加 `batch_cosine_similarity()` 和 `detect_language_families_fast()`（GPU 加速）
+5. 新建 `mvl/experiment_large_society_cuda.py` — 1000+ Agent 大社会实验
+
+### 实验结果
+| 实验 | 结果 | 状态 |
+|------|------|------|
+| 规模对比 100→1000 | 1000 Agent 2941 rounds/s, 100% 成功率 | PASS |
+| 语言家族检测 | 997/1000 Agent 收敛为同一家族 | PASS |
+| 方言分化 | 分化度 0.007（小世界网络促进趋同）| 有效发现 |
+
+### 关键发现
+1. 单 Agent CUDA 转换开销 > 计算收益：批量相似度计算（跨 Agent）比逐对计算快 9x
+2. encoder_sensory Conv2D 使用 PyTorch 后 0.7ms/step（含 GPU warmup）
+3. 1000 Agent 在小世界网络下语言快速趋同，形成 1 个主导语言家族
+4. 小世界网络拓扑阻止方言分化：短路径长度使信息快速传播

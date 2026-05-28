@@ -127,8 +127,8 @@ class FEPAgent:
                 if self._last_teacher_demo_action in available_actions:
                     return self._last_teacher_demo_action
 
-        # 主动推理：选择最小化期望自由能的动作
-        action = self.active_inference.select_action(
+        # 主动推理：选择最小化期望自由能的动作（批量计算）
+        action = self.active_inference.select_action_batch(
             obs, self.predictor, self.belief, available_actions
         )
 

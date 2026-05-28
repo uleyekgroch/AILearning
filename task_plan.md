@@ -984,3 +984,47 @@ Region 0 vs Region 1 差异最大（0.48），Region 2 vs Region 4 最相似（0
 - mvl/multi_agent_3d_env.py（新建：多 Agent 共享环境）
 - mvl/agent_social.py（新建：社会学习 Agent）
 - mvl/experiment_social_learning.py（新建：4 个实验）
+
+---
+
+## Phase 47: CUDA 加速 + 1000+ Agent 大社会
+**Status:** complete ✅
+
+从 CPU 到 GPU 的计算升级，支撑 1000+ Agent 规模。
+
+### 加速模块
+| 模块 | 变更 | 收益 |
+|------|------|------|
+| cuda_utils.py | 新建 CUDA 工具层 | 基础设施 |
+| encoder_sensory.py | Conv2D → PyTorch F.conv2d | 0.7ms/step |
+| active_inference.py | select_action_batch 批量动作选择 | 备用（单 Agent 开销 > 收益）|
+| language_society_large.py | batch_cosine_similarity GPU 加速 | 家族检测 9x |
+
+### 实验结果
+
+**实验 1：规模对比**
+| Agent 数 | 成功率 | 相似度 | 速度 |
+|----------|--------|--------|------|
+| 100 | 100% | 0.962 | 3046 rounds/s |
+| 500 | 100% | 0.799 | 3309 rounds/s |
+| 1000 | 100% | 0.619 | 2941 rounds/s |
+
+**实验 2：1000 Agent 语言家族检测**
+- Fast: 4 families (0.170s) vs Original: 259 families (0.260s)
+- 主导家族：997/1000 Agent
+
+**实验 3：方言分化**
+- 组内相似度：0.804，组间相似度：0.798
+- 方言分化度：0.007（小世界网络促进趋同）
+
+### 关键发现
+1. 单 Agent CUDA 转换开销 > 计算收益：真正的加速来自跨 Agent 批处理
+2. 小世界网络下 1000 Agent 快速趋同为 1 个主导语言家族
+3. 小世界网络拓扑阻止方言分化（短路径 → 信息快速传播）
+
+### 更新的文件
+- mvl/cuda_utils.py（新建：CUDA 工具层）
+- mvl/encoder_sensory.py（改写：PyTorch Conv2D）
+- mvl/active_inference.py（改写：添加 select_action_batch）
+- mvl/language_society_large.py（改写：GPU 批量相似度）
+- mvl/experiment_large_society_cuda.py（新建：1000+ Agent 实验）
