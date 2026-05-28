@@ -1060,3 +1060,49 @@ Region 0 vs Region 1 差异最大（0.48），Region 2 vs Region 4 最相似（0
 - mvl/physics_soft.py（扩展：软体弹簧-质点系统）
 - mvl/environment_3d.py（集成流体/软体）
 - mvl/experiment_fluid_soft.py（新建：4 个实验）
+
+## Phase 49: 超大规模社会（2000-5000 Agent）
+**Status:** complete ✅
+
+将社会规模推到 2000-5000 Agent，优化拓扑构建和指标计算。
+
+### 优化
+| 模块 | 变更 | 收益 |
+|------|------|------|
+| language_society_large.py | set 替代 list.remove() | small_world O(n) 构建 |
+| language_society_large.py | np.random.choice(replace=False) | scale_free 无重试 |
+| language_society_large.py | batch_step_parallel() | 多对并行通信 |
+| language_society_large.py | detect_language_families_sampled() | 5000+ Agent 家族检测 |
+
+### 实验结果
+
+**实验 1：规模梯度**
+| Agent 数 | Round 500 相似度 | Round 3000 相似度 | 速度 |
+|----------|-----------------|------------------|------|
+| 2000 | 0.952 | 0.990 | 46 rounds/s |
+| 3000 | 0.942 | 0.985 | 81 rounds/s |
+| 5000 | 0.871 | 0.972 | 76 rounds/s |
+
+**实验 2：拓扑对比（2000 Agent）**
+| 拓扑 | 最终相似度 | 家族数 |
+|------|-----------|--------|
+| small_world | 0.987 | 1 |
+| scale_free | 0.986 | 1 |
+| line | 0.986 | 1 |
+
+**实验 3：5000 Agent 家族演化**
+- Round 500 即收敛为 1 家族（5000 成员）
+
+**实验 4：枢纽 Agent 分析**
+- 枢纽度 149 vs 平均 6
+- 枢纽相似度 0.944 vs 普通 0.923
+
+### 关键发现
+1. 所有规模最终收敛为 1 家族 — 小世界网络短路径确保信息快速传播
+2. 5000 Agent 初始相似度（0.871）比 2000（0.952）低，但最终都达到 0.97+
+3. 拓扑类型在大规模下差异极小 — 通信轮数足够时，拓扑不再是瓶颈
+4. 枢纽 Agent 有略高相似度，但词汇量相同
+
+### 更新的文件
+- mvl/language_society_large.py（优化拓扑 + 新增批量方法）
+- mvl/experiment_mega_society.py（新建：4 个实验）

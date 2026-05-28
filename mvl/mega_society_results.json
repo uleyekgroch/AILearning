@@ -1,0 +1,295 @@
+{
+  "scale_gradient": {
+    "2000": {
+      "rounds": [
+        500,
+        1000,
+        1500,
+        2000,
+        2500,
+        3000
+      ],
+      "success_rate": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "avg_similarity": [
+        0.9518783688545227,
+        0.9709998965263367,
+        0.9807771444320679,
+        0.9855954051017761,
+        0.9880472421646118,
+        0.9903849959373474
+      ],
+      "num_families": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "timing": {
+        "total_seconds": 64.67,
+        "comm_seconds": 62.67,
+        "metric_seconds": 1.15,
+        "rounds_per_second": 46.4
+      }
+    },
+    "3000": {
+      "rounds": [
+        500,
+        1000,
+        1500,
+        2000,
+        2500,
+        3000
+      ],
+      "success_rate": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "avg_similarity": [
+        0.9416879415512085,
+        0.9608030915260315,
+        0.9699710011482239,
+        0.9786276817321777,
+        0.9817825555801392,
+        0.9845360517501831
+      ],
+      "num_families": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "timing": {
+        "total_seconds": 36.92,
+        "comm_seconds": 35.53,
+        "metric_seconds": 0.99,
+        "rounds_per_second": 81.3
+      }
+    },
+    "5000": {
+      "rounds": [
+        500,
+        1000,
+        1500,
+        2000,
+        2500,
+        3000
+      ],
+      "success_rate": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "avg_similarity": [
+        0.8711416125297546,
+        0.9299669861793518,
+        0.9472091794013977,
+        0.9644086956977844,
+        0.9692685604095459,
+        0.9722360968589783
+      ],
+      "num_families": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "timing": {
+        "total_seconds": 39.72,
+        "comm_seconds": 35.88,
+        "metric_seconds": 3.38,
+        "rounds_per_second": 75.5
+      }
+    }
+  },
+  "topology_comparison": {
+    "small_world": {
+      "rounds": [
+        500,
+        1000,
+        1500,
+        2000
+      ],
+      "success_rate": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "avg_similarity": [
+        0.9742175340652466,
+        0.975638747215271,
+        0.9819559454917908,
+        0.9872705936431885
+      ],
+      "num_families": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "timing": {
+        "total_seconds": 24.52,
+        "comm_seconds": 24.02,
+        "metric_seconds": 0.26,
+        "rounds_per_second": 81.6
+      }
+    },
+    "scale_free": {
+      "rounds": [
+        500,
+        1000,
+        1500,
+        2000
+      ],
+      "success_rate": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "avg_similarity": [
+        0.9507315158843994,
+        0.9742286801338196,
+        0.9828813076019287,
+        0.985736608505249
+      ],
+      "num_families": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "timing": {
+        "total_seconds": 24.57,
+        "comm_seconds": 24.07,
+        "metric_seconds": 0.26,
+        "rounds_per_second": 81.4
+      }
+    },
+    "line": {
+      "rounds": [
+        500,
+        1000,
+        1500,
+        2000
+      ],
+      "success_rate": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "avg_similarity": [
+        0.9630222916603088,
+        0.9777728319168091,
+        0.9803504347801208,
+        0.9858243465423584
+      ],
+      "num_families": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "timing": {
+        "total_seconds": 24.31,
+        "comm_seconds": 23.81,
+        "metric_seconds": 0.26,
+        "rounds_per_second": 82.3
+      }
+    }
+  },
+  "family_evolution": {
+    "family_history": [
+      {
+        "round": 500,
+        "num_families": 1,
+        "largest_family": 5000,
+        "top_5_sizes": [
+          5000
+        ]
+      },
+      {
+        "round": 1000,
+        "num_families": 1,
+        "largest_family": 5000,
+        "top_5_sizes": [
+          5000
+        ]
+      },
+      {
+        "round": 1500,
+        "num_families": 1,
+        "largest_family": 5000,
+        "top_5_sizes": [
+          5000
+        ]
+      },
+      {
+        "round": 2000,
+        "num_families": 1,
+        "largest_family": 5000,
+        "top_5_sizes": [
+          5000
+        ]
+      },
+      {
+        "round": 2500,
+        "num_families": 1,
+        "largest_family": 5000,
+        "top_5_sizes": [
+          5000
+        ]
+      },
+      {
+        "round": 3000,
+        "num_families": 1,
+        "largest_family": 5000,
+        "top_5_sizes": [
+          5000
+        ]
+      }
+    ]
+  },
+  "hub_analysis": {
+    "hub_degrees": [
+      149,
+      132,
+      130,
+      124,
+      120,
+      100,
+      87,
+      86,
+      71,
+      68
+    ],
+    "avg_degree": 5.996,
+    "hub_vocab_mean": 9.0,
+    "hub_vocab_std": 0.0,
+    "normal_vocab_mean": 9.0,
+    "normal_vocab_std": 0.0,
+    "hub_avg_similarity": 0.9436795515188798,
+    "normal_avg_similarity": 0.9230743841054352
+  }
+}

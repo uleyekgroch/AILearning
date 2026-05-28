@@ -145,4 +145,29 @@
 2. 软体受压后形变（0.309），释放后恢复，验证弹簧-质点模型有效
 3. 语言系统从物理特征中涌现材质相关词汇：liquid（流体）、deformed（软体）、metal（刚体）
 4. 去掉 type 标签后，Agent 必须通过物理属性（material, behavior, hardness）区分物体类型
-4. 小世界网络拓扑阻止方言分化：短路径长度使信息快速传播
+
+## 2026-05-28: Phase 49 超大规模社会（2000-5000 Agent）
+
+### 完成的工作
+1. 优化 `mvl/language_society_large.py`
+   - `_build_small_world()`: set 替代 list.remove()，O(1) 删除
+   - `_build_scale_free()`: np.random.choice(replace=False) 替代拒绝采样
+   - 新增 `batch_step_parallel()`: 多对 Agent 并行通信
+   - 新增 `compute_similarity_sampled()`: 采样相似度（不构建全量矩阵）
+   - 新增 `detect_lingua_franca_fast()`: GPU 批量通用语检测
+   - 新增 `detect_language_families_sampled()`: 采样家族检测（5000+ Agent）
+2. 新建 `mvl/experiment_mega_society.py` — 4 个实验
+
+### 实验结果
+| 实验 | 结果 | 状态 |
+|------|------|------|
+| 规模梯度 2000/3000/5000 | 全部收敛为 1 家族，5000 Agent 速度 76 rounds/s | PASS |
+| 拓扑对比 2000 Agent | small_world/scale_free/line 差异极小（0.986-0.987）| 有效发现 |
+| 语言家族演化 5000 | Round 500 即收敛为 1 家族 | PASS |
+| 枢纽 Agent 分析 | 枢纽度 149 vs 平均 6，相似度略高 0.944 vs 0.923 | 有效发现 |
+
+### 关键发现
+1. 所有规模最终收敛为 1 个家族 — 小世界网络短路径确保信息快速传播
+2. 5000 Agent 初始相似度（0.871）比 2000（0.952）低，但最终都达到 0.97+
+3. 拓扑类型在大规模下差异极小 — 通信轮数足够时，拓扑不再是瓶颈
+4. 枢纽 Agent（度 149 vs 平均 6）有略高相似度，但词汇量相同（9）

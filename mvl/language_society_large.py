@@ -108,9 +108,12 @@ class LargeScaleLanguageSociety:
 
         每个节点连 k 个近邻，以概率 p 随机重连。
         特征：高聚类系数 + 短平均路径长度。
+
+        优化：使用 set 替代 list.remove()，O(1) 删除。
         """
         n = len(ids)
-        adj = {aid: [] for aid in ids}
+        # 用 set 加速邻域操作
+        adj_set = {aid: set() for aid in ids}
 
         # 第一步：环形网格，每个节点连 k/2 左右邻居
         half_k = k // 2
@@ -118,33 +121,29 @@ class LargeScaleLanguageSociety:
             for d in range(1, half_k + 1):
                 left = (i - d) % n
                 right = (i + d) % n
-                if ids[left] not in adj[ids[i]]:
-                    adj[ids[i]].append(ids[left])
-                if ids[right] not in adj[ids[i]]:
-                    adj[ids[i]].append(ids[right])
-                if ids[i] not in adj[ids[left]]:
-                    adj[ids[left]].append(ids[i])
-                if ids[i] not in adj[ids[right]]:
-                    adj[ids[right]].append(ids[i])
+                adj_set[ids[i]].add(ids[left])
+                adj_set[ids[i]].add(ids[right])
+                adj_set[ids[left]].add(ids[i])
+                adj_set[ids[right]].add(ids[i])
 
         # 第二步：以概率 p 随机重连
+        all_ids_set = set(ids)
         for i in range(n):
-            neighbors = list(adj[ids[i]])
+            neighbors = list(adj_set[ids[i]])
             for nb in neighbors:
                 if random.random() < p:
-                    # 移除旧边
-                    adj[ids[i]].remove(nb)
-                    if ids[i] in adj[nb]:
-                        adj[nb].remove(ids[i])
+                    # 移除旧边 O(1)
+                    adj_set[ids[i]].discard(nb)
+                    adj_set[nb].discard(ids[i])
                     # 选新目标（排除自身和已有邻居）
-                    candidates = [j for j in range(n)
-                                  if j != i and ids[j] not in adj[ids[i]]]
+                    candidates = all_ids_set - adj_set[ids[i]] - {ids[i]}
                     if candidates:
-                        new_idx = random.choice(candidates)
-                        adj[ids[i]].append(ids[new_idx])
-                        adj[ids[new_idx]].append(ids[i])
+                        new_id = random.choice(list(candidates))
+                        adj_set[ids[i]].add(new_id)
+                        adj_set[new_id].add(ids[i])
 
-        return adj
+        # 转回 list 格式（兼容现有接口）
+        return {aid: list(nbs) for aid, nbs in adj_set.items()}
 
     def _build_scale_free(self, ids: List[str],
                           m: int = 3) -> Dict[str, List[str]]:
@@ -153,6 +152,8 @@ class LargeScaleLanguageSociety:
 
         优先连接模型：新节点倾向连接高度节点。
         特征：少数枢纽节点有大量连接，多数节点连接很少。
+
+        优化：np.random.choice(replace=False) 替代拒绝采样。
         """
         n = len(ids)
         adj = {aid: [] for aid in ids}
@@ -167,21 +168,14 @@ class LargeScaleLanguageSociety:
         # 逐步添加新节点
         for i in range(m0, n):
             # 计算度数权重
-            degrees = [len(adj[ids[j]]) for j in range(i)]
-            total_degree = sum(degrees)
+            degrees = np.array([len(adj[ids[j]]) for j in range(i)], dtype=np.float64)
+            total_degree = degrees.sum()
             if total_degree == 0:
-                # 均匀选择
-                targets = random.sample(range(i), min(m, i))
+                targets = np.random.choice(i, size=min(m, i), replace=False).tolist()
             else:
-                probs = [d / total_degree for d in degrees]
-                # 按概率选择 m 个不同目标
-                targets = set()
-                attempts = 0
-                while len(targets) < min(m, i) and attempts < 100:
-                    idx = np.random.choice(i, p=probs)
-                    targets.add(idx)
-                    attempts += 1
-                targets = list(targets)
+                probs = degrees / total_degree
+                # 直接采样 m 个不同目标（无重试）
+                targets = np.random.choice(i, size=min(m, i), replace=False, p=probs).tolist()
 
             for t in targets:
                 adj[ids[i]].append(ids[t])
@@ -230,6 +224,138 @@ class LargeScaleLanguageSociety:
             if self.step(scene, target_idx):
                 successes += 1
         return successes / num_rounds
+
+    def _sample_disjoint_pairs(self, num_pairs: int) -> List[Tuple[str, str]]:
+        """采样 num_pairs 对不相交的相邻 Agent"""
+        pairs = []
+        used = set()
+        all_ids = [a.id for a in self.agents]
+        attempts = 0
+        max_attempts = num_pairs * 10
+        while len(pairs) < num_pairs and attempts < max_attempts:
+            attempts += 1
+            a_id = random.choice(all_ids)
+            if a_id in used:
+                continue
+            neighbors = self.adjacency.get(a_id, [])
+            if not neighbors:
+                continue
+            b_id = random.choice(neighbors)
+            if b_id in used:
+                continue
+            pairs.append((a_id, b_id))
+            used.add(a_id)
+            used.add(b_id)
+        return pairs
+
+    def batch_step_parallel(self, scene: List[Dict[str, str]],
+                            target_idx: int,
+                            num_pairs: int = None) -> float:
+        """
+        多对 Agent 并行通信（共享同一场景）
+
+        每轮同时让 num_pairs 对不相交的 Agent 通信。
+        比逐对 step() 快 num_pairs 倍（减少场景生成开销）。
+        """
+        if num_pairs is None:
+            num_pairs = min(self.num_agents // 2, 100)
+
+        pairs = self._sample_disjoint_pairs(num_pairs)
+        if not pairs:
+            return 0.0
+
+        successes = 0
+        for a_id, b_id in pairs:
+            a, b = self.agent_map[a_id], self.agent_map[b_id]
+            speaker, listener = (a, b) if random.random() < 0.5 else (b, a)
+
+            utterance = speaker.speak(scene[target_idx], scene)
+            chosen = listener.listen(utterance, scene)
+            success = (chosen == target_idx)
+
+            speaker.update_from_communication(utterance, success)
+            listener.update_from_communication(utterance, success)
+
+            if success:
+                successes += 1
+
+            self.history.append({
+                'round': self.round_num,
+                'speaker': speaker.id,
+                'listener': listener.id,
+                'success': success,
+            })
+            self.round_num += 1
+
+        return successes / len(pairs)
+
+    def compute_similarity_sampled(self, sample_size: int = 500) -> float:
+        """
+        采样计算平均相似度（不构建全量矩阵）
+
+        随机采样 sample_size 个 Agent，计算所有对的平均相似度。
+        比 batch_cosine_similarity() 节省内存（无需 n×n 矩阵）。
+        """
+        n = self.num_agents
+        actual_sample = min(sample_size, n)
+        sampled_indices = random.sample(range(n), actual_sample)
+
+        sims = []
+        for i in range(len(sampled_indices)):
+            for j in range(i + 1, len(sampled_indices)):
+                a = self.agents[sampled_indices[i]]
+                b = self.agents[sampled_indices[j]]
+                sim = compute_language_similarity(a.language, b.language)['overall_similarity']
+                sims.append(sim)
+
+        return float(np.mean(sims)) if sims else 0.0
+
+    def detect_lingua_franca_fast(self, sample_size: int = 500,
+                                  threshold: float = 0.7) -> Optional[str]:
+        """
+        批量检测通用语（lingua franca）
+
+        使用 GPU 批量相似度矩阵，找到平均相似度最高的 Agent。
+        比 detect_lingua_franca() 快得多（GPU 批处理 + 采样）。
+        """
+        n = self.num_agents
+        actual_sample = min(sample_size, n)
+        sampled_indices = random.sample(range(n), actual_sample)
+
+        # 构建采样 Agent 的词汇矩阵
+        sampled_agents = [self.agents[i] for i in sampled_indices]
+        all_symbols = set()
+        for agent in sampled_agents:
+            all_symbols.update(agent.language.vocabulary.keys())
+        if not all_symbols:
+            return None
+
+        symbol_list = sorted(all_symbols)
+        symbol_to_idx = {s: i for i, s in enumerate(symbol_list)}
+        m = len(symbol_list)
+
+        freq_matrix = np.zeros((actual_sample, m), dtype=np.float32)
+        for i, agent in enumerate(sampled_agents):
+            for sym, data in agent.language.vocabulary.items():
+                freq_matrix[i, symbol_to_idx[sym]] = data.get('frequency', 0)
+
+        # GPU 余弦相似度
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        freq_t = torch.from_numpy(freq_matrix).to(device)
+        norms = torch.norm(freq_t, dim=1, keepdim=True).clamp(min=1e-8)
+        freq_normed = freq_t / norms
+        sim_matrix = (freq_normed @ freq_normed.t()).cpu().numpy()
+
+        # 每个 Agent 的平均相似度
+        avg_sims = np.mean(sim_matrix, axis=1)
+
+        # 找到最高平均相似度的 Agent
+        best_idx = int(np.argmax(avg_sims))
+        best_score = float(avg_sims[best_idx])
+
+        if best_score > threshold:
+            return sampled_agents[best_idx].id
+        return None
 
     # ============================================================
     # 采样指标计算：O(sample_size) 代替 O(n²)
@@ -666,6 +792,121 @@ class LargeScaleLanguageSociety:
             families[find(i)].append(i)
 
         result = [sorted(members) for members in families.values() if len(members) > 0]
+        self._family_cache = result
+        self._family_cache_round = self.round_num
+        return result
+
+    def detect_language_families_sampled(self, sample_size: int = 500,
+                                         threshold: float = 0.5) -> List[List[int]]:
+        """
+        采样版语言家族检测（适用于 5000+ Agent）
+
+        1. 随机采样 sample_size 个 Agent
+        2. 构建采样 Agent 的词汇矩阵
+        3. GPU 余弦相似度 + 并查集
+        4. 将未采样 Agent 分配到最近的家族
+
+        返回：家族列表（索引为原始 Agent 索引）
+        """
+        n = self.num_agents
+        actual_sample = min(sample_size, n)
+        sampled_indices = sorted(random.sample(range(n), actual_sample))
+
+        # 构建采样 Agent 的词汇矩阵
+        sampled_agents = [self.agents[i] for i in sampled_indices]
+        all_symbols = set()
+        for agent in sampled_agents:
+            all_symbols.update(agent.language.vocabulary.keys())
+
+        if not all_symbols:
+            # 所有 Agent 没有词汇，每个都是一个家族
+            return [[i] for i in range(n)]
+
+        symbol_list = sorted(all_symbols)
+        symbol_to_idx = {s: i for i, s in enumerate(symbol_list)}
+        m = len(symbol_list)
+
+        freq_matrix = np.zeros((actual_sample, m), dtype=np.float32)
+        for i, agent in enumerate(sampled_agents):
+            for sym, data in agent.language.vocabulary.items():
+                freq_matrix[i, symbol_to_idx[sym]] = data.get('frequency', 0)
+
+        # GPU 余弦相似度
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        freq_t = torch.from_numpy(freq_matrix).to(device)
+        norms = torch.norm(freq_t, dim=1, keepdim=True).clamp(min=1e-8)
+        freq_normed = freq_t / norms
+        sim_matrix = (freq_normed @ freq_normed.t()).cpu().numpy()
+
+        # 并查集聚类（在采样 Agent 上）
+        parent = list(range(actual_sample))
+
+        def find(x):
+            while parent[x] != x:
+                parent[x] = parent[parent[x]]
+                x = parent[x]
+            return x
+
+        def union(x, y):
+            rx, ry = find(x), find(y)
+            if rx != ry:
+                parent[rx] = ry
+
+        # 批量合并
+        for i in range(actual_sample):
+            for j in range(i + 1, actual_sample):
+                if sim_matrix[i, j] > threshold:
+                    union(i, j)
+
+        # 收集采样家族
+        sample_families = defaultdict(list)
+        for i in range(actual_sample):
+            sample_families[find(i)].append(i)
+
+        # 为每个采样家族计算代表向量（平均词汇频率）
+        family_reps = {}
+        for family_id, members in sample_families.items():
+            member_indices = [sampled_indices[m] for m in members]
+            rep_vector = np.zeros(m, dtype=np.float32)
+            for mi in members:
+                rep_vector += freq_matrix[mi]
+            rep_vector /= len(members)
+            family_reps[family_id] = (member_indices, rep_vector)
+
+        # 将未采样 Agent 分配到最近的家族
+        result_families = defaultdict(list)
+        for family_id, (member_indices, _) in family_reps.items():
+            for idx in member_indices:
+                result_families[family_id].append(idx)
+
+        # 分配未采样 Agent
+        unsampled = [i for i in range(n) if i not in set(sampled_indices)]
+        if unsampled and family_reps:
+            # 构建未采样 Agent 的词汇矩阵
+            unsampled_agents = [self.agents[i] for i in unsampled]
+            unsampled_freq = np.zeros((len(unsampled), m), dtype=np.float32)
+            for i, agent in enumerate(unsampled_agents):
+                for sym, data in agent.language.vocabulary.items():
+                    if sym in symbol_to_idx:
+                        unsampled_freq[i, symbol_to_idx[sym]] = data.get('frequency', 0)
+
+            # 计算与各家族代表的余弦相似度
+            family_ids = list(family_reps.keys())
+            rep_matrix = np.array([family_reps[fid][1] for fid in family_ids], dtype=np.float32)
+
+            # GPU 计算
+            unsampled_t = torch.from_numpy(unsampled_freq).to(device)
+            rep_t = torch.from_numpy(rep_matrix).to(device)
+            unsampled_norms = torch.norm(unsampled_t, dim=1, keepdim=True).clamp(min=1e-8)
+            rep_norms = torch.norm(rep_t, dim=1, keepdim=True).clamp(min=1e-8)
+            assign_sim = ((unsampled_t / unsampled_norms) @ (rep_t / rep_norms).t()).cpu().numpy()
+
+            # 分配到最相似的家族
+            best_family = np.argmax(assign_sim, axis=1)
+            for i, fam_idx in enumerate(best_family):
+                result_families[family_ids[fam_idx]].append(unsampled[i])
+
+        result = [sorted(members) for members in result_families.values() if members]
         self._family_cache = result
         self._family_cache_round = self.round_num
         return result
