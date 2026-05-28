@@ -1274,7 +1274,13 @@ class CommunicationGame:
             if new_utterance:
                 new_chosen = other_game.listener.interpret(new_utterance, scene_features)
                 new_success = (new_chosen == target_idx)
-                # 更新双方
+                # 更新双方（重试也算一轮游戏）
+                self.language.total_games += 1
+                other_game.language.total_games += 1
+                if new_success:
+                    self.language.total_successes += 1
+                    other_game.language.total_successes += 1
+                    success = True
                 self.language.record_usage(new_utterance, new_success)
                 other_game.language.record_usage(new_utterance, new_success)
                 if len(new_utterance) >= 2:
@@ -1285,8 +1291,6 @@ class CommunicationGame:
                         other_game.language.record_collocation(
                             new_utterance[i], new_utterance[i + 1], new_success
                         )
-                if new_success:
-                    success = True
 
         # 记录日志
         self.game_log.append({
