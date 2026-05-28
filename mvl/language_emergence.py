@@ -19,13 +19,13 @@ from itertools import combinations
 
 # 符号分类常量
 COLORS = {'red', 'blue', 'green', 'yellow'}
-SHAPES = {'circle', 'square', 'triangle'}
-SIZES = {'big', 'small'}
-MATERIALS = {'metal', 'wood', 'plastic'}
+SHAPES = {'circle', 'square', 'triangle', 'sphere', 'cube', 'cylinder'}
+SIZES = {'big', 'small', 'medium', 'mid'}
+MATERIALS = {'metal', 'wood', 'plastic', 'glass', 'rubber', 'stone', 'fabric'}
 DEFAULT_MODIFIER_ORDER = ['size', 'color', 'material']
 
 # 动作符号常量
-ACTIONS = {'push', 'pull', 'grab', 'drop', 'move', 'go', 'stop', 'turn'}
+ACTIONS = {'push', 'pull', 'grab', 'drop', 'move', 'go', 'stop', 'turn', 'throw'}
 ACTION_EFFECTS = {
     'push': 'displacement',
     'pull': 'attraction',
@@ -35,6 +35,7 @@ ACTION_EFFECTS = {
     'go': 'directional',
     'stop': 'halt',
     'turn': 'rotation',
+    'throw': 'trajectory',
 }
 ACTION_EFFECT_VALUES = set(ACTION_EFFECTS.values())
 
@@ -114,6 +115,18 @@ def _symbol_category(sym: str) -> Optional[str]:
     return None
 
 
+def _is_compound(sym: str) -> bool:
+    """判断符号是否为复合符号（如 'red-cube'）"""
+    return '-' in sym and _symbol_category(sym) is None
+
+
+def _expand_compound(sym: str) -> List[str]:
+    """展开复合符号为组件列表；非复合符号返回自身"""
+    if _is_compound(sym):
+        return sym.split('-')
+    return [sym]
+
+
 class EmergingLanguage:
     """
     涌现语言系统
@@ -145,14 +158,109 @@ class EmergingLanguage:
         # 形容词层级偏好：相邻词对的成功率
         self.modifier_order = {}  # {('size','color'): {count, successes}, ...}
 
+        # 维度级统计：按特征维度（shape/material/color/size）追踪成功率
+        # 用于在多个同等效果的组合中，优先选择来自高成功率维度的符号
+        self.dimension_stats = {}  # {dim: {frequency, successes, success_rate}}
+
+        # 复合符号：频繁成功的多符号组合被压缩为单一符号
+        # 如 "red-cube" 由 "red" + "cube" 频繁共现而生成
+        self.compounds = {}  # {compound_sym: {components, frequency, successes, success_rate}}
+
+        # 复合符号共现追踪：用于递归复合（3+ 组件）
+        # 记录复合符号与其他符号在同一成功描述中的共现
+        self.compound_cooccurrence = {}  # {(compound, other): {count, successes}}
+
         # 统计
         self.total_games = 0
         self.total_successes = 0
         self.multi_symbol_games = 0  # 使用多符号描述的游戏数
         self.tri_symbol_games = 0    # 使用 3 符号描述的游戏数
 
+    def save_state(self) -> dict:
+        """导出所有学习到的状态（用于迁移学习）"""
+        return {
+            'vocabulary': self.vocabulary,
+            'collocations': {str(k): v for k, v in self.collocations.items()},
+            'word_order_scores': self.word_order_scores,
+            'word_order_counts': self.word_order_counts,
+            'grammar_rules': self.grammar_rules,
+            'ngram_patterns': {str(k): v for k, v in self.ngram_patterns.items()},
+            'modifier_order': {str(k): v for k, v in self.modifier_order.items()},
+            'dimension_stats': self.dimension_stats,
+            'compounds': self.compounds,
+            'compound_cooccurrence': {str(k): v for k, v in self.compound_cooccurrence.items()},
+            'total_games': self.total_games,
+            'total_successes': self.total_successes,
+            'multi_symbol_games': self.multi_symbol_games,
+            'tri_symbol_games': self.tri_symbol_games,
+        }
+
+    def load_state(self, state: dict):
+        """从导出的状态恢复（用于迁移学习）"""
+        self.vocabulary = state.get('vocabulary', {})
+        # collocations 的 key 是 tuple，需要从字符串恢复
+        raw_col = state.get('collocations', {})
+        self.collocations = {}
+        for k, v in raw_col.items():
+            if isinstance(k, str):
+                # 解析 "('a', 'b')" 格式
+                import ast
+                try:
+                    key = ast.literal_eval(k)
+                except (ValueError, SyntaxError):
+                    key = k
+            else:
+                key = k
+            self.collocations[key] = v
+        self.word_order_scores = state.get('word_order_scores', {'modifier_first': 0.0, 'head_first': 0.0})
+        self.word_order_counts = state.get('word_order_counts', {'modifier_first': 0, 'head_first': 0})
+        self.grammar_rules = state.get('grammar_rules', [])
+        # ngram_patterns 和 modifier_order 同样需要 tuple 恢复
+        raw_ngram = state.get('ngram_patterns', {})
+        self.ngram_patterns = {}
+        for k, v in raw_ngram.items():
+            if isinstance(k, str):
+                import ast
+                try:
+                    key = ast.literal_eval(k)
+                except (ValueError, SyntaxError):
+                    key = k
+            else:
+                key = k
+            self.ngram_patterns[key] = v
+        raw_mod = state.get('modifier_order', {})
+        self.modifier_order = {}
+        for k, v in raw_mod.items():
+            if isinstance(k, str):
+                import ast
+                try:
+                    key = ast.literal_eval(k)
+                except (ValueError, SyntaxError):
+                    key = k
+            else:
+                key = k
+            self.modifier_order[key] = v
+        self.dimension_stats = state.get('dimension_stats', {})
+        self.compounds = state.get('compounds', {})
+        raw_cc = state.get('compound_cooccurrence', {})
+        self.compound_cooccurrence = {}
+        for k, v in raw_cc.items():
+            if isinstance(k, str):
+                import ast
+                try:
+                    key = ast.literal_eval(k)
+                except (ValueError, SyntaxError):
+                    key = k
+            else:
+                key = k
+            self.compound_cooccurrence[key] = v
+        self.total_games = state.get('total_games', 0)
+        self.total_successes = state.get('total_successes', 0)
+        self.multi_symbol_games = state.get('multi_symbol_games', 0)
+        self.tri_symbol_games = state.get('tri_symbol_games', 0)
+
     def record_usage(self, symbols: List[str], success: bool):
-        """记录一次符号使用"""
+        """记录一次符号使用（符号级 + 维度级 + 复合符号更新）"""
         for sym in symbols:
             if sym not in self.vocabulary:
                 self.vocabulary[sym] = {
@@ -166,6 +274,25 @@ class EmergingLanguage:
             self.vocabulary[sym]['success_rate'] = (
                 self.vocabulary[sym]['successes'] / self.vocabulary[sym]['frequency']
             )
+
+            # 更新复合符号的 last_used
+            if sym in self.compounds:
+                self.compounds[sym]['last_used'] = self.total_games
+
+            # 维度级统计
+            dim = _symbol_category(sym)
+            if dim:
+                if dim not in self.dimension_stats:
+                    self.dimension_stats[dim] = {
+                        'frequency': 0, 'successes': 0, 'success_rate': 0.0
+                    }
+                self.dimension_stats[dim]['frequency'] += 1
+                if success:
+                    self.dimension_stats[dim]['successes'] += 1
+                self.dimension_stats[dim]['success_rate'] = (
+                    self.dimension_stats[dim]['successes'] /
+                    self.dimension_stats[dim]['frequency']
+                )
 
     def record_collocation(self, sym_a: str, sym_b: str, success: bool):
         """记录一次符号组合"""
@@ -192,6 +319,105 @@ class EmergingLanguage:
             self.ngram_patterns[key]['count'] += 1
             if success:
                 self.ngram_patterns[key]['successes'] += 1
+
+    def check_compound_formation(self, symbols: List[str], success: bool):
+        """
+        检查符号序列是否应该形成复合符号
+
+        两种路径：
+        1. 原始 n-gram：连续符号序列频繁成功
+        2. 递归复合：已有复合符号 + 新符号频繁共现
+        """
+        if not success or len(symbols) < 2:
+            return
+
+        # 路径 1：原始 n-gram
+        for n in range(2, len(symbols) + 1):
+            for i in range(len(symbols) - n + 1):
+                subsym = symbols[i:i + n]
+                if any(_is_compound(s) for s in subsym):
+                    continue
+                key = tuple(subsym)
+                ngram_data = self.ngram_patterns.get(key)
+                if ngram_data is None:
+                    continue
+                count = ngram_data['count']
+                successes = ngram_data['successes']
+                rate = successes / count if count > 0 else 0
+
+                min_count = max(2, 7 - n)
+                if count >= min_count and rate >= 0.8:
+                    compound_sym = '-'.join(subsym)
+                    if compound_sym not in self.compounds:
+                        self.compounds[compound_sym] = {
+                            'components': subsym,
+                            'frequency': count,
+                            'successes': successes,
+                            'success_rate': rate,
+                            'last_used': self.total_games,
+                        }
+
+        # 路径 2：递归复合——已有复合符号频繁与另一个符号共现
+        for sym in symbols:
+            if not _is_compound(sym):
+                continue
+            comp_data = self.compounds.get(sym)
+            if comp_data is None:
+                continue
+            for other in symbols:
+                if other == sym or _is_compound(other):
+                    continue
+                # 检查两种顺序的共现
+                for pattern in [(sym, other), (other, sym)]:
+                    cc_data = self.compound_cooccurrence.get(pattern)
+                    if cc_data is None:
+                        continue
+                    count = cc_data['count']
+                    successes = cc_data['successes']
+                    rate = successes / count if count > 0 else 0
+                    if count >= 2 and rate >= 0.8:
+                        if pattern[0] == other:
+                            new_components = [other] + comp_data['components']
+                        else:
+                            new_components = comp_data['components'] + [other]
+                        new_compound = '-'.join(new_components)
+                        if new_compound not in self.compounds:
+                            self.compounds[new_compound] = {
+                                'components': new_components,
+                                'frequency': count,
+                                'successes': successes,
+                                'success_rate': rate,
+                                'last_used': self.total_games,
+                            }
+
+    def record_compound_cooccurrence(self, symbols: List[str], success: bool):
+        """记录复合符号与其他符号的共现（用于递归复合）"""
+        compounds_in = [s for s in symbols if _is_compound(s)]
+        others = [s for s in symbols if not _is_compound(s)]
+        if not compounds_in or not others:
+            return
+        for comp in compounds_in:
+            for other in others:
+                key = (comp, other)
+                if key not in self.compound_cooccurrence:
+                    self.compound_cooccurrence[key] = {'count': 0, 'successes': 0}
+                self.compound_cooccurrence[key]['count'] += 1
+                if success:
+                    self.compound_cooccurrence[key]['successes'] += 1
+
+    def prune_compounds(self, max_age: int = 100):
+        """
+        淘汰长期不使用的复合符号
+
+        移除最近 max_age 轮内未被使用的复合符号。
+        """
+        to_remove = []
+        for sym, data in self.compounds.items():
+            last_used = data.get('last_used', 0)
+            if self.total_games - last_used > max_age:
+                to_remove.append(sym)
+        for sym in to_remove:
+            del self.compounds[sym]
 
     def record_modifier_order(self, cat_a: str, cat_b: str, success: bool):
         """记录形容词层级偏好（相邻词对的类别关系）"""
@@ -332,10 +558,29 @@ class Speaker:
         # 尝试所有策略，选择最短的描述
         candidates = []
 
-        # 策略 1: 单符号
-        for sym in target_symbols:
-            if self._is_unique(sym, scene_features):
-                candidates.append([sym])
+        # 策略 0: 复合符号（优先使用已生成的复合符号）
+        for compound_sym, data in self.language.compounds.items():
+            components = data.get('components', [])
+            # 检查复合符号的所有组件是否都在目标特征中
+            if all(c in target_symbols for c in components):
+                # 检查复合符号是否能唯一标识目标
+                if self._is_unique(compound_sym, scene_features):
+                    candidates.append([compound_sym])
+                else:
+                    # 复合符号不够唯一，尝试 + 其他符号
+                    remaining = [s for s in target_symbols
+                                 if s not in components and not _is_compound(s)]
+                    for extra in remaining:
+                        combo = [compound_sym, extra]
+                        if self._count_matches(combo, scene_features) <= 1:
+                            candidates.append(combo)
+
+        # 策略 1: 单符号（多个可选时优先选词汇成功率高的）
+        unique_syms = [sym for sym in target_symbols if self._is_unique(sym, scene_features)]
+        if unique_syms:
+            if self.language.vocabulary:
+                unique_syms.sort(key=lambda s: -self.language.vocabulary.get(s, {}).get('success_rate', 0.0))
+            candidates.append([unique_syms[0]])
 
         # 策略 2: 正向组合
         best_combo = self._find_best_combination(target_symbols, scene_features)
@@ -355,25 +600,12 @@ class Speaker:
             if rel_result:
                 candidates.append(rel_result)
 
-        # 选择最短的候选描述
+        # 选择最短的候选描述（同长度时优先选词汇成功率高的）
         if candidates:
-            candidates.sort(key=len)
+            candidates.sort(key=lambda c: (len(c), -self._candidate_score(c)))
             return candidates[0]
 
         # 所有策略都失败，返回最佳正向组合
-        return self._order_symbols(best_combo)
-
-        # 组合仍有歧义 → 尝试否定
-        if target_idx >= 0:
-            neg_result = self._try_negation(target_features, scene_features, target_idx)
-            if neg_result:
-                return neg_result
-
-            # 否定也不够 → 尝试相对从句
-            rel_result = self._try_relative_clause(target_features, scene_features, target_idx)
-            if rel_result:
-                return rel_result
-
         return self._order_symbols(best_combo)
 
     def _try_negation(self, target_features: Dict[str, str],
@@ -450,8 +682,39 @@ class Speaker:
 
         return None
 
+    def _candidate_score(self, symbols: List[str]) -> float:
+        """
+        计算候选描述的词汇成功率分数（用于同长度候选的排序）
+
+        优先使用符号级成功率；符号完全无数据时，回退到维度级成功率。
+        维度级是回退机制，不是融合机制——避免粗糙的维度信息稀释精确的符号信息。
+        维度统计需要最小频率阈值（10 次）才可用，避免早期噪声。
+        """
+        if not self.language.vocabulary and not self.language.dimension_stats:
+            return 0.0
+        dim_min_freq = 10  # 维度统计最小可信频率
+        rates = []
+        for sym in symbols:
+            sym_data = self.language.vocabulary.get(sym)
+            if sym_data and sym_data['frequency'] > 0:
+                rates.append(sym_data['success_rate'])
+            else:
+                # 回退：用维度级成功率估计未见过的符号
+                dim = _symbol_category(sym)
+                dim_data = self.language.dimension_stats.get(dim) if dim else None
+                if dim_data and dim_data['frequency'] >= dim_min_freq:
+                    rates.append(dim_data['success_rate'])
+                else:
+                    rates.append(0.0)
+        return sum(rates) / len(rates) if rates else 0.0
+
     def _is_unique(self, symbol: str, scene: List[Dict[str, str]]) -> bool:
-        return sum(1 for obj in scene if symbol in obj.values()) == 1
+        """检查符号是否唯一标识场景中的一个物体（支持复合符号展开）"""
+        components = _expand_compound(symbol)
+        return sum(
+            1 for obj in scene
+            if all(c in obj.values() for c in components)
+        ) == 1
 
     def _find_best_combination(self, symbols: List[str],
                                scene: List[Dict[str, str]]) -> List[str]:
@@ -489,14 +752,18 @@ class Speaker:
 
         if not candidates:
             return None
-        # 随机选择同等效果的组合之一（漂变机制）
+        # 优先选词汇成功率高的组合，无词汇信息时随机选择（漂变机制）
+        if self.language.vocabulary:
+            candidates.sort(key=lambda c: -self._candidate_score(c))
+            return candidates[0]
         return candidates[np.random.randint(len(candidates))]
 
     def _count_matches(self, combo: List[str], scene: List[Dict[str, str]]) -> int:
-        """计算场景中有多少物体匹配该组合"""
+        """计算场景中有多少物体匹配该组合（支持复合符号展开）"""
         return sum(
             1 for obj in scene
-            if all(sym in obj.values() for sym in combo)
+            if all(any(c in obj.values() for c in _expand_compound(sym))
+                   for sym in combo)
         )
 
     def _order_symbols(self, symbols: List[str]) -> List[str]:
@@ -659,7 +926,7 @@ class Listener:
         计算描述与物体的匹配度
 
         支持否定：遇到 negation marker 时，下一个符号反转匹配
-        （物体不包含该符号时得分 +1）
+        支持复合符号：展开后检查每个组件是否匹配
         """
         obj_values = set(obj_features.values())
         score = 0
@@ -668,11 +935,14 @@ class Listener:
             if utterance[i] in NEGATION_MARKERS and i + 1 < len(utterance):
                 # 否定：如果物体不包含下一个符号，得分 +1
                 negated_sym = utterance[i + 1]
-                if negated_sym not in obj_values:
+                components = _expand_compound(negated_sym)
+                if not all(c in obj_values for c in components):
                     score += 1
                 i += 2
             else:
-                if utterance[i] in obj_values:
+                # 复合符号：所有组件都匹配才算匹配
+                components = _expand_compound(utterance[i])
+                if all(c in obj_values for c in components):
                     score += 1
                 i += 1
         return score / len(utterance) if utterance else 0.0
@@ -749,6 +1019,16 @@ class CommunicationGame:
         if len(utterance) >= 2:
             self.language.record_ngram(utterance, success)
 
+        # 记录复合符号共现（用于递归复合）
+        self.language.record_compound_cooccurrence(utterance, success)
+
+        # 检查是否形成复合符号
+        self.language.check_compound_formation(utterance, success)
+
+        # 定期淘汰不活跃的复合符号（每 50 轮检查一次）
+        if self.language.total_games % 50 == 0:
+            self.language.prune_compounds(max_age=100)
+
         # 记录词序
         order = self._detect_order(utterance, target)
         if order:
@@ -766,6 +1046,20 @@ class CommunicationGame:
         })
 
         return success
+
+    def play_round_frozen(self, scene_features: List[Dict[str, str]],
+                           target_idx: int) -> bool:
+        """一轮参照游戏（不更新语言统计，用于迁移测试）"""
+        if target_idx >= len(scene_features) or not scene_features:
+            return False
+
+        target = scene_features[target_idx]
+        utterance = self.speaker.describe(target, scene_features)
+        if not utterance:
+            return False
+
+        chosen_idx = self.listener.interpret(utterance, scene_features)
+        return chosen_idx == target_idx
 
     def _detect_order(self, utterance: List[str],
                       target_features: Dict[str, str]) -> Optional[str]:

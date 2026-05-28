@@ -65,19 +65,24 @@ class NeuralNetworkPredictor:
         """ReLU导数"""
         return (x > 0).astype(float)
 
-    def predict(self, obs: np.ndarray, action: int) -> np.ndarray:
+    def predict(self, obs: np.ndarray, action) -> np.ndarray:
         """
         预测下一时刻的观测
 
         前向传播：
-        1. 输入 = [obs, action_one_hot]
+        1. 输入 = [obs, action_vec]
         2. hidden1 = relu(W1 @ input + b1)
         3. hidden2 = relu(W2 @ hidden1 + b2)
         4. output = W3 @ hidden2 + b3
+
+        action: int（离散，one-hot）或 np.ndarray（连续，直接使用）
         """
         # 编码动作
-        action_vec = np.zeros(self.action_dim)
-        action_vec[action] = 1.0
+        if isinstance(action, np.ndarray):
+            action_vec = action[:self.action_dim]
+        else:
+            action_vec = np.zeros(self.action_dim)
+            action_vec[action] = 1.0
 
         # 拼接输入
         x = np.concatenate([obs, action_vec])
@@ -103,7 +108,7 @@ class NeuralNetworkPredictor:
 
         return output
 
-    def learn(self, obs: np.ndarray, action: int, actual_next_obs: np.ndarray) -> float:
+    def learn(self, obs: np.ndarray, action, actual_next_obs: np.ndarray) -> float:
         """
         学习 = 减少预测误差
 
@@ -156,7 +161,7 @@ class NeuralNetworkPredictor:
 
         return prediction_error
 
-    def learn_and_get_input_gradient(self, obs: np.ndarray, action: int,
+    def learn_and_get_input_gradient(self, obs: np.ndarray, action,
                                       actual_next_obs: np.ndarray) -> Tuple[float, np.ndarray]:
         """
         学习并返回输入梯度
@@ -251,7 +256,7 @@ class AdaptiveLearningRatePredictor(NeuralNetworkPredictor):
         # 学习率历史
         self.lr_history = []
 
-    def learn(self, obs: np.ndarray, action: int, actual_next_obs: np.ndarray) -> float:
+    def learn(self, obs: np.ndarray, action, actual_next_obs: np.ndarray) -> float:
         """学习并自适应调整学习率"""
         error = super().learn(obs, action, actual_next_obs)
 

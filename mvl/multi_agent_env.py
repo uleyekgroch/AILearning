@@ -1,13 +1,20 @@
 """
-Phase 27: 多 Agent 共享网格世界
+Phase 27/30: 多 Agent 共享网格世界
 
 N 个 Agent 在同一环境中各自探索，
 每个 Agent 有自己的位置和视野范围。
+
+Phase 30 改进：
+- 自适应网格大小（随 Agent 数量缩放）
+- 均匀随机出生点（替换 4 角落）
+- 空间索引加速观测
 """
 
 import random
+import numpy as np
 from typing import List, Dict, Optional, Set
 from dataclasses import dataclass, field
+from collections import defaultdict
 
 import sys
 import os
@@ -29,44 +36,74 @@ class AgentState:
 class MultiAgentGridWorld:
     """多 Agent 共享网格世界"""
 
-    def __init__(self, width: int = 12, height: int = 12, num_agents: int = 2):
+    def __init__(self, width: int = None, height: int = None, num_agents: int = 2):
+        # 自适应网格大小：至少 base_size，随 Agent 数缩放
+        if width is None:
+            width = max(12, int(np.sqrt(num_agents) * 3))
+        if height is None:
+            height = width
         self.width = width
         self.height = height
         self.objects: List[Object] = []
         self.step_count = 0
+        self.num_agents = num_agents
 
-        # 初始化 Agent 位置（均匀分布在四个角落区域）
-        positions = [
-            (1, 1), (width - 2, height - 2),
-            (1, height - 2), (width - 2, 1),
-        ]
+        # 空间索引：网格 cell 大小 = fov_range
+        self._cell_size = 3
+        self._spatial_index: Dict[tuple, List[int]] = defaultdict(list)
+
+        # 均匀随机出生点（不重叠）
+        occupied = set()
         self.agents: List[AgentState] = []
         for i in range(num_agents):
-            px, py = positions[i % len(positions)]
+            for _ in range(100):  # 最多尝试 100 次
+                px = random.randint(1, self.width - 2)
+                py = random.randint(1, self.height - 2)
+                if (px, py) not in occupied:
+                    occupied.add((px, py))
+                    break
             self.agents.append(AgentState(
                 agent_id=i, x=px, y=py,
                 fov_range=3,
             ))
 
+    def _update_spatial_index(self):
+        """更新空间索引"""
+        self._spatial_index.clear()
+        for idx, obj in enumerate(self.objects):
+            cell = (obj.x // self._cell_size, obj.y // self._cell_size)
+            self._spatial_index[cell].append(idx)
+
     def add_object(self, obj: Object):
         """添加物体"""
         obj.enrich_features()
         self.objects.append(obj)
+        # 更新空间索引
+        cell = (obj.x // self._cell_size, obj.y // self._cell_size)
+        self._spatial_index[cell].append(len(self.objects) - 1)
 
     def get_agent_observation(self, agent_id: int) -> dict:
-        """获取指定 Agent 的局部观测"""
+        """获取指定 Agent 的局部观测（使用空间索引加速）"""
         agent = self.agents[agent_id]
         visible = []
-        for obj in self.objects:
-            dist = abs(obj.x - agent.x) + abs(obj.y - agent.y)
-            if dist <= agent.fov_range:
-                visible.append({
-                    'object': obj,
-                    'relative_x': obj.x - agent.x,
-                    'relative_y': obj.y - agent.y,
-                    'distance': dist,
-                })
-                agent.discovered_objects.add(obj.id)
+
+        # 只搜索邻近的网格 cell
+        cx = agent.x // self._cell_size
+        cy = agent.y // self._cell_size
+        for dx in range(-1, 2):
+            for dy in range(-1, 2):
+                cell = (cx + dx, cy + dy)
+                for obj_idx in self._spatial_index.get(cell, []):
+                    obj = self.objects[obj_idx]
+                    dist = abs(obj.x - agent.x) + abs(obj.y - agent.y)
+                    if dist <= agent.fov_range:
+                        visible.append({
+                            'object': obj,
+                            'relative_x': obj.x - agent.x,
+                            'relative_y': obj.y - agent.y,
+                            'distance': dist,
+                        })
+                        agent.discovered_objects.add(obj.id)
 
         return {
             'agent_id': agent_id,
@@ -91,8 +128,16 @@ class MultiAgentGridWorld:
             agent.x = new_x
             agent.y = new_y
 
-        self.step_count += 1
         return self.get_agent_observation(agent_id)
+
+    def batch_step(self, actions: List[int]) -> List[dict]:
+        """批量执行所有 Agent 的动作，返回所有观测"""
+        observations = []
+        for agent_id, action in enumerate(actions):
+            obs = self.step_agent(agent_id, action)
+            observations.append(obs)
+        self.step_count += 1
+        return observations
 
     def get_all_discoveries(self) -> Dict[int, Set[int]]:
         """获取每个 Agent 发现的物体 ID"""
@@ -125,23 +170,22 @@ class MultiAgentGridWorld:
 
 
 def create_multi_agent_world(num_agents: int = 2) -> MultiAgentGridWorld:
-    """创建测试世界"""
-    env = MultiAgentGridWorld(12, 12, num_agents)
+    """创建测试世界（自适应网格大小）"""
+    env = MultiAgentGridWorld(num_agents=num_agents)
 
-    # 散布各种材质的物体
-    objects_data = [
-        (0, 3, 3, 'red', 'circle', 1.5, 'metal'),
-        (1, 8, 8, 'blue', 'square', 0.5, 'fabric'),
-        (2, 5, 2, 'green', 'triangle', 1.0, 'wood'),
-        (3, 10, 5, 'yellow', 'circle', 1.8, 'stone'),
-        (4, 2, 9, 'red', 'square', 0.8, 'plastic'),
-        (5, 7, 6, 'blue', 'circle', 1.2, 'glass'),
-        (6, 1, 5, 'green', 'square', 0.6, 'fabric'),
-        (7, 9, 10, 'yellow', 'triangle', 1.4, 'metal'),
-        (8, 4, 7, 'red', 'triangle', 0.9, 'wood'),
-        (9, 6, 1, 'blue', 'square', 1.1, 'stone'),
-    ]
-    for oid, x, y, color, shape, weight, material in objects_data:
+    # 物体数量随网格面积缩放
+    num_objects = max(10, env.width * env.height // 10)
+    colors = ['red', 'blue', 'green', 'yellow']
+    shapes = ['circle', 'square', 'triangle']
+    materials = ['metal', 'fabric', 'wood', 'stone', 'plastic', 'glass']
+
+    for oid in range(num_objects):
+        x = random.randint(0, env.width - 1)
+        y = random.randint(0, env.height - 1)
+        color = colors[oid % len(colors)]
+        shape = shapes[oid % len(shapes)]
+        material = materials[oid % len(materials)]
+        weight = 0.5 + (oid % 5) * 0.3
         env.add_object(Object(oid, x, y, color, shape, weight, material=material))
 
     return env
