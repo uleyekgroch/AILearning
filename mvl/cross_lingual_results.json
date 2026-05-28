@@ -1,0 +1,224 @@
+{
+  "baseline": {
+    "isolation": {
+      "A": 0.952,
+      "B": 0.956
+    },
+    "before": {
+      "cross_lingual": {
+        "baseline_success": 0.98,
+        "reverse_success": 0.95,
+        "cross_success": 0.965,
+        "vocab_overlap": 0.7,
+        "shared_symbols": 14,
+        "total_symbols": 20,
+        "avg_similarity": 0.4056775901622109
+      },
+      "intra_a": {
+        "baseline_success": 0.95,
+        "reverse_success": 0.95,
+        "cross_success": 0.95,
+        "vocab_overlap": 1.0,
+        "shared_symbols": 17,
+        "total_symbols": 17,
+        "avg_similarity": 0.5665723544177004
+      },
+      "intra_b": {
+        "baseline_success": 0.95,
+        "reverse_success": 0.97,
+        "cross_success": 0.96,
+        "vocab_overlap": 1.0,
+        "shared_symbols": 17,
+        "total_symbols": 17,
+        "avg_similarity": 0.5500556890103806
+      },
+      "avg_translation_table_size": 0.0,
+      "num_bilingual": 0
+    },
+    "contact": {
+      "cross_success": 0.9397590361445783,
+      "intra_success": 0.9610778443113772,
+      "cross_total": 166,
+      "intra_total": 334,
+      "num_bridges": 0
+    },
+    "after": {
+      "cross_lingual": {
+        "baseline_success": 0.97,
+        "reverse_success": 0.94,
+        "cross_success": 0.955,
+        "vocab_overlap": 0.85,
+        "shared_symbols": 17,
+        "total_symbols": 20,
+        "avg_similarity": 0.40165237087654093
+      },
+      "intra_a": {
+        "baseline_success": 0.95,
+        "reverse_success": 0.95,
+        "cross_success": 0.95,
+        "vocab_overlap": 1.0,
+        "shared_symbols": 17,
+        "total_symbols": 17,
+        "avg_similarity": 0.5475134706961107
+      },
+      "intra_b": {
+        "baseline_success": 0.96,
+        "reverse_success": 0.97,
+        "cross_success": 0.965,
+        "vocab_overlap": 1.0,
+        "shared_symbols": 20,
+        "total_symbols": 20,
+        "avg_similarity": 0.5890197071514819
+      },
+      "avg_translation_table_size": 0.0,
+      "num_bilingual": 0
+    }
+  },
+  "bridge": {
+    "no_bridge": {
+      "cross_before": 0.95,
+      "cross_after": 0.955,
+      "contact_success": 0.9341317365269461
+    },
+    "bridge": {
+      "cross_before": 0.955,
+      "cross_after": 0.955,
+      "contact_success": 0.8280254777070064
+    },
+    "bilingual": {
+      "cross_before": 0.95,
+      "cross_after": 0.975,
+      "contact_success": 0.9785714285714285
+    }
+  },
+  "env_difference": {
+    "热带 vs 极地": {
+      "iso_a": 0.9525,
+      "iso_b": 0.9525,
+      "cross_before": 0.9625,
+      "cross_after": 0.975,
+      "vocab_overlap_before": 0.7,
+      "vocab_overlap_after": 0.85,
+      "sim_before": 0.39241762518763706,
+      "sim_after": 0.4184893852046352
+    },
+    "热带 vs 工业": {
+      "iso_a": 0.955,
+      "iso_b": 0.95625,
+      "cross_before": 0.93125,
+      "cross_after": 0.95625,
+      "vocab_overlap_before": 0.13793103448275862,
+      "vocab_overlap_after": 0.5862068965517241,
+      "sim_before": 0.31494773037395113,
+      "sim_after": 0.3008357191125509
+    },
+    "热带 vs 森林": {
+      "iso_a": 0.9425,
+      "iso_b": 0.96875,
+      "cross_before": 0.94375,
+      "cross_after": 0.9625,
+      "vocab_overlap_before": 0.1,
+      "vocab_overlap_after": 0.5333333333333333,
+      "sim_before": 0.28615233192132594,
+      "sim_after": 0.2982703378461156
+    },
+    "极地 vs 工业": {
+      "iso_a": 0.95125,
+      "iso_b": 0.95375,
+      "cross_before": 0.9375,
+      "cross_after": 0.9375,
+      "vocab_overlap_before": 0.03125,
+      "vocab_overlap_after": 0.53125,
+      "sim_before": 0.28584801925770187,
+      "sim_after": 0.304680845060692
+    },
+    "工业 vs 魔法": {
+      "iso_a": 0.95125,
+      "iso_b": 0.93,
+      "cross_before": 0.9625,
+      "cross_after": 0.925,
+      "vocab_overlap_before": 0.12,
+      "vocab_overlap_after": 0.64,
+      "sim_before": 0.36407289187565794,
+      "sim_after": 0.3527745234642735
+    },
+    "热带 vs 热带": {
+      "iso_a": 0.94625,
+      "iso_b": 0.95625,
+      "cross_before": 0.95625,
+      "cross_after": 0.9875,
+      "vocab_overlap_before": 1.0,
+      "vocab_overlap_after": 1.0,
+      "sim_before": 0.5363213783830968,
+      "sim_after": 0.5321648012798851
+    }
+  },
+  "lingua_franca": {
+    "rounds": [
+      100,
+      200,
+      300,
+      400,
+      500,
+      600,
+      700,
+      800,
+      900,
+      1000,
+      1100,
+      1200,
+      1300,
+      1400,
+      1500,
+      1600,
+      1700,
+      1800,
+      1900,
+      2000
+    ],
+    "cross_success": [
+      0.9322033898305084,
+      0.9629629629629629,
+      0.9622641509433962,
+      0.9069767441860465,
+      1.0,
+      0.9761904761904762,
+      0.9622641509433962,
+      0.9387755102040817,
+      0.9736842105263158,
+      0.9661016949152542,
+      0.8913043478260869,
+      0.9782608695652174,
+      0.9807692307692307,
+      0.9782608695652174,
+      0.9333333333333333,
+      1.0,
+      0.9591836734693877,
+      0.9387755102040817,
+      0.9555555555555556,
+      0.9811320754716981
+    ],
+    "intra_success": [
+      0.975609756097561,
+      0.9565217391304348,
+      0.9361702127659575,
+      0.9649122807017544,
+      0.9615384615384616,
+      0.9137931034482759,
+      0.9574468085106383,
+      0.9019607843137255,
+      0.967741935483871,
+      0.9512195121951219,
+      0.9629629629629629,
+      0.9074074074074074,
+      0.8958333333333334,
+      0.9259259259259259,
+      0.9454545454545454,
+      0.9814814814814815,
+      0.9215686274509803,
+      0.9607843137254902,
+      0.9636363636363636,
+      0.9574468085106383
+    ]
+  }
+}

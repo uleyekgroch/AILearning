@@ -65,6 +65,9 @@ mvl/
 │   ├── agent_social.py               # 社会学习 Agent
 │   └── instruction_grounding.py      # 指令 Grounding（动词+物体描述）
 │
+├── 跨语言翻译模块
+│   └── language_translator.py        # 双语 Agent + 跨环境翻译
+│
 └── 实验模块（26 个 experiment_*.py）
 ```
 
@@ -132,6 +135,7 @@ python experiment_tool_use.py
 | 47 | CUDA 加速 + 1000+ Agent 大社会 | ✅ |
 | 48 | 流体与软体物理（SPH 粒子 + 弹簧-质点）| ✅ |
 | 49 | 超大规模社会（2000-5000 Agent）| ✅ |
+| 50 | 跨语言迁移（不同环境的语言互译）| ✅ |
 
 ## 关键论文
 
