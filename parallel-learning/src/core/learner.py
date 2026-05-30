@@ -527,26 +527,6 @@ class Learner:
         except (KeyError, Exception):
             pass
 
-        # ===== 新增：对象中心世界模型学习 =====
-        try:
-            # 感知对象
-            perception = self.world_model.perceive(obs)
-            objects = perception['objects']
-            # 更新对象状态
-            for obj in objects:
-                if obj.id in self.world_model.objects:
-                    # 预测下一状态
-                    predicted_state = self.world_model.state_predictor(obj)
-                    # 与实际观测比较
-                    prediction_error = torch.cosine_similarity(
-                        predicted_state.unsqueeze(0), next_obs.unsqueeze(0)
-                    ).item()
-                    # 如果预测误差高，更新对象属性
-                    if prediction_error < 0.5:
-                        obj.attributes['prediction_error'] = prediction_error
-        except Exception:
-            pass
-
         # ===== 新增：反思学习（每10步反思一次）=====
         if self._total_steps % 10 == 0 and self._total_steps > 0:
             try:
@@ -1160,22 +1140,9 @@ class Learner:
         else:
             self._learning_stats['failed'] += 1
 
-        # 12. 自改进：评估性能并调整策略
+        # 12. 自改进：评估性能并调整策略（参数通过get_parameter动态获取）
         score = verification.get('score', 0.5)
         improvement = self.self_improvement.evaluate_performance(text[:30], score)
-
-        # 应用脚手架调整
-        for adj in improvement.get('adjustments', []):
-            param = adj['parameter']
-            if param == 'hebbian_lr':
-                # 更新Hebbian学习率
-                pass  # 在_train_embedding中使用get_parameter
-            elif param == 'negative_threshold':
-                # 更新负样本阈值
-                pass  # 在_train_embedding中使用get_parameter
-            elif param == 'confidence_threshold':
-                # 更新置信度阈值
-                pass  # 在_synthesize_from_reasoning中使用get_parameter
 
         # 13. 经验反思学习：记录经验并定期反思
         self.reflective_learning.record_experience(
