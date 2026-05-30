@@ -598,10 +598,16 @@ class Learner:
         device = base_scores.device
         simulator_bonus = simulator_bonus.to(device)
         explore_bonus = explore_bonus.to(device)
-        # empowerment：控制力高的动作获得奖励
+
+        # empowerment：按动作计算信息增益
         empowerment_bonus = torch.zeros(n_actions, device=device)
         if empowerment > 0.3:
-            empowerment_bonus += empowerment * 0.2
+            # 对每个动作，计算其带来的信息增益
+            for a in range(n_actions):
+                # 使用预测方差作为信息增益的代理
+                # 方差高 = 不确定性高 = 信息增益大
+                empowerment_bonus[a] = preds[a].var() * empowerment
+
         final_scores = base_scores + simulator_bonus + explore_bonus * 0.3 + empowerment_bonus
         action = int(final_scores.argmax().item())
 
@@ -1820,7 +1826,7 @@ class Learner:
         # 测试时训练：根据查询上下文微调编码器
         # 先确保编码器已初始化
         question_repr = self._encode_text(question)
-        if hasattr(self, '_learnable_encoder') and hasattr(self, '_knowledge_extractor'):
+        if hasattr(self, '_learnable_encoder'):
             # 获取相关实体
             similar_entities = self._find_similar_entities(question_repr, top_k=3)
             relevant_entities = [eid for eid, sim in similar_entities if sim > 0.3]
