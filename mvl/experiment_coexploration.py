@@ -4,6 +4,7 @@ Phase 27 实验：多 Agent 共同探索与语言通信
 5 个实验验证多 Agent 共同探索中的语言涌现。
 """
 
+import json
 import random
 import sys
 import os
@@ -12,6 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from multi_agent_env import MultiAgentGridWorld, create_multi_agent_world
 from exploring_agent import ExploringAgent, CoExplorationGame, SoloExplorationGame
 from language_emergence import compute_language_similarity
+import numpy as np
 
 
 def experiment_1_individual_view():
@@ -201,12 +203,38 @@ if __name__ == '__main__':
     print("Phase 27: 多 Agent 共同探索与语言通信实验")
     print("=" * 60)
 
-    experiment_1_individual_view()
-    experiment_2_language_emergence()
-    experiment_3_communication_benefit()
-    experiment_4_language_convergence()
+    r1_ids0, r1_ids1 = experiment_1_individual_view()
+    r2 = experiment_2_language_emergence()
+    r3 = experiment_3_communication_benefit()
+    r4 = experiment_4_language_convergence()
     experiment_5_scaling()
 
     print("\n" + "=" * 60)
     print("所有实验完成")
     print("=" * 60)
+
+    # 保存结果
+    def to_serializable(obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, (np.floating, np.integer)):
+            return float(obj)
+        elif isinstance(obj, dict):
+            return {k: to_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [to_serializable(v) for v in obj]
+        elif isinstance(obj, set):
+            return sorted(list(obj))
+        return obj
+
+    results = {
+        'experiment_1_individual_view': {
+            'agent0_visible': sorted(r1_ids0),
+            'agent1_visible': sorted(r1_ids1),
+        },
+        'experiment_3_communication_benefit': r3,
+        'experiment_4_language_convergence': r4,
+    }
+    with open('coexploration_results.json', 'w', encoding='utf-8') as f:
+        json.dump(to_serializable(results), f, indent=2, ensure_ascii=False)
+    print(f"\n结果已保存到: coexploration_results.json")

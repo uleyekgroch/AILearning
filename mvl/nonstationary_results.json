@@ -1,0 +1,459 @@
+{
+  "experiment_1": {
+    "final_sr": 0.864,
+    "regime_changes": 2,
+    "snapshots": [
+      {
+        "round": 50,
+        "regime": "spring",
+        "regime_changed": false,
+        "success_rate": 0.86,
+        "speaker_vocab": {
+          "active_count": 7,
+          "total_known": 7,
+          "top_symbols": {
+            "small": 1.45,
+            "oval": 1.45,
+            "yellow": 1.42,
+            "circle": 1.42,
+            "tiny": 1.42,
+            "white": 1.33,
+            "green": 1.12
+          }
+        },
+        "listener_vocab": {
+          "active_count": 7,
+          "total_known": 7,
+          "top_symbols": {
+            "small": 1.45,
+            "oval": 1.45,
+            "yellow": 1.42,
+            "circle": 1.42,
+            "tiny": 1.42,
+            "white": 1.33,
+            "green": 1.12
+          }
+        }
+      },
+      {
+        "round": 100,
+        "regime": "spring",
+        "regime_changed": false,
+        "success_rate": 0.9,
+        "speaker_vocab": {
+          "active_count": 7,
+          "total_known": 7,
+          "top_symbols": {
+            "circle": 2.0,
+            "small": 2.0,
+            "oval": 2.0,
+            "tiny": 1.97,
+            "white": 1.93,
+            "yellow": 1.78,
+            "green": 1.39
+          }
+        },
+        "listener_vocab": {
+          "active_count": 7,
+          "total_known": 7,
+          "top_symbols": {
+            "circle": 2.0,
+            "small": 2.0,
+            "oval": 2.0,
+            "tiny": 1.97,
+            "white": 1.93,
+            "yellow": 1.78,
+            "green": 1.39
+          }
+        }
+      },
+      {
+        "round": 150,
+        "regime": "spring",
+        "regime_changed": false,
+        "success_rate": 0.8933,
+        "speaker_vocab": {
+          "active_count": 7,
+          "total_known": 7,
+          "top_symbols": {
+            "yellow": 2.0,
+            "circle": 2.0,
+            "small": 2.0,
+            "white": 2.0,
+            "oval": 2.0,
+            "tiny": 2.0,
+            "green": 1.66
+          }
+        },
+        "listener_vocab": {
+          "active_count": 7,
+          "total_known": 7,
+          "top_symbols": {
+            "yellow": 2.0,
+            "circle": 2.0,
+            "small": 2.0,
+            "white": 2.0,
+            "oval": 2.0,
+            "tiny": 2.0,
+            "green": 1.66
+          }
+        }
+      },
+      {
+        "round": 151,
+        "regime": "summer",
+        "regime_changed": true,
+        "success_rate": 0.8874,
+        "speaker_vocab": {
+          "active_count": 10,
+          "total_known": 10,
+          "top_symbols": {
+            "yellow": 2.0,
+            "circle": 2.0,
+            "small": 2.0,
+            "white": 2.0,
+            "oval": 2.0,
+            "tiny": 2.0,
+            "green": 1.66,
+            "orange": 0.94,
+            "star": 0.94,
+            "large": 0.94
+          }
+        },
+        "listener_vocab": {
+          "active_count": 10,
+          "total_known": 10,
+          "top_symbols": {
+            "yellow": 2.0,
+            "circle": 2.0,
+            "small": 2.0,
+            "white": 2.0,
+            "oval": 2.0,
+            "tiny": 2.0,
+            "green": 1.66,
+            "orange": 0.94,
+            "star": 0.94,
+            "large": 0.94
+          }
+        }
+      },
+      {
+        "round": 200,
+        "regime": "summer",
+        "regime_changed": false,
+        "success_rate": 0.87,
+        "speaker_vocab": {
+          "active_count": 7,
+          "total_known": 14,
+          "top_symbols": {
+            "triangle": 1.45,
+            "large": 1.33,
+            "bright": 1.3,
+            "medium": 1.27,
+            "red": 1.24,
+            "star": 1.15,
+            "orange": 1.06
+          }
+        },
+        "listener_vocab": {
+          "active_count": 14,
+          "total_known": 14,
+          "top_symbols": {
+            "yellow": 2.0,
+            "circle": 2.0,
+            "small": 2.0,
+            "white": 2.0,
+            "oval": 2.0,
+            "tiny": 2.0,
+            "green": 1.66,
+            "triangle": 1.45,
+            "large": 1.33,
+            "bright": 1.3
+          }
+        }
+      },
+      {
+        "round": 250,
+        "regime": "summer",
+        "regime_changed": false,
+        "success_rate": 0.872,
+        "speaker_vocab": {
+          "active_count": 7,
+          "total_known": 14,
+          "top_symbols": {
+            "triangle": 1.97,
+            "large": 1.84,
+            "red": 1.72,
+            "medium": 1.72,
+            "bright": 1.66,
+            "star": 1.57,
+            "orange": 1.18
+          }
+        },
+        "listener_vocab": {
+          "active_count": 14,
+          "total_known": 14,
+          "top_symbols": {
+            "yellow": 2.0,
+            "circle": 2.0,
+            "small": 2.0,
+            "white": 2.0,
+            "oval": 2.0,
+            "tiny": 2.0,
+            "triangle": 1.97,
+            "large": 1.84,
+            "red": 1.72,
+            "medium": 1.72
+          }
+        }
+      },
+      {
+        "round": 300,
+        "regime": "summer",
+        "regime_changed": false,
+        "success_rate": 0.8733,
+        "speaker_vocab": {
+          "active_count": 7,
+          "total_known": 14,
+          "top_symbols": {
+            "bright": 2.0,
+            "triangle": 2.0,
+            "medium": 2.0,
+            "large": 1.97,
+            "star": 1.87,
+            "red": 1.84,
+            "orange": 1.57
+          }
+        },
+        "listener_vocab": {
+          "active_count": 14,
+          "total_known": 14,
+          "top_symbols": {
+            "yellow": 2.0,
+            "circle": 2.0,
+            "small": 2.0,
+            "white": 2.0,
+            "oval": 2.0,
+            "tiny": 2.0,
+            "bright": 2.0,
+            "triangle": 2.0,
+            "medium": 2.0,
+            "large": 1.97
+          }
+        }
+      },
+      {
+        "round": 301,
+        "regime": "autumn",
+        "regime_changed": true,
+        "success_rate": 0.8738,
+        "speaker_vocab": {
+          "active_count": 9,
+          "total_known": 16,
+          "top_symbols": {
+            "large": 2.0,
+            "bright": 2.0,
+            "triangle": 2.0,
+            "medium": 2.0,
+            "star": 1.87,
+            "red": 1.84,
+            "orange": 1.57,
+            "dark": 1.03,
+            "rectangle": 1.03
+          }
+        },
+        "listener_vocab": {
+          "active_count": 16,
+          "total_known": 16,
+          "top_symbols": {
+            "yellow": 2.0,
+            "circle": 2.0,
+            "small": 2.0,
+            "white": 2.0,
+            "oval": 2.0,
+            "tiny": 2.0,
+            "large": 2.0,
+            "bright": 2.0,
+            "triangle": 2.0,
+            "medium": 2.0
+          }
+        }
+      },
+      {
+        "round": 350,
+        "regime": "autumn",
+        "regime_changed": false,
+        "success_rate": 0.88,
+        "speaker_vocab": {
+          "active_count": 7,
+          "total_known": 19,
+          "top_symbols": {
+            "large": 2.0,
+            "rectangle": 1.87,
+            "orange": 1.75,
+            "huge": 1.6,
+            "dark": 1.48,
+            "brown": 1.48,
+            "square": 1.27
+          }
+        },
+        "listener_vocab": {
+          "active_count": 19,
+          "total_known": 19,
+          "top_symbols": {
+            "yellow": 2.0,
+            "circle": 2.0,
+            "small": 2.0,
+            "white": 2.0,
+            "oval": 2.0,
+            "tiny": 2.0,
+            "large": 2.0,
+            "bright": 2.0,
+            "triangle": 2.0,
+            "medium": 2.0
+          }
+        }
+      },
+      {
+        "round": 400,
+        "regime": "autumn",
+        "regime_changed": false,
+        "success_rate": 0.8825,
+        "speaker_vocab": {
+          "active_count": 7,
+          "total_known": 19,
+          "top_symbols": {
+            "large": 2.0,
+            "rectangle": 2.0,
+            "huge": 2.0,
+            "square": 2.0,
+            "dark": 1.99,
+            "orange": 1.9,
+            "brown": 1.87
+          }
+        },
+        "listener_vocab": {
+          "active_count": 19,
+          "total_known": 19,
+          "top_symbols": {
+            "yellow": 2.0,
+            "circle": 2.0,
+            "small": 2.0,
+            "white": 2.0,
+            "oval": 2.0,
+            "tiny": 2.0,
+            "large": 2.0,
+            "bright": 2.0,
+            "triangle": 2.0,
+            "medium": 2.0
+          }
+        }
+      },
+      {
+        "round": 450,
+        "regime": "autumn",
+        "regime_changed": false,
+        "success_rate": 0.8711,
+        "speaker_vocab": {
+          "active_count": 7,
+          "total_known": 19,
+          "top_symbols": {
+            "orange": 2.0,
+            "rectangle": 2.0,
+            "huge": 2.0,
+            "large": 1.97,
+            "dark": 1.94,
+            "brown": 1.91,
+            "square": 1.91
+          }
+        },
+        "listener_vocab": {
+          "active_count": 19,
+          "total_known": 19,
+          "top_symbols": {
+            "yellow": 2.0,
+            "circle": 2.0,
+            "small": 2.0,
+            "white": 2.0,
+            "oval": 2.0,
+            "tiny": 2.0,
+            "orange": 2.0,
+            "bright": 2.0,
+            "triangle": 2.0,
+            "medium": 2.0
+          }
+        }
+      },
+      {
+        "round": 500,
+        "regime": "autumn",
+        "regime_changed": false,
+        "success_rate": 0.864,
+        "speaker_vocab": {
+          "active_count": 7,
+          "total_known": 19,
+          "top_symbols": {
+            "orange": 2.0,
+            "brown": 2.0,
+            "large": 1.97,
+            "rectangle": 1.97,
+            "huge": 1.97,
+            "dark": 1.91,
+            "square": 1.88
+          }
+        },
+        "listener_vocab": {
+          "active_count": 19,
+          "total_known": 19,
+          "top_symbols": {
+            "yellow": 2.0,
+            "circle": 2.0,
+            "small": 2.0,
+            "white": 2.0,
+            "oval": 2.0,
+            "tiny": 2.0,
+            "orange": 2.0,
+            "bright": 2.0,
+            "triangle": 2.0,
+            "medium": 2.0
+          }
+        }
+      }
+    ]
+  },
+  "experiment_2": {
+    "adaptive_sr": 0.886,
+    "static_sr": 0.8833,
+    "adaptive_advantage_pct": 0.3
+  },
+  "experiment_3": {
+    "slow": {
+      "success_rate": 0.8925,
+      "active_vocab": 7,
+      "regime_changes": 2
+    },
+    "medium": {
+      "success_rate": 0.82,
+      "active_vocab": 4,
+      "regime_changes": 3
+    },
+    "fast": {
+      "success_rate": 0.875,
+      "active_vocab": 0,
+      "regime_changes": 7
+    }
+  },
+  "experiment_4": {
+    "cycle_recovery": [
+      {
+        "cycle": 1,
+        "recovery_sr": 0.9
+      },
+      {
+        "cycle": 2,
+        "recovery_sr": 0.9
+      }
+    ],
+    "recovery_improvement_pct": 0.0
+  }
+}

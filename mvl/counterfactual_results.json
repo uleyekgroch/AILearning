@@ -1,0 +1,82 @@
+{
+  "experiment_1": {
+    "marker_emergence_round": {
+      "otherwise": -1,
+      "would": 1,
+      "if": 0,
+      "instead": 8
+    },
+    "emerged_count": 3,
+    "final_success_rate": 1.0,
+    "cf_marker_accuracy": 1.0,
+    "snapshots": [
+      {
+        "round": 50,
+        "success_rate": 1.0,
+        "cf_marker_rate": 1.0,
+        "vocab_size": 20,
+        "cf_markers_in_vocab": 3
+      },
+      {
+        "round": 100,
+        "success_rate": 1.0,
+        "cf_marker_rate": 1.0,
+        "vocab_size": 21,
+        "cf_markers_in_vocab": 3
+      },
+      {
+        "round": 150,
+        "success_rate": 1.0,
+        "cf_marker_rate": 1.0,
+        "vocab_size": 21,
+        "cf_markers_in_vocab": 3
+      },
+      {
+        "round": 200,
+        "success_rate": 1.0,
+        "cf_marker_rate": 1.0,
+        "vocab_size": 22,
+        "cf_markers_in_vocab": 3
+      },
+      {
+        "round": 250,
+        "success_rate": 1.0,
+        "cf_marker_rate": 1.0,
+        "vocab_size": 22,
+        "cf_markers_in_vocab": 3
+      },
+      {
+        "round": 300,
+        "success_rate": 1.0,
+        "cf_marker_rate": 1.0,
+        "vocab_size": 22,
+        "cf_markers_in_vocab": 3
+      }
+    ]
+  },
+  "experiment_2": {
+    "with_markers": {
+      "avg_success_rate": 1.0,
+      "std": 0.0
+    },
+    "without_markers": {
+      "avg_success_rate": 0.176,
+      "std": 0.0266
+    }
+  },
+  "experiment_3": {
+    "with_cf_markers": {
+      "cf_marker_rate": 0.75,
+      "temporal_marker_rate": 0.25
+    },
+    "without_cf_markers": {
+      "cf_marker_rate": 0.0,
+      "temporal_marker_rate": 0.25
+    }
+  },
+  "experiment_4": {
+    "train_success_rate": 1.0,
+    "test_success_rate": 1.0,
+    "transfer_ratio": 1.0
+  }
+}

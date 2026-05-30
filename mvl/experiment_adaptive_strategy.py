@@ -4,6 +4,7 @@ Phase 25 实验：自适应策略选择
 5 个实验验证自适应系统是否优于固定策略系统。
 """
 
+import json
 import random
 import sys
 import os
@@ -13,6 +14,7 @@ from grounding_unified_language import (
     UnifiedCommunicationGame, generate_unified_scenario,
 )
 from adaptive_strategy import AdaptiveCommunicationGame
+import numpy as np
 
 
 def experiment_1_adaptive_vs_fixed():
@@ -271,12 +273,40 @@ if __name__ == '__main__':
     print("Phase 25: 自适应策略选择实验")
     print("=" * 60)
 
-    experiment_1_adaptive_vs_fixed()
-    experiment_2_convergence()
-    experiment_3_ambiguity_preference()
-    experiment_4_listener_weights()
-    experiment_5_stability()
+    r1 = experiment_1_adaptive_vs_fixed()
+    r2_weights, r2_success = experiment_2_convergence()
+    r3 = experiment_3_ambiguity_preference()
+    r4 = experiment_4_listener_weights()
+    r5 = experiment_5_stability()
 
     print("\n" + "=" * 60)
     print("所有实验完成")
     print("=" * 60)
+
+    # 保存结果
+    def to_serializable(obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, (np.floating, np.integer)):
+            return float(obj)
+        elif isinstance(obj, dict):
+            return {k: to_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [to_serializable(v) for v in obj]
+        elif isinstance(obj, set):
+            return sorted(list(obj))
+        elif isinstance(obj, tuple):
+            return [to_serializable(v) for v in obj]
+        return obj
+
+    results = {
+        'experiment_1_adaptive_vs_fixed': r1,
+        'experiment_2_convergence': {
+            'weight_history': [(rn, w) for rn, w in r2_weights],
+            'success_history': [(rn, s) for rn, s in r2_success],
+        },
+        'experiment_5_stability': r5,
+    }
+    with open('adaptive_strategy_results.json', 'w', encoding='utf-8') as f:
+        json.dump(to_serializable(results), f, indent=2, ensure_ascii=False)
+    print(f"\n结果已保存到: adaptive_strategy_results.json")

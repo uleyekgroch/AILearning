@@ -1,0 +1,83 @@
+{
+  "experiment_1_simple_subset": {
+    "negation_emerged": true,
+    "utterance": [
+      "not",
+      "blue"
+    ],
+    "success": true
+  },
+  "experiment_2_emergence": {
+    "success_rate": 1.0,
+    "negation_rate": 0.3319838056680162,
+    "negation_success_rate": 1.0,
+    "vocab_size": 17,
+    "negation_symbols": [
+      "not"
+    ],
+    "emergence_round": 0,
+    "negation_emerged": true
+  },
+  "experiment_3_complexity_levels": {
+    "简单": {
+      "negation_rate": 0.2864321608040201,
+      "negation_symbols": [
+        "not"
+      ],
+      "success_rate": 1.0
+    },
+    "中等": {
+      "negation_rate": 0.336734693877551,
+      "negation_symbols": [
+        "not"
+      ],
+      "success_rate": 1.0
+    },
+    "复杂": {
+      "negation_rate": 0.2864864864864865,
+      "negation_symbols": [
+        "not"
+      ],
+      "success_rate": 1.0
+    },
+    "极端": {
+      "negation_rate": 0.2754491017964072,
+      "negation_symbols": [
+        "not"
+      ],
+      "success_rate": 1.0
+    }
+  },
+  "experiment_4_multiple_runs": {
+    "avg_negation_rate": 0.32060856541458554,
+    "emergence_rate": 1.0,
+    "avg_success_rate": 1.0,
+    "run_details": [
+      {
+        "negation_rate": 0.3116438356164384,
+        "negation_emerged": true,
+        "success_rate": 1.0
+      },
+      {
+        "negation_rate": 0.38831615120274915,
+        "negation_emerged": true,
+        "success_rate": 1.0
+      },
+      {
+        "negation_rate": 0.2925170068027211,
+        "negation_emerged": true,
+        "success_rate": 1.0
+      },
+      {
+        "negation_rate": 0.3253424657534247,
+        "negation_emerged": true,
+        "success_rate": 1.0
+      },
+      {
+        "negation_rate": 0.2852233676975945,
+        "negation_emerged": true,
+        "success_rate": 1.0
+      }
+    ]
+  }
+}

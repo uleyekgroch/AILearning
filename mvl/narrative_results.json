@@ -1,0 +1,79 @@
+{
+  "experiment_1_simple_narrative": {
+    "success_rate": 1.0,
+    "narrative_rate": 1.0,
+    "narrative_success_rate": 1.0,
+    "vocab_size": 21,
+    "narrative_symbols": [
+      "then"
+    ],
+    "emergence_round": 0,
+    "narrative_emerged": true
+  },
+  "experiment_2_causal_narrative": {
+    "success_rate": 1.0,
+    "narrative_rate": 1.0,
+    "causal_symbols": [],
+    "narrative_symbols": [
+      "then"
+    ],
+    "causal_emerged": false,
+    "emergence_round": -1
+  },
+  "experiment_3_multi_event": {
+    "success_rate": 1.0,
+    "narrative_rate": 1.0,
+    "narrative_symbols": [
+      "then"
+    ],
+    "narrative_emerged": true,
+    "emergence_round": 0
+  },
+  "experiment_4_stability": {
+    "avg_narrative_rate": 1.0,
+    "emergence_rate": 1.0,
+    "avg_success_rate": 1.0,
+    "run_details": [
+      {
+        "narrative_emerged": true,
+        "narrative_rate": 1.0,
+        "success_rate": 1.0,
+        "narrative_symbols": [
+          "then"
+        ]
+      },
+      {
+        "narrative_emerged": true,
+        "narrative_rate": 1.0,
+        "success_rate": 1.0,
+        "narrative_symbols": [
+          "then"
+        ]
+      },
+      {
+        "narrative_emerged": true,
+        "narrative_rate": 1.0,
+        "success_rate": 1.0,
+        "narrative_symbols": [
+          "then"
+        ]
+      },
+      {
+        "narrative_emerged": true,
+        "narrative_rate": 1.0,
+        "success_rate": 1.0,
+        "narrative_symbols": [
+          "then"
+        ]
+      },
+      {
+        "narrative_emerged": true,
+        "narrative_rate": 1.0,
+        "success_rate": 1.0,
+        "narrative_symbols": [
+          "then"
+        ]
+      }
+    ]
+  }
+}

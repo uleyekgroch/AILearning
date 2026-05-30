@@ -1,0 +1,77 @@
+{
+  "experiment_1_politeness_emergence": {
+    "overall_success_rate": 1.0,
+    "emerged_markers": {
+      "pardon": 11,
+      "sorry": 15,
+      "thanks": 42,
+      "excuse": 19,
+      "kinda": 82,
+      "please": 60,
+      "perhaps": 71,
+      "maybe": 69
+    },
+    "num_emerged": 8,
+    "context_appropriate_rate": 1.0,
+    "marker_counts": {
+      "pardon": 11,
+      "sorry": 15,
+      "thanks": 42,
+      "excuse": 19,
+      "kinda": 82,
+      "please": 60,
+      "perhaps": 71,
+      "maybe": 69
+    },
+    "context_distribution": {
+      "stranger": 79,
+      "acquaintance": 80,
+      "friend": 57,
+      "hierarchical": 153
+    }
+  },
+  "experiment_2_polite_vs_direct": {
+    "polite_sr": 1.0,
+    "polite_std": 0.0,
+    "direct_sr": 0.9593,
+    "direct_std": 0.0122,
+    "difference": 0.0407,
+    "verdict": "REVIEW"
+  },
+  "experiment_3_social_distance_effect": {
+    "distances": {
+      "0.0": {
+        "marker_density": 0.16,
+        "success_rate": 1.0
+      },
+      "0.25": {
+        "marker_density": 0.17,
+        "success_rate": 1.0
+      },
+      "0.5": {
+        "marker_density": 0.1417,
+        "success_rate": 1.0
+      },
+      "0.75": {
+        "marker_density": 1.165,
+        "success_rate": 1.0
+      },
+      "1.0": {
+        "marker_density": 1.1733,
+        "success_rate": 1.0
+      }
+    },
+    "trend": "非单调",
+    "density_range": [
+      0.1417,
+      1.1733
+    ],
+    "verdict": "PASS"
+  },
+  "experiment_4_politeness_transfer": {
+    "train_sr": 1.0,
+    "transfer_sr": 1.0,
+    "transfer_rate": 1.0,
+    "verdict": "PASS"
+  }
+}

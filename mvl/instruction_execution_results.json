@@ -1,0 +1,46 @@
+{
+  "exp1": {
+    "grab_success_rate": 1.0,
+    "push_success_rate": 1.0,
+    "total_success_rate": 1.0,
+    "navigation_failures": 0
+  },
+  "exp2": {
+    "cooperative_success_rate": 0.7,
+    "solo_success_rate": 0.55,
+    "advantage": 0.1499999999999999
+  },
+  "exp3": {
+    "total_success_rate": 0.9166666666666666,
+    "avg_symbols": 2.6166666666666667,
+    "early_success_rate": 0.9,
+    "late_success_rate": 0.8,
+    "improvement": -0.09999999999999998,
+    "log": {
+      "rounds": [
+        10,
+        20,
+        30,
+        40,
+        50,
+        60
+      ],
+      "success_rate": [
+        0.9,
+        0.9,
+        0.9333333333333333,
+        0.925,
+        0.94,
+        0.9166666666666666
+      ],
+      "avg_symbols": [
+        2.4,
+        2.6,
+        2.4,
+        2.325,
+        2.44,
+        2.6166666666666667
+      ]
+    }
+  }
+}

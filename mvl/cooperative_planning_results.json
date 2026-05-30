@@ -1,0 +1,60 @@
+{
+  "experiment_1": {
+    "final_role_markers": 7,
+    "total_role_markers": 8,
+    "final_success_rate": 0.72,
+    "snapshots": [
+      {
+        "round": 50,
+        "success_rate": 0.78,
+        "role_markers": 7,
+        "vocab_size": 13
+      },
+      {
+        "round": 100,
+        "success_rate": 0.72,
+        "role_markers": 7,
+        "vocab_size": 13
+      },
+      {
+        "round": 150,
+        "success_rate": 0.72,
+        "role_markers": 7,
+        "vocab_size": 13
+      },
+      {
+        "round": 200,
+        "success_rate": 0.72,
+        "role_markers": 7,
+        "vocab_size": 13
+      }
+    ]
+  },
+  "experiment_2": {
+    "sequence_markers": 2,
+    "total_sequence_markers": 5,
+    "task_success_rate": 0.775,
+    "step_success_rate": 0.9149
+  },
+  "experiment_3": {
+    "planned": {
+      "1": 0.88,
+      "2": 0.76,
+      "3": 0.69,
+      "4": 0.76,
+      "5": 0.77
+    },
+    "independent": {
+      "1": 0.27,
+      "2": 0.22,
+      "3": 0.21,
+      "4": 0.15,
+      "5": 0.19
+    }
+  },
+  "experiment_4": {
+    "train_success_rate": 0.728,
+    "test_success_rate": 0.738,
+    "transfer_ratio": 1.0137
+  }
+}

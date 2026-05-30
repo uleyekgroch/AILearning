@@ -13,6 +13,7 @@ Phase 18: 元认知与自我反思实验
 4. 稳定性验证：多次运行的涌现率
 """
 
+import json
 import numpy as np
 from typing import Dict, List
 from collections import defaultdict
@@ -315,6 +316,30 @@ def main():
     print("2. 帮助请求（'help'）在困难场景中频繁出现")
     print("3. 教师根据信号调整教学策略")
     print("4. 元认知是自我改进学习的关键机制")
+
+    # 保存结果
+    def to_serializable(obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, (np.floating, np.integer)):
+            return float(obj)
+        elif isinstance(obj, dict):
+            return {k: to_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [to_serializable(v) for v in obj]
+        elif isinstance(obj, set):
+            return sorted(list(obj))
+        return obj
+
+    results = {
+        'experiment_1_basic_metacognition': r1,
+        'experiment_2_difficult_scenes': r2,
+        'experiment_3_comparison': r3,
+        'experiment_4_stability': r4,
+    }
+    with open('metacognition_results.json', 'w', encoding='utf-8') as f:
+        json.dump(to_serializable(results), f, indent=2, ensure_ascii=False)
+    print(f"\n结果已保存到: metacognition_results.json")
 
 
 if __name__ == '__main__':

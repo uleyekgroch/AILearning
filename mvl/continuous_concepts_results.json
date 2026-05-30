@@ -1,0 +1,67 @@
+{
+  "experiment_1": {
+    "purity": 0.918,
+    "top10_sharpness": 0.0215,
+    "all_sharpness": 0.0253,
+    "avg_centroid_distance": 7.5369,
+    "k": 6,
+    "n_objects": 500
+  },
+  "experiment_2": {
+    "sharpness_before": 0.0239,
+    "sharpness_after": 0.024,
+    "avg_boundary_shift": 0.002527,
+    "purity_before": 0.92,
+    "purity_after": 0.92,
+    "shift_trajectory": [
+      0.0,
+      0.00155,
+      0.002108,
+      0.003216,
+      0.002722,
+      0.002552
+    ],
+    "n_rounds": 300
+  },
+  "experiment_3": {
+    "fuzzy_avg": 0.715,
+    "binary_avg": 0.826,
+    "improvement": -0.111,
+    "fuzzy_per_run": [
+      0.73,
+      0.75,
+      0.705,
+      0.705,
+      0.685
+    ],
+    "binary_per_run": [
+      0.82,
+      0.815,
+      0.82,
+      0.82,
+      0.855
+    ]
+  },
+  "experiment_4": {
+    "pre_alignment": 0.9055,
+    "post_alignment": 0.9129,
+    "alignment_improvement": 0.0074,
+    "pre_per_pair": [
+      0.8793,
+      0.8793,
+      0.9579
+    ],
+    "post_per_pair": [
+      0.8833,
+      0.8876,
+      0.9678
+    ],
+    "purity_per_agent": [
+      0.92,
+      0.95,
+      0.94
+    ],
+    "n_agents": 3,
+    "n_rounds": 200
+  }
+}

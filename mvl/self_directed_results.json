@@ -1,0 +1,8575 @@
+{
+  "comparison": {
+    "self_directed": [
+      {
+        "success_rate": 0.82,
+        "window_rates": [
+          0.9,
+          0.7,
+          0.9,
+          0.8,
+          0.78,
+          0.84
+        ],
+        "total_rounds": 300,
+        "vocabulary_size": 34,
+        "goal_history": [
+          [
+            "size",
+            "shape"
+          ],
+          [
+            "color",
+            "pattern"
+          ],
+          [
+            "material",
+            "texture"
+          ],
+          [
+            "temperature",
+            "weight"
+          ],
+          [
+            "origin",
+            "shape"
+          ],
+          [
+            "brightness",
+            "shape"
+          ],
+          [
+            "size",
+            "origin"
+          ],
+          [
+            "color",
+            "temperature"
+          ],
+          [
+            "pattern",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "texture",
+            "weight"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "brightness",
+            "texture"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "pattern",
+            "size"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "pattern",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "origin",
+            "material"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "shape"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "texture",
+            "size"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "brightness",
+            "origin"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "weight",
+            "shape"
+          ],
+          [
+            "origin",
+            "weight"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "weight",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "brightness",
+            "size"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "texture",
+            "weight"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "texture",
+            "origin"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "origin",
+            "weight"
+          ],
+          [
+            "temperature",
+            "texture"
+          ],
+          [
+            "shape",
+            "material"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "shape",
+            "origin"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "texture",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "brightness",
+            "temperature"
+          ],
+          [
+            "brightness",
+            "temperature"
+          ],
+          [
+            "brightness",
+            "temperature"
+          ],
+          [
+            "brightness",
+            "temperature"
+          ],
+          [
+            "brightness",
+            "temperature"
+          ],
+          [
+            "brightness",
+            "temperature"
+          ],
+          [
+            "brightness",
+            "temperature"
+          ],
+          [
+            "brightness",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "size",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "origin",
+            "weight"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "texture",
+            "temperature"
+          ],
+          [
+            "color",
+            "shape"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "brightness",
+            "shape"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "brightness",
+            "material"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "size",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "shape",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "temperature",
+            "color"
+          ]
+        ],
+        "knowledge_snapshots": {
+          "50": {
+            "color": {
+              "status": "mastered",
+              "frequency": 40,
+              "success_rate": 0.875,
+              "priority": 0.464
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "size": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 1,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "temperature": {
+              "status": "mastered",
+              "frequency": 34,
+              "success_rate": 0.853,
+              "priority": 0.523
+            },
+            "brightness": {
+              "status": "mastered",
+              "frequency": 1,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "pattern": {
+              "status": "mastered",
+              "frequency": 1,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "origin": {
+              "status": "mastered",
+              "frequency": 1,
+              "success_rate": 1.0,
+              "priority": 0.0
+            }
+          },
+          "100": {
+            "color": {
+              "status": "learning",
+              "frequency": 85,
+              "success_rate": 0.788,
+              "priority": 0.943
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "size": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 69,
+              "success_rate": 0.725,
+              "priority": 1.17
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 2,
+              "success_rate": 0.5,
+              "priority": 0.549
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "origin": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            }
+          },
+          "150": {
+            "color": {
+              "status": "mastered",
+              "frequency": 125,
+              "success_rate": 0.816,
+              "priority": 0.89
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "size": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "learning",
+              "frequency": 4,
+              "success_rate": 0.75,
+              "priority": 0.402
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 102,
+              "success_rate": 0.765,
+              "priority": 1.091
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "origin": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            }
+          },
+          "200": {
+            "color": {
+              "status": "mastered",
+              "frequency": 164,
+              "success_rate": 0.811,
+              "priority": 0.965
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 0.833,
+              "priority": 0.324
+            },
+            "size": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 0.833,
+              "priority": 0.324
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 0.833,
+              "priority": 0.324
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 131,
+              "success_rate": 0.756,
+              "priority": 1.193
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 4,
+              "success_rate": 0.5,
+              "priority": 0.805
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "origin": {
+              "status": "mastered",
+              "frequency": 7,
+              "success_rate": 0.857,
+              "priority": 0.297
+            }
+          },
+          "250": {
+            "color": {
+              "status": "mastered",
+              "frequency": 186,
+              "success_rate": 0.812,
+              "priority": 0.984
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 0.833,
+              "priority": 0.324
+            },
+            "size": {
+              "status": "mastered",
+              "frequency": 8,
+              "success_rate": 0.875,
+              "priority": 0.275
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "learning",
+              "frequency": 7,
+              "success_rate": 0.714,
+              "priority": 0.594
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 0.833,
+              "priority": 0.324
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 173,
+              "success_rate": 0.763,
+              "priority": 1.223
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 28,
+              "success_rate": 0.714,
+              "priority": 0.962
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 8,
+              "success_rate": 0.75,
+              "priority": 0.549
+            }
+          },
+          "300": {
+            "color": {
+              "status": "mastered",
+              "frequency": 228,
+              "success_rate": 0.816,
+              "priority": 1.001
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 7,
+              "success_rate": 0.857,
+              "priority": 0.297
+            },
+            "size": {
+              "status": "mastered",
+              "frequency": 9,
+              "success_rate": 0.889,
+              "priority": 0.256
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "learning",
+              "frequency": 8,
+              "success_rate": 0.75,
+              "priority": 0.549
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 0.833,
+              "priority": 0.324
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 210,
+              "success_rate": 0.767,
+              "priority": 1.249
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 30,
+              "success_rate": 0.733,
+              "priority": 0.916
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 9,
+              "success_rate": 0.667,
+              "priority": 0.768
+            }
+          }
+        }
+      },
+      {
+        "success_rate": 0.7333333333333333,
+        "window_rates": [
+          0.8,
+          0.78,
+          0.74,
+          0.62,
+          0.74,
+          0.72
+        ],
+        "total_rounds": 300,
+        "vocabulary_size": 30,
+        "goal_history": [
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "size",
+            "texture"
+          ],
+          [
+            "material",
+            "weight"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "brightness",
+            "shape"
+          ],
+          [
+            "pattern",
+            "size"
+          ],
+          [
+            "temperature",
+            "color"
+          ],
+          [
+            "brightness",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "material",
+            "color"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "shape",
+            "texture"
+          ],
+          [
+            "origin",
+            "color"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "origin",
+            "material"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "weight",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "material"
+          ],
+          [
+            "temperature",
+            "weight"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "color"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "brightness",
+            "pattern"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "pattern",
+            "shape"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "pattern",
+            "size"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "pattern",
+            "brightness"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "brightness",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "shape",
+            "color"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "size",
+            "color"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "shape",
+            "texture"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "brightness",
+            "material"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "shape",
+            "material"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "color",
+            "origin"
+          ],
+          [
+            "brightness",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "weight",
+            "origin"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "color",
+            "pattern"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "pattern",
+            "material"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "pattern",
+            "shape"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "weight",
+            "material"
+          ],
+          [
+            "size",
+            "material"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "pattern",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "pattern",
+            "weight"
+          ],
+          [
+            "weight",
+            "shape"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "temperature",
+            "origin"
+          ],
+          [
+            "shape",
+            "color"
+          ],
+          [
+            "origin",
+            "brightness"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "origin",
+            "temperature"
+          ]
+        ],
+        "knowledge_snapshots": {
+          "50": {
+            "color": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "size": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 1,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 38,
+              "success_rate": 0.737,
+              "priority": 0.964
+            },
+            "brightness": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "pattern": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 39,
+              "success_rate": 0.744,
+              "priority": 0.946
+            }
+          },
+          "100": {
+            "color": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "size": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 1,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 81,
+              "success_rate": 0.741,
+              "priority": 1.142
+            },
+            "brightness": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "pattern": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 82,
+              "success_rate": 0.744,
+              "priority": 1.132
+            }
+          },
+          "150": {
+            "color": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "size": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 1,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 123,
+              "success_rate": 0.724,
+              "priority": 1.332
+            },
+            "brightness": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "pattern": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 120,
+              "success_rate": 0.717,
+              "priority": 1.359
+            }
+          },
+          "200": {
+            "color": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "size": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 0.8,
+              "priority": 0.358
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 1,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 169,
+              "success_rate": 0.692,
+              "priority": 1.58
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 7,
+              "success_rate": 0.714,
+              "priority": 0.594
+            },
+            "pattern": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 164,
+              "success_rate": 0.689,
+              "priority": 1.588
+            }
+          },
+          "250": {
+            "color": {
+              "status": "mastered",
+              "frequency": 7,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "size": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 0.8,
+              "priority": 0.358
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 217,
+              "success_rate": 0.7,
+              "priority": 1.613
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 8,
+              "success_rate": 0.75,
+              "priority": 0.549
+            },
+            "pattern": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 210,
+              "success_rate": 0.695,
+              "priority": 1.631
+            }
+          },
+          "300": {
+            "color": {
+              "status": "mastered",
+              "frequency": 9,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 9,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "size": {
+              "status": "mastered",
+              "frequency": 7,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 7,
+              "success_rate": 0.857,
+              "priority": 0.297
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 252,
+              "success_rate": 0.694,
+              "priority": 1.691
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 10,
+              "success_rate": 0.6,
+              "priority": 0.959
+            },
+            "pattern": {
+              "status": "mastered",
+              "frequency": 11,
+              "success_rate": 0.909,
+              "priority": 0.226
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 250,
+              "success_rate": 0.692,
+              "priority": 1.702
+            }
+          }
+        }
+      },
+      {
+        "success_rate": 0.6766666666666666,
+        "window_rates": [
+          0.54,
+          0.72,
+          0.66,
+          0.66,
+          0.74,
+          0.74
+        ],
+        "total_rounds": 300,
+        "vocabulary_size": 32,
+        "goal_history": [
+          [
+            "weight",
+            "temperature"
+          ],
+          [
+            "pattern",
+            "texture"
+          ],
+          [
+            "material",
+            "size"
+          ],
+          [
+            "brightness",
+            "origin"
+          ],
+          [
+            "shape",
+            "color"
+          ],
+          [
+            "shape",
+            "pattern"
+          ],
+          [
+            "pattern",
+            "texture"
+          ],
+          [
+            "pattern",
+            "size"
+          ],
+          [
+            "pattern",
+            "temperature"
+          ],
+          [
+            "pattern",
+            "temperature"
+          ],
+          [
+            "pattern",
+            "temperature"
+          ],
+          [
+            "pattern",
+            "temperature"
+          ],
+          [
+            "shape",
+            "weight"
+          ],
+          [
+            "pattern",
+            "temperature"
+          ],
+          [
+            "pattern",
+            "temperature"
+          ],
+          [
+            "pattern",
+            "temperature"
+          ],
+          [
+            "pattern",
+            "temperature"
+          ],
+          [
+            "size",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "size",
+            "color"
+          ],
+          [
+            "brightness",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "pattern",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "shape",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "brightness",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "weight",
+            "origin"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "origin",
+            "size"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "size",
+            "shape"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "weight",
+            "pattern"
+          ],
+          [
+            "color",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "pattern",
+            "material"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "texture",
+            "origin"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "pattern",
+            "shape"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "weight",
+            "texture"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "material",
+            "color"
+          ],
+          [
+            "weight",
+            "size"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "material",
+            "weight"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "weight",
+            "material"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "texture",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "brightness",
+            "texture"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "brightness",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "pattern"
+          ]
+        ],
+        "knowledge_snapshots": {
+          "50": {
+            "color": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "size": {
+              "status": "learning",
+              "frequency": 5,
+              "success_rate": 0.6,
+              "priority": 0.717
+            },
+            "material": {
+              "status": "weak",
+              "frequency": 1,
+              "success_rate": 0.0,
+              "priority": 0.693
+            },
+            "texture": {
+              "status": "learning",
+              "frequency": 2,
+              "success_rate": 0.5,
+              "priority": 0.549
+            },
+            "weight": {
+              "status": "learning",
+              "frequency": 2,
+              "success_rate": 0.5,
+              "priority": 0.549
+            },
+            "temperature": {
+              "status": "weak",
+              "frequency": 37,
+              "success_rate": 0.459,
+              "priority": 1.966
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 4,
+              "success_rate": 0.75,
+              "priority": 0.402
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 38,
+              "success_rate": 0.5,
+              "priority": 1.832
+            },
+            "origin": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            }
+          },
+          "100": {
+            "color": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "size": {
+              "status": "learning",
+              "frequency": 7,
+              "success_rate": 0.714,
+              "priority": 0.594
+            },
+            "material": {
+              "status": "weak",
+              "frequency": 1,
+              "success_rate": 0.0,
+              "priority": 0.693
+            },
+            "texture": {
+              "status": "learning",
+              "frequency": 2,
+              "success_rate": 0.5,
+              "priority": 0.549
+            },
+            "weight": {
+              "status": "learning",
+              "frequency": 2,
+              "success_rate": 0.5,
+              "priority": 0.549
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 84,
+              "success_rate": 0.595,
+              "priority": 1.798
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 4,
+              "success_rate": 0.75,
+              "priority": 0.402
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 82,
+              "success_rate": 0.598,
+              "priority": 1.778
+            },
+            "origin": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            }
+          },
+          "150": {
+            "color": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "size": {
+              "status": "learning",
+              "frequency": 8,
+              "success_rate": 0.75,
+              "priority": 0.549
+            },
+            "material": {
+              "status": "learning",
+              "frequency": 2,
+              "success_rate": 0.5,
+              "priority": 0.549
+            },
+            "texture": {
+              "status": "learning",
+              "frequency": 2,
+              "success_rate": 0.5,
+              "priority": 0.549
+            },
+            "weight": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 128,
+              "success_rate": 0.602,
+              "priority": 1.936
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 4,
+              "success_rate": 0.75,
+              "priority": 0.402
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 127,
+              "success_rate": 0.606,
+              "priority": 1.91
+            },
+            "origin": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            }
+          },
+          "200": {
+            "color": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "learning",
+              "frequency": 4,
+              "success_rate": 0.75,
+              "priority": 0.402
+            },
+            "size": {
+              "status": "learning",
+              "frequency": 8,
+              "success_rate": 0.75,
+              "priority": 0.549
+            },
+            "material": {
+              "status": "learning",
+              "frequency": 2,
+              "success_rate": 0.5,
+              "priority": 0.549
+            },
+            "texture": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "weight": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 174,
+              "success_rate": 0.609,
+              "priority": 2.018
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 4,
+              "success_rate": 0.75,
+              "priority": 0.402
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 174,
+              "success_rate": 0.615,
+              "priority": 1.989
+            },
+            "origin": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            }
+          },
+          "250": {
+            "color": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "learning",
+              "frequency": 4,
+              "success_rate": 0.75,
+              "priority": 0.402
+            },
+            "size": {
+              "status": "learning",
+              "frequency": 9,
+              "success_rate": 0.778,
+              "priority": 0.512
+            },
+            "material": {
+              "status": "weak",
+              "frequency": 5,
+              "success_rate": 0.4,
+              "priority": 1.075
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 0.8,
+              "priority": 0.358
+            },
+            "weight": {
+              "status": "learning",
+              "frequency": 6,
+              "success_rate": 0.5,
+              "priority": 0.973
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 214,
+              "success_rate": 0.631,
+              "priority": 1.983
+            },
+            "brightness": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 0.8,
+              "priority": 0.358
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 217,
+              "success_rate": 0.641,
+              "priority": 1.935
+            },
+            "origin": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            }
+          },
+          "300": {
+            "color": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "learning",
+              "frequency": 4,
+              "success_rate": 0.75,
+              "priority": 0.402
+            },
+            "size": {
+              "status": "learning",
+              "frequency": 9,
+              "success_rate": 0.778,
+              "priority": 0.512
+            },
+            "material": {
+              "status": "weak",
+              "frequency": 5,
+              "success_rate": 0.4,
+              "priority": 1.075
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 0.833,
+              "priority": 0.324
+            },
+            "weight": {
+              "status": "learning",
+              "frequency": 6,
+              "success_rate": 0.5,
+              "priority": 0.973
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 259,
+              "success_rate": 0.645,
+              "priority": 1.975
+            },
+            "brightness": {
+              "status": "mastered",
+              "frequency": 7,
+              "success_rate": 0.857,
+              "priority": 0.297
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 260,
+              "success_rate": 0.65,
+              "priority": 1.948
+            },
+            "origin": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            }
+          }
+        }
+      },
+      {
+        "success_rate": 0.7566666666666667,
+        "window_rates": [
+          0.78,
+          0.74,
+          0.74,
+          0.76,
+          0.74,
+          0.78
+        ],
+        "total_rounds": 300,
+        "vocabulary_size": 34,
+        "goal_history": [
+          [
+            "brightness",
+            "weight"
+          ],
+          [
+            "shape",
+            "size"
+          ],
+          [
+            "origin",
+            "weight"
+          ],
+          [
+            "color",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "texture"
+          ],
+          [
+            "material",
+            "size"
+          ],
+          [
+            "material",
+            "size"
+          ],
+          [
+            "size",
+            "weight"
+          ],
+          [
+            "material",
+            "size"
+          ],
+          [
+            "origin",
+            "brightness"
+          ],
+          [
+            "shape",
+            "size"
+          ],
+          [
+            "shape",
+            "size"
+          ],
+          [
+            "shape",
+            "size"
+          ],
+          [
+            "size",
+            "shape"
+          ],
+          [
+            "size",
+            "shape"
+          ],
+          [
+            "size",
+            "shape"
+          ],
+          [
+            "shape",
+            "brightness"
+          ],
+          [
+            "color",
+            "weight"
+          ],
+          [
+            "brightness",
+            "material"
+          ],
+          [
+            "size",
+            "shape"
+          ],
+          [
+            "size",
+            "origin"
+          ],
+          [
+            "size",
+            "weight"
+          ],
+          [
+            "size",
+            "origin"
+          ],
+          [
+            "size",
+            "shape"
+          ],
+          [
+            "size",
+            "shape"
+          ],
+          [
+            "temperature",
+            "weight"
+          ],
+          [
+            "size",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "size",
+            "temperature"
+          ],
+          [
+            "size",
+            "temperature"
+          ],
+          [
+            "size",
+            "temperature"
+          ],
+          [
+            "size",
+            "temperature"
+          ],
+          [
+            "size",
+            "temperature"
+          ],
+          [
+            "size",
+            "temperature"
+          ],
+          [
+            "size",
+            "temperature"
+          ],
+          [
+            "size",
+            "temperature"
+          ],
+          [
+            "size",
+            "origin"
+          ],
+          [
+            "size",
+            "temperature"
+          ],
+          [
+            "size",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "origin",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "shape"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "material",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "brightness",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "brightness",
+            "size"
+          ],
+          [
+            "brightness",
+            "shape"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "pattern",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "brightness",
+            "shape"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "origin",
+            "color"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "brightness",
+            "texture"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "origin",
+            "material"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "material",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "weight",
+            "color"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "origin",
+            "weight"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "color",
+            "temperature"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "color",
+            "shape"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "material",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "weight",
+            "material"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "origin",
+            "brightness"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "material"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "material"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "weight",
+            "texture"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "weight",
+            "texture"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "texture",
+            "temperature"
+          ],
+          [
+            "weight",
+            "material"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "material",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "brightness",
+            "origin"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "material",
+            "origin"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "texture",
+            "pattern"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "temperature",
+            "size"
+          ],
+          [
+            "texture",
+            "color"
+          ]
+        ],
+        "knowledge_snapshots": {
+          "50": {
+            "color": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 10,
+              "success_rate": 0.8,
+              "priority": 0.48
+            },
+            "size": {
+              "status": "learning",
+              "frequency": 41,
+              "success_rate": 0.756,
+              "priority": 0.912
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 1,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "weight": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 21,
+              "success_rate": 0.667,
+              "priority": 1.03
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "pattern": {
+              "status": "mastered",
+              "frequency": 1,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 4,
+              "success_rate": 0.75,
+              "priority": 0.402
+            }
+          },
+          "100": {
+            "color": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "learning",
+              "frequency": 12,
+              "success_rate": 0.75,
+              "priority": 0.641
+            },
+            "size": {
+              "status": "learning",
+              "frequency": 85,
+              "success_rate": 0.753,
+              "priority": 1.1
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 1,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "weight": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 54,
+              "success_rate": 0.648,
+              "priority": 1.41
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 7,
+              "success_rate": 0.714,
+              "priority": 0.594
+            },
+            "pattern": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 5,
+              "success_rate": 0.6,
+              "priority": 0.717
+            }
+          },
+          "150": {
+            "color": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "learning",
+              "frequency": 13,
+              "success_rate": 0.692,
+              "priority": 0.812
+            },
+            "size": {
+              "status": "learning",
+              "frequency": 128,
+              "success_rate": 0.75,
+              "priority": 1.215
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 0.833,
+              "priority": 0.324
+            },
+            "texture": {
+              "status": "learning",
+              "frequency": 2,
+              "success_rate": 0.5,
+              "priority": 0.549
+            },
+            "weight": {
+              "status": "learning",
+              "frequency": 3,
+              "success_rate": 0.667,
+              "priority": 0.462
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 94,
+              "success_rate": 0.691,
+              "priority": 1.405
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 9,
+              "success_rate": 0.556,
+              "priority": 1.023
+            },
+            "pattern": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 6,
+              "success_rate": 0.667,
+              "priority": 0.649
+            }
+          },
+          "200": {
+            "color": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 0.8,
+              "priority": 0.358
+            },
+            "shape": {
+              "status": "learning",
+              "frequency": 14,
+              "success_rate": 0.714,
+              "priority": 0.774
+            },
+            "size": {
+              "status": "learning",
+              "frequency": 174,
+              "success_rate": 0.753,
+              "priority": 1.276
+            },
+            "material": {
+              "status": "learning",
+              "frequency": 8,
+              "success_rate": 0.75,
+              "priority": 0.549
+            },
+            "texture": {
+              "status": "learning",
+              "frequency": 2,
+              "success_rate": 0.5,
+              "priority": 0.549
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 0.8,
+              "priority": 0.358
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 128,
+              "success_rate": 0.688,
+              "priority": 1.519
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 9,
+              "success_rate": 0.556,
+              "priority": 1.023
+            },
+            "pattern": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 7,
+              "success_rate": 0.714,
+              "priority": 0.594
+            }
+          },
+          "250": {
+            "color": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 0.8,
+              "priority": 0.358
+            },
+            "shape": {
+              "status": "learning",
+              "frequency": 14,
+              "success_rate": 0.714,
+              "priority": 0.774
+            },
+            "size": {
+              "status": "learning",
+              "frequency": 218,
+              "success_rate": 0.752,
+              "priority": 1.335
+            },
+            "material": {
+              "status": "learning",
+              "frequency": 11,
+              "success_rate": 0.636,
+              "priority": 0.904
+            },
+            "texture": {
+              "status": "learning",
+              "frequency": 4,
+              "success_rate": 0.75,
+              "priority": 0.402
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 7,
+              "success_rate": 0.857,
+              "priority": 0.297
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 161,
+              "success_rate": 0.671,
+              "priority": 1.675
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 10,
+              "success_rate": 0.6,
+              "priority": 0.959
+            },
+            "pattern": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 7,
+              "success_rate": 0.714,
+              "priority": 0.594
+            }
+          },
+          "300": {
+            "color": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 0.833,
+              "priority": 0.324
+            },
+            "shape": {
+              "status": "learning",
+              "frequency": 14,
+              "success_rate": 0.714,
+              "priority": 0.774
+            },
+            "size": {
+              "status": "learning",
+              "frequency": 263,
+              "success_rate": 0.757,
+              "priority": 1.357
+            },
+            "material": {
+              "status": "learning",
+              "frequency": 12,
+              "success_rate": 0.667,
+              "priority": 0.855
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 0.833,
+              "priority": 0.324
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 7,
+              "success_rate": 0.857,
+              "priority": 0.297
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 197,
+              "success_rate": 0.68,
+              "priority": 1.691
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 11,
+              "success_rate": 0.545,
+              "priority": 1.13
+            },
+            "pattern": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 9,
+              "success_rate": 0.667,
+              "priority": 0.768
+            }
+          }
+        }
+      },
+      {
+        "success_rate": 0.7466666666666667,
+        "window_rates": [
+          0.84,
+          0.74,
+          0.74,
+          0.84,
+          0.64,
+          0.68
+        ],
+        "total_rounds": 300,
+        "vocabulary_size": 32,
+        "goal_history": [
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "material",
+            "brightness"
+          ],
+          [
+            "brightness",
+            "texture"
+          ],
+          [
+            "brightness",
+            "temperature"
+          ],
+          [
+            "size",
+            "shape"
+          ],
+          [
+            "weight",
+            "color"
+          ],
+          [
+            "weight",
+            "shape"
+          ],
+          [
+            "weight",
+            "texture"
+          ],
+          [
+            "color",
+            "temperature"
+          ],
+          [
+            "origin",
+            "shape"
+          ],
+          [
+            "weight",
+            "texture"
+          ],
+          [
+            "texture",
+            "color"
+          ],
+          [
+            "shape",
+            "weight"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "texture",
+            "size"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "weight",
+            "texture"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "size",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "shape",
+            "color"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "texture",
+            "pattern"
+          ],
+          [
+            "texture",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "texture"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "texture",
+            "color"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "material",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "color"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "size",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "brightness",
+            "shape"
+          ],
+          [
+            "shape",
+            "pattern"
+          ],
+          [
+            "texture",
+            "shape"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "shape",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "temperature",
+            "weight"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "temperature",
+            "weight"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "texture",
+            "weight"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "weight",
+            "shape"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "brightness",
+            "size"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "color",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "weight",
+            "material"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "size",
+            "brightness"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "brightness",
+            "color"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "temperature",
+            "material"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "temperature"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "shape",
+            "brightness"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "pattern",
+            "temperature"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "origin",
+            "pattern"
+          ],
+          [
+            "shape",
+            "pattern"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ],
+          [
+            "pattern",
+            "origin"
+          ]
+        ],
+        "knowledge_snapshots": {
+          "50": {
+            "color": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "size": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 1,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "temperature": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "brightness": {
+              "status": "mastered",
+              "frequency": 1,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 35,
+              "success_rate": 0.771,
+              "priority": 0.819
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 37,
+              "success_rate": 0.784,
+              "priority": 0.787
+            }
+          },
+          "100": {
+            "color": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "size": {
+              "status": "mastered",
+              "frequency": 7,
+              "success_rate": 0.857,
+              "priority": 0.297
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 1,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 0.8,
+              "priority": 0.358
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "temperature": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "brightness": {
+              "status": "mastered",
+              "frequency": 1,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 79,
+              "success_rate": 0.747,
+              "priority": 1.109
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 85,
+              "success_rate": 0.765,
+              "priority": 1.048
+            }
+          },
+          "150": {
+            "color": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "size": {
+              "status": "mastered",
+              "frequency": 7,
+              "success_rate": 0.857,
+              "priority": 0.297
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 9,
+              "success_rate": 0.889,
+              "priority": 0.256
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "temperature": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "brightness": {
+              "status": "mastered",
+              "frequency": 1,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 124,
+              "success_rate": 0.734,
+              "priority": 1.285
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 128,
+              "success_rate": 0.742,
+              "priority": 1.253
+            }
+          },
+          "200": {
+            "color": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 9,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "size": {
+              "status": "mastered",
+              "frequency": 10,
+              "success_rate": 0.8,
+              "priority": 0.48
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 11,
+              "success_rate": 0.909,
+              "priority": 0.226
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 3,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "temperature": {
+              "status": "learning",
+              "frequency": 4,
+              "success_rate": 0.75,
+              "priority": 0.402
+            },
+            "brightness": {
+              "status": "mastered",
+              "frequency": 2,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 164,
+              "success_rate": 0.756,
+              "priority": 1.245
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 167,
+              "success_rate": 0.76,
+              "priority": 1.227
+            }
+          },
+          "250": {
+            "color": {
+              "status": "mastered",
+              "frequency": 7,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 9,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "size": {
+              "status": "learning",
+              "frequency": 11,
+              "success_rate": 0.727,
+              "priority": 0.678
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 11,
+              "success_rate": 0.909,
+              "priority": 0.226
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "temperature": {
+              "status": "mastered",
+              "frequency": 6,
+              "success_rate": 0.833,
+              "priority": 0.324
+            },
+            "brightness": {
+              "status": "learning",
+              "frequency": 4,
+              "success_rate": 0.75,
+              "priority": 0.402
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 207,
+              "success_rate": 0.725,
+              "priority": 1.47
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 207,
+              "success_rate": 0.725,
+              "priority": 1.47
+            }
+          },
+          "300": {
+            "color": {
+              "status": "mastered",
+              "frequency": 7,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "shape": {
+              "status": "mastered",
+              "frequency": 11,
+              "success_rate": 0.909,
+              "priority": 0.226
+            },
+            "size": {
+              "status": "learning",
+              "frequency": 11,
+              "success_rate": 0.727,
+              "priority": 0.678
+            },
+            "material": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "texture": {
+              "status": "mastered",
+              "frequency": 11,
+              "success_rate": 0.909,
+              "priority": 0.226
+            },
+            "weight": {
+              "status": "mastered",
+              "frequency": 4,
+              "success_rate": 1.0,
+              "priority": 0.0
+            },
+            "temperature": {
+              "status": "mastered",
+              "frequency": 7,
+              "success_rate": 0.857,
+              "priority": 0.297
+            },
+            "brightness": {
+              "status": "mastered",
+              "frequency": 5,
+              "success_rate": 0.8,
+              "priority": 0.358
+            },
+            "pattern": {
+              "status": "learning",
+              "frequency": 253,
+              "success_rate": 0.711,
+              "priority": 1.598
+            },
+            "origin": {
+              "status": "learning",
+              "frequency": 249,
+              "success_rate": 0.711,
+              "priority": 1.597
+            }
+          }
+        }
+      }
+    ],
+    "random": [
+      {
+        "success_rate": 0.9466666666666667,
+        "window_rates": [
+          0.94,
+          0.98,
+          0.92,
+          0.96,
+          0.94,
+          0.94
+        ],
+        "total_rounds": 300,
+        "vocabulary_size": 40
+      },
+      {
+        "success_rate": 0.96,
+        "window_rates": [
+          0.96,
+          0.96,
+          0.94,
+          1.0,
+          0.94,
+          0.96
+        ],
+        "total_rounds": 300,
+        "vocabulary_size": 40
+      },
+      {
+        "success_rate": 0.9366666666666666,
+        "window_rates": [
+          0.92,
+          0.98,
+          0.94,
+          0.94,
+          0.92,
+          0.92
+        ],
+        "total_rounds": 300,
+        "vocabulary_size": 40
+      },
+      {
+        "success_rate": 0.9366666666666666,
+        "window_rates": [
+          0.94,
+          0.98,
+          0.94,
+          0.86,
+          0.94,
+          0.96
+        ],
+        "total_rounds": 300,
+        "vocabulary_size": 40
+      },
+      {
+        "success_rate": 0.9366666666666666,
+        "window_rates": [
+          0.94,
+          0.94,
+          0.94,
+          0.92,
+          0.92,
+          0.96
+        ],
+        "total_rounds": 300,
+        "vocabulary_size": 40
+      }
+    ],
+    "uniform": [
+      {
+        "success_rate": 0.9233333333333333,
+        "window_rates": [
+          0.9,
+          0.9,
+          0.98,
+          0.94,
+          1.0,
+          0.82
+        ],
+        "total_rounds": 300,
+        "vocabulary_size": 40
+      },
+      {
+        "success_rate": 0.9533333333333334,
+        "window_rates": [
+          1.0,
+          0.96,
+          0.96,
+          0.94,
+          0.92,
+          0.94
+        ],
+        "total_rounds": 300,
+        "vocabulary_size": 40
+      },
+      {
+        "success_rate": 0.94,
+        "window_rates": [
+          0.92,
+          0.96,
+          0.92,
+          0.92,
+          0.92,
+          1.0
+        ],
+        "total_rounds": 300,
+        "vocabulary_size": 40
+      },
+      {
+        "success_rate": 0.9266666666666666,
+        "window_rates": [
+          0.94,
+          0.9,
+          0.92,
+          0.96,
+          0.94,
+          0.9
+        ],
+        "total_rounds": 300,
+        "vocabulary_size": 40
+      },
+      {
+        "success_rate": 0.9233333333333333,
+        "window_rates": [
+          0.92,
+          0.94,
+          0.98,
+          0.86,
+          0.86,
+          0.98
+        ],
+        "total_rounds": 300,
+        "vocabulary_size": 40
+      }
+    ]
+  },
+  "gap_recovery": {
+    "self_directed": [
+      {
+        "before_covered": 3,
+        "after_covered": 10,
+        "recovery": 7,
+        "phase2_success": 0.82
+      },
+      {
+        "before_covered": 3,
+        "after_covered": 10,
+        "recovery": 7,
+        "phase2_success": 0.84
+      },
+      {
+        "before_covered": 3,
+        "after_covered": 10,
+        "recovery": 7,
+        "phase2_success": 0.62
+      },
+      {
+        "before_covered": 3,
+        "after_covered": 10,
+        "recovery": 7,
+        "phase2_success": 0.63
+      },
+      {
+        "before_covered": 3,
+        "after_covered": 10,
+        "recovery": 7,
+        "phase2_success": 0.68
+      }
+    ],
+    "random": [
+      {
+        "before_covered": 3,
+        "after_covered": 10,
+        "recovery": 7,
+        "phase2_success": 0.91
+      },
+      {
+        "before_covered": 3,
+        "after_covered": 10,
+        "recovery": 7,
+        "phase2_success": 0.95
+      },
+      {
+        "before_covered": 3,
+        "after_covered": 10,
+        "recovery": 7,
+        "phase2_success": 0.94
+      },
+      {
+        "before_covered": 3,
+        "after_covered": 10,
+        "recovery": 7,
+        "phase2_success": 0.95
+      },
+      {
+        "before_covered": 3,
+        "after_covered": 10,
+        "recovery": 7,
+        "phase2_success": 0.94
+      }
+    ]
+  },
+  "adaptive_goals": {
+    "goal_snapshots": {
+      "50": {
+        "pattern": 42,
+        "color": 3,
+        "weight": 2,
+        "temperature": 2,
+        "brightness": 1,
+        "size": 42,
+        "material": 3,
+        "origin": 1,
+        "texture": 2,
+        "shape": 2
+      },
+      "100": {
+        "pattern": 48,
+        "size": 49,
+        "shape": 1,
+        "material": 1,
+        "texture": 1
+      },
+      "150": {
+        "pattern": 48,
+        "size": 49,
+        "material": 1,
+        "weight": 1,
+        "brightness": 1
+      },
+      "200": {
+        "texture": 1,
+        "pattern": 50,
+        "size": 49
+      },
+      "250": {
+        "pattern": 47,
+        "temperature": 1,
+        "size": 47,
+        "color": 2,
+        "weight": 1,
+        "material": 1,
+        "brightness": 1
+      },
+      "300": {
+        "pattern": 49,
+        "size": 49,
+        "weight": 1,
+        "color": 1
+      }
+    },
+    "knowledge_snapshots": {
+      "50": {
+        "color": {
+          "status": "learning",
+          "frequency": 3,
+          "success_rate": 0.667,
+          "priority": 0.462
+        },
+        "shape": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "size": {
+          "status": "mastered",
+          "frequency": 36,
+          "success_rate": 0.806,
+          "priority": 0.702
+        },
+        "material": {
+          "status": "learning",
+          "frequency": 3,
+          "success_rate": 0.667,
+          "priority": 0.462
+        },
+        "texture": {
+          "status": "mastered",
+          "frequency": 2,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "weight": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "temperature": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "brightness": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "pattern": {
+          "status": "learning",
+          "frequency": 34,
+          "success_rate": 0.794,
+          "priority": 0.732
+        },
+        "origin": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        }
+      },
+      "100": {
+        "color": {
+          "status": "learning",
+          "frequency": 3,
+          "success_rate": 0.667,
+          "priority": 0.462
+        },
+        "shape": {
+          "status": "mastered",
+          "frequency": 2,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "size": {
+          "status": "mastered",
+          "frequency": 83,
+          "success_rate": 0.831,
+          "priority": 0.747
+        },
+        "material": {
+          "status": "learning",
+          "frequency": 4,
+          "success_rate": 0.75,
+          "priority": 0.402
+        },
+        "texture": {
+          "status": "mastered",
+          "frequency": 3,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "weight": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "temperature": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "brightness": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "pattern": {
+          "status": "mastered",
+          "frequency": 72,
+          "success_rate": 0.806,
+          "priority": 0.834
+        },
+        "origin": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        }
+      },
+      "150": {
+        "color": {
+          "status": "learning",
+          "frequency": 3,
+          "success_rate": 0.667,
+          "priority": 0.462
+        },
+        "shape": {
+          "status": "mastered",
+          "frequency": 2,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "size": {
+          "status": "learning",
+          "frequency": 132,
+          "success_rate": 0.795,
+          "priority": 1.0
+        },
+        "material": {
+          "status": "mastered",
+          "frequency": 5,
+          "success_rate": 0.8,
+          "priority": 0.358
+        },
+        "texture": {
+          "status": "mastered",
+          "frequency": 3,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "weight": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "temperature": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "brightness": {
+          "status": "mastered",
+          "frequency": 2,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "pattern": {
+          "status": "learning",
+          "frequency": 112,
+          "success_rate": 0.759,
+          "priority": 1.14
+        },
+        "origin": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        }
+      },
+      "200": {
+        "color": {
+          "status": "learning",
+          "frequency": 3,
+          "success_rate": 0.667,
+          "priority": 0.462
+        },
+        "shape": {
+          "status": "mastered",
+          "frequency": 2,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "size": {
+          "status": "learning",
+          "frequency": 180,
+          "success_rate": 0.778,
+          "priority": 1.155
+        },
+        "material": {
+          "status": "mastered",
+          "frequency": 5,
+          "success_rate": 0.8,
+          "priority": 0.358
+        },
+        "texture": {
+          "status": "mastered",
+          "frequency": 4,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "weight": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "temperature": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "brightness": {
+          "status": "mastered",
+          "frequency": 2,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "pattern": {
+          "status": "learning",
+          "frequency": 155,
+          "success_rate": 0.742,
+          "priority": 1.303
+        },
+        "origin": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        }
+      },
+      "250": {
+        "color": {
+          "status": "mastered",
+          "frequency": 5,
+          "success_rate": 0.8,
+          "priority": 0.358
+        },
+        "shape": {
+          "status": "mastered",
+          "frequency": 2,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "size": {
+          "status": "learning",
+          "frequency": 223,
+          "success_rate": 0.78,
+          "priority": 1.189
+        },
+        "material": {
+          "status": "mastered",
+          "frequency": 6,
+          "success_rate": 0.833,
+          "priority": 0.324
+        },
+        "texture": {
+          "status": "mastered",
+          "frequency": 4,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "weight": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "temperature": {
+          "status": "mastered",
+          "frequency": 2,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "brightness": {
+          "status": "mastered",
+          "frequency": 3,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "pattern": {
+          "status": "learning",
+          "frequency": 195,
+          "success_rate": 0.749,
+          "priority": 1.326
+        },
+        "origin": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        }
+      },
+      "300": {
+        "color": {
+          "status": "mastered",
+          "frequency": 6,
+          "success_rate": 0.833,
+          "priority": 0.324
+        },
+        "shape": {
+          "status": "mastered",
+          "frequency": 2,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "size": {
+          "status": "learning",
+          "frequency": 268,
+          "success_rate": 0.795,
+          "priority": 1.148
+        },
+        "material": {
+          "status": "mastered",
+          "frequency": 6,
+          "success_rate": 0.833,
+          "priority": 0.324
+        },
+        "texture": {
+          "status": "mastered",
+          "frequency": 4,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "weight": {
+          "status": "mastered",
+          "frequency": 2,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "temperature": {
+          "status": "mastered",
+          "frequency": 2,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "brightness": {
+          "status": "mastered",
+          "frequency": 3,
+          "success_rate": 1.0,
+          "priority": 0.0
+        },
+        "pattern": {
+          "status": "learning",
+          "frequency": 233,
+          "success_rate": 0.764,
+          "priority": 1.288
+        },
+        "origin": {
+          "status": "mastered",
+          "frequency": 1,
+          "success_rate": 1.0,
+          "priority": 0.0
+        }
+      }
+    }
+  }
+}

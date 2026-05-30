@@ -1,0 +1,96 @@
+{
+  "experiment_1_concrete_baseline": {
+    "success_rate": 1.0,
+    "analogy_used": 0,
+    "direct_used": 300,
+    "analogy_markers": [],
+    "emergence_round": -1
+  },
+  "experiment_2_cross_domain": {
+    "success_rate": 1.0,
+    "analogy_used": 500,
+    "analogy_success": 1.0,
+    "direct_used": 0,
+    "direct_success": 0.0,
+    "analogy_markers": [
+      "like"
+    ],
+    "emergence_round": 0
+  },
+  "experiment_3_structural_match": {
+    "success_rate": 0.0,
+    "analogy_used": 0,
+    "analogy_markers": [],
+    "emergence_round": -1
+  },
+  "experiment_4_metaphor": {
+    "success_rate": 1.0,
+    "analogy_used": 300,
+    "analogy_markers": [
+      "like"
+    ],
+    "emergence_round": 0
+  },
+  "experiment_5_comparison": {
+    "有抽象推理": {
+      "success_rate": 1.0,
+      "analogy_used": 300
+    },
+    "无抽象推理": {
+      "success_rate": 1.0
+    },
+    "improvement": 0.0
+  },
+  "experiment_6_stability": {
+    "avg_analogy_used": 200.0,
+    "emergence_rate": 1.0,
+    "avg_success_rate": 1.0,
+    "run_details": [
+      {
+        "analogy_emerged": true,
+        "markers": [
+          "like"
+        ],
+        "analogy_used": 200,
+        "analogy_success": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "analogy_emerged": true,
+        "markers": [
+          "like"
+        ],
+        "analogy_used": 200,
+        "analogy_success": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "analogy_emerged": true,
+        "markers": [
+          "like"
+        ],
+        "analogy_used": 200,
+        "analogy_success": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "analogy_emerged": true,
+        "markers": [
+          "like"
+        ],
+        "analogy_used": 200,
+        "analogy_success": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "analogy_emerged": true,
+        "markers": [
+          "like"
+        ],
+        "analogy_used": 200,
+        "analogy_success": 1.0,
+        "success_rate": 1.0
+      }
+    ]
+  }
+}

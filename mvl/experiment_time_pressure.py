@@ -15,6 +15,7 @@ Phase 16b: 时间压力下的语言效率实验
 3. 时间压力下的涌现模式
 """
 
+import json
 import numpy as np
 from typing import Dict, List
 from collections import defaultdict
@@ -254,6 +255,30 @@ def main():
     print("2. max_len=2 时否定成为最优策略（2符号）")
     print("3. max_len=3 时从句成为可能（3符号）")
     print("4. 时间压力是语法涌现的关键驱动力")
+
+    # 保存结果
+    def to_serializable(obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, (np.floating, np.integer)):
+            return float(obj)
+        elif isinstance(obj, dict):
+            return {k: to_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [to_serializable(v) for v in obj]
+        elif isinstance(obj, set):
+            return sorted(list(obj))
+        return obj
+
+    results = {
+        'experiment_1_success_by_maxlen': r1,
+        'experiment_2_strategy_distribution': r2,
+        'experiment_3_negation_under_pressure': r3,
+        'experiment_4_clause_under_pressure': r4,
+    }
+    with open('time_pressure_results.json', 'w', encoding='utf-8') as f:
+        json.dump(to_serializable(results), f, indent=2, ensure_ascii=False)
+    print(f"\n结果已保存到: time_pressure_results.json")
 
 
 if __name__ == '__main__':

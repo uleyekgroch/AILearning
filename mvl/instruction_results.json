@@ -1,0 +1,55 @@
+{
+  "exp1": {
+    "grab_success_rate": 0.78,
+    "push_success_rate": 0.78,
+    "total_success_rate": 0.78,
+    "parse_failures": 0
+  },
+  "exp2": {
+    "instructed_accuracy": 0.64,
+    "random_accuracy": 0.09,
+    "advantage": 0.55
+  },
+  "exp3": {
+    "log": {
+      "steps": [
+        200,
+        400,
+        600,
+        800
+      ],
+      "verb_count": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "instruction_success": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "all_symbols": [
+      "big",
+      "grab",
+      "push"
+    ],
+    "verb_usage": {
+      "push": 9,
+      "grab": 11
+    },
+    "total_instructions": 20,
+    "success_rate": 1.0,
+    "verbs_in_vocab": [
+      "grab",
+      "push"
+    ]
+  },
+  "exp4": {
+    "grab_success_rate": 0.8,
+    "throw_success_rate": 1.0,
+    "compound_success_rate": 0.8
+  }
+}

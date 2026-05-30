@@ -1,0 +1,74 @@
+{
+  "experiment_1": {
+    "stage_transitions": [
+      [
+        49,
+        "early_preoperational"
+      ],
+      [
+        199,
+        "late_preoperational"
+      ]
+    ],
+    "task_scores": [
+      {
+        "step": 49,
+        "stage": "early_preoperational",
+        "tasks": {}
+      },
+      {
+        "step": 199,
+        "stage": "late_preoperational",
+        "tasks": {
+          "·ÖÀà": 0.6948942985394695
+        }
+      }
+    ]
+  },
+  "experiment_2": {
+    "A": {
+      "final_stage": "late_preoperational",
+      "final_error": 0.00519602436687743,
+      "symbols": 3,
+      "stages_visited": 3,
+      "generalization_error": 0.1268556009409329
+    },
+    "B": {
+      "final_stage": "late_formal",
+      "final_error": 5.744613752145879e-09,
+      "symbols": 2,
+      "generalization_error": 0.09403306858574105
+    },
+    "C": {
+      "final_stage": "adolescent",
+      "final_error": 1.3078641356262518e-07,
+      "symbols": 3,
+      "generalization_error": 0.09444356622605417
+    }
+  },
+  "experiment_3": [
+    {
+      "early_preoperational": 49,
+      "late_preoperational": 199
+    },
+    {
+      "early_preoperational": 1003,
+      "late_preoperational": 3004
+    },
+    {
+      "early_preoperational": 2003,
+      "late_preoperational": 2004
+    },
+    {
+      "early_preoperational": 49,
+      "late_preoperational": 199,
+      "early_concrete": 2001,
+      "late_concrete": 2002
+    },
+    {
+      "early_preoperational": 49,
+      "late_preoperational": 199,
+      "early_concrete": 499
+    }
+  ]
+}

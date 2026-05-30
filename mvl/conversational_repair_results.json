@@ -1,0 +1,178 @@
+{
+  "experiment_1": {
+    "final_success_rate": 1.0,
+    "final_markers": [
+      "different",
+      "huh"
+    ],
+    "marker_count": 2,
+    "total_possible": 8,
+    "repair_requests": 6,
+    "repair_success_rate": 1.0,
+    "snapshots": [
+      {
+        "round": 50,
+        "success_rate": 1.0,
+        "repair_requests": 6,
+        "repair_rate": 0.12,
+        "markers_in_vocab": [
+          "different",
+          "huh"
+        ],
+        "marker_count": 2,
+        "vocab_size": 11
+      },
+      {
+        "round": 100,
+        "success_rate": 1.0,
+        "repair_requests": 6,
+        "repair_rate": 0.06,
+        "markers_in_vocab": [
+          "different",
+          "huh"
+        ],
+        "marker_count": 2,
+        "vocab_size": 11
+      },
+      {
+        "round": 150,
+        "success_rate": 1.0,
+        "repair_requests": 6,
+        "repair_rate": 0.04,
+        "markers_in_vocab": [
+          "different",
+          "huh"
+        ],
+        "marker_count": 2,
+        "vocab_size": 11
+      },
+      {
+        "round": 200,
+        "success_rate": 1.0,
+        "repair_requests": 6,
+        "repair_rate": 0.03,
+        "markers_in_vocab": [
+          "different",
+          "huh"
+        ],
+        "marker_count": 2,
+        "vocab_size": 11
+      },
+      {
+        "round": 250,
+        "success_rate": 1.0,
+        "repair_requests": 6,
+        "repair_rate": 0.024,
+        "markers_in_vocab": [
+          "different",
+          "huh"
+        ],
+        "marker_count": 2,
+        "vocab_size": 11
+      },
+      {
+        "round": 300,
+        "success_rate": 1.0,
+        "repair_requests": 6,
+        "repair_rate": 0.02,
+        "markers_in_vocab": [
+          "different",
+          "huh"
+        ],
+        "marker_count": 2,
+        "vocab_size": 11
+      }
+    ]
+  },
+  "experiment_2": {
+    "avg_repair_sr": 1.0,
+    "avg_norepair_sr": 1.0,
+    "improvement": 0.0,
+    "repair_srs": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "norepair_srs": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "experiment_3": {
+    "data_points": [
+      {
+        "total_rounds": 100,
+        "overall_sr": 1.0,
+        "recent_sr": 1.0,
+        "overall_repair_rate": 0.06,
+        "recent_repair_rate": 0.0826,
+        "markers_stabilized": 2,
+        "repair_requests_total": 6
+      },
+      {
+        "total_rounds": 200,
+        "overall_sr": 1.0,
+        "recent_sr": 1.0,
+        "overall_repair_rate": 0.03,
+        "recent_repair_rate": 0.0344,
+        "markers_stabilized": 2,
+        "repair_requests_total": 6
+      },
+      {
+        "total_rounds": 300,
+        "overall_sr": 1.0,
+        "recent_sr": 1.0,
+        "overall_repair_rate": 0.02,
+        "recent_repair_rate": 0.0218,
+        "markers_stabilized": 2,
+        "repair_requests_total": 6
+      },
+      {
+        "total_rounds": 400,
+        "overall_sr": 1.0,
+        "recent_sr": 1.0,
+        "overall_repair_rate": 0.015,
+        "recent_repair_rate": 0.016,
+        "markers_stabilized": 2,
+        "repair_requests_total": 6
+      },
+      {
+        "total_rounds": 500,
+        "overall_sr": 1.0,
+        "recent_sr": 1.0,
+        "overall_repair_rate": 0.012,
+        "recent_repair_rate": 0.0126,
+        "markers_stabilized": 2,
+        "repair_requests_total": 6
+      }
+    ],
+    "stabilization_round": 300,
+    "repair_rate_decline": 0.07
+  },
+  "experiment_4": {
+    "overall_sr": 1.0,
+    "cross_speaker_repair_sr": 1.0,
+    "per_speaker": {
+      "speaker_0": {
+        "success_rate": 1.0,
+        "repair_success_rate": 1.0,
+        "rounds": 100
+      },
+      "speaker_1": {
+        "success_rate": 1.0,
+        "repair_success_rate": 1.0,
+        "rounds": 100
+      },
+      "speaker_2": {
+        "success_rate": 1.0,
+        "repair_success_rate": 1.0,
+        "rounds": 100
+      }
+    }
+  }
+}

@@ -1,17 +1,17 @@
 {
   "\u7ebf\u6027\u6a21\u578b": {
-    "final_error": 0.020462290341921142,
-    "final_symbols": 2,
-    "final_progress": 0.003919292217552674
+    "final_error": 0.06852573895744242,
+    "final_symbols": 1,
+    "final_progress": 0.007818659907449569
   },
   "\u795e\u7ecf\u7f51\u7edc": {
-    "final_error": 0.037008614691483664,
-    "final_symbols": 1,
-    "final_progress": 0.3604241742613954
+    "final_error": 0.014640466326815722,
+    "final_symbols": 5,
+    "final_progress": 0.48513607457806907
   },
   "\u81ea\u9002\u5e94NN": {
-    "final_error": 0.2335003810457694,
-    "final_symbols": 2,
-    "final_progress": 0.47021940205347684
+    "final_error": 0.1761478187146273,
+    "final_symbols": 4,
+    "final_progress": 0.0
   }
 }

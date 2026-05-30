@@ -1,0 +1,624 @@
+{
+  "experiment_1_divergence": {
+    "snapshots": [
+      {
+        "round": 10,
+        "avg_overlap": 0.6416,
+        "pairwise": [
+          0.6154,
+          0.6667,
+          0.6429
+        ],
+        "vocab_sizes": [
+          9,
+          12,
+          11
+        ]
+      },
+      {
+        "round": 20,
+        "avg_overlap": 0.4746,
+        "pairwise": [
+          0.5,
+          0.4737,
+          0.45
+        ],
+        "vocab_sizes": [
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "round": 30,
+        "avg_overlap": 0.3918,
+        "pairwise": [
+          0.3913,
+          0.4091,
+          0.375
+        ],
+        "vocab_sizes": [
+          15,
+          17,
+          16
+        ]
+      },
+      {
+        "round": 40,
+        "avg_overlap": 0.3804,
+        "pairwise": [
+          0.375,
+          0.3913,
+          0.375
+        ],
+        "vocab_sizes": [
+          16,
+          17,
+          16
+        ]
+      },
+      {
+        "round": 50,
+        "avg_overlap": 0.37,
+        "pairwise": [
+          0.375,
+          0.375,
+          0.36
+        ],
+        "vocab_sizes": [
+          16,
+          17,
+          17
+        ]
+      },
+      {
+        "round": 60,
+        "avg_overlap": 0.3419,
+        "pairwise": [
+          0.3333,
+          0.3462,
+          0.3462
+        ],
+        "vocab_sizes": [
+          18,
+          18,
+          17
+        ]
+      },
+      {
+        "round": 70,
+        "avg_overlap": 0.3333,
+        "pairwise": [
+          0.3333,
+          0.3333,
+          0.3333
+        ],
+        "vocab_sizes": [
+          18,
+          18,
+          18
+        ]
+      },
+      {
+        "round": 80,
+        "avg_overlap": 0.3333,
+        "pairwise": [
+          0.3333,
+          0.3333,
+          0.3333
+        ],
+        "vocab_sizes": [
+          18,
+          18,
+          18
+        ]
+      },
+      {
+        "round": 90,
+        "avg_overlap": 0.3333,
+        "pairwise": [
+          0.3333,
+          0.3333,
+          0.3333
+        ],
+        "vocab_sizes": [
+          18,
+          18,
+          18
+        ]
+      },
+      {
+        "round": 100,
+        "avg_overlap": 0.3333,
+        "pairwise": [
+          0.3333,
+          0.3333,
+          0.3333
+        ],
+        "vocab_sizes": [
+          18,
+          18,
+          18
+        ]
+      },
+      {
+        "round": 110,
+        "avg_overlap": 0.3333,
+        "pairwise": [
+          0.3333,
+          0.3333,
+          0.3333
+        ],
+        "vocab_sizes": [
+          18,
+          18,
+          18
+        ]
+      },
+      {
+        "round": 120,
+        "avg_overlap": 0.3333,
+        "pairwise": [
+          0.3333,
+          0.3333,
+          0.3333
+        ],
+        "vocab_sizes": [
+          18,
+          18,
+          18
+        ]
+      },
+      {
+        "round": 130,
+        "avg_overlap": 0.3333,
+        "pairwise": [
+          0.3333,
+          0.3333,
+          0.3333
+        ],
+        "vocab_sizes": [
+          18,
+          18,
+          18
+        ]
+      },
+      {
+        "round": 140,
+        "avg_overlap": 0.3333,
+        "pairwise": [
+          0.3333,
+          0.3333,
+          0.3333
+        ],
+        "vocab_sizes": [
+          18,
+          18,
+          18
+        ]
+      },
+      {
+        "round": 150,
+        "avg_overlap": 0.3333,
+        "pairwise": [
+          0.3333,
+          0.3333,
+          0.3333
+        ],
+        "vocab_sizes": [
+          18,
+          18,
+          18
+        ]
+      }
+    ],
+    "initial_overlap": 1.0,
+    "final_avg_overlap": 0.3333,
+    "divergence": 0.6667,
+    "num_communities": 3,
+    "isolation_rounds": 150
+  },
+  "experiment_2_pidgin": {
+    "pidgin_snapshots": [
+      {
+        "round": 50,
+        "cross_sr": 1.0,
+        "avg_overlap": 0.3333,
+        "shared_symbols": 26,
+        "phase": "pidgin"
+      },
+      {
+        "round": 100,
+        "cross_sr": 1.0,
+        "avg_overlap": 0.3333,
+        "shared_symbols": 26,
+        "phase": "pidgin"
+      },
+      {
+        "round": 150,
+        "cross_sr": 1.0,
+        "avg_overlap": 0.3333,
+        "shared_symbols": 27,
+        "phase": "pidgin"
+      },
+      {
+        "round": 200,
+        "cross_sr": 1.0,
+        "avg_overlap": 0.3333,
+        "shared_symbols": 27,
+        "phase": "pidgin"
+      }
+    ],
+    "pre_contact_sr": 1.0,
+    "post_contact_sr": 1.0,
+    "pre_overlap": 0.3333,
+    "post_overlap": 0.3333,
+    "shared_symbols_count": 27,
+    "final_phase": "pidgin",
+    "emergence_order": [
+      [
+        "yellow",
+        0
+      ],
+      [
+        "triangle",
+        0
+      ],
+      [
+        "small",
+        0
+      ],
+      [
+        "red_1",
+        1
+      ],
+      [
+        "red",
+        2
+      ],
+      [
+        "square_0",
+        2
+      ],
+      [
+        "small_0",
+        2
+      ],
+      [
+        "big_1",
+        3
+      ],
+      [
+        "green_1",
+        4
+      ],
+      [
+        "square_1",
+        4
+      ],
+      [
+        "yellow_0",
+        5
+      ],
+      [
+        "circle_0",
+        5
+      ],
+      [
+        "big_0",
+        5
+      ],
+      [
+        "circle",
+        6
+      ],
+      [
+        "big",
+        6
+      ],
+      [
+        "green_0",
+        7
+      ],
+      [
+        "square",
+        7
+      ],
+      [
+        "blue",
+        8
+      ],
+      [
+        "blue_0",
+        9
+      ],
+      [
+        "triangle_0",
+        9
+      ]
+    ],
+    "isolation_rounds": 100,
+    "contact_rounds": 200
+  },
+  "experiment_3_creole": {
+    "creole_snapshots": [
+      {
+        "round": 50,
+        "cross_sr": 1.0,
+        "intra_sr": 0.0,
+        "avg_overlap": 0.3333,
+        "shared_symbols": 30,
+        "novel_symbols": 0,
+        "vocab_growth": 0,
+        "total_vocab": 36,
+        "phase": "pidgin"
+      },
+      {
+        "round": 100,
+        "cross_sr": 1.0,
+        "intra_sr": 0.0,
+        "avg_overlap": 0.3333,
+        "shared_symbols": 36,
+        "novel_symbols": 0,
+        "vocab_growth": 0,
+        "total_vocab": 36,
+        "phase": "creole"
+      },
+      {
+        "round": 150,
+        "cross_sr": 1.0,
+        "intra_sr": 0.0,
+        "avg_overlap": 0.3333,
+        "shared_symbols": 36,
+        "novel_symbols": 0,
+        "vocab_growth": 0,
+        "total_vocab": 36,
+        "phase": "creole"
+      },
+      {
+        "round": 200,
+        "cross_sr": 1.0,
+        "intra_sr": 0.0,
+        "avg_overlap": 0.3333,
+        "shared_symbols": 36,
+        "novel_symbols": 0,
+        "vocab_growth": 0,
+        "total_vocab": 36,
+        "phase": "creole"
+      },
+      {
+        "round": 250,
+        "cross_sr": 1.0,
+        "intra_sr": 0.0,
+        "avg_overlap": 0.3333,
+        "shared_symbols": 36,
+        "novel_symbols": 0,
+        "vocab_growth": 0,
+        "total_vocab": 36,
+        "phase": "creole"
+      },
+      {
+        "round": 300,
+        "cross_sr": 1.0,
+        "intra_sr": 0.0,
+        "avg_overlap": 0.3333,
+        "shared_symbols": 36,
+        "novel_symbols": 0,
+        "vocab_growth": 0,
+        "total_vocab": 36,
+        "phase": "creole"
+      }
+    ],
+    "final_common_symbols": 9,
+    "creole_coverage": 0.25,
+    "novel_symbols_total": 0,
+    "novel_timeline": [
+      [
+        50,
+        0
+      ],
+      [
+        100,
+        0
+      ],
+      [
+        150,
+        0
+      ],
+      [
+        200,
+        0
+      ],
+      [
+        250,
+        0
+      ],
+      [
+        300,
+        0
+      ]
+    ],
+    "pairwise_shared_avg": 9.0,
+    "final_phase": "creole",
+    "isolation_rounds": 100,
+    "contact_rounds": 300
+  },
+  "experiment_4_scaling": {
+    "by_size": {
+      "size_3": {
+        "community_size": 3,
+        "pre_contact_sr": 1.0,
+        "post_contact_sr": 1.0,
+        "sr_improvement": 0.0,
+        "pre_overlap": 0.3333,
+        "post_overlap": 0.3333,
+        "shared_symbols": 27,
+        "intra_sr": 0.0,
+        "stability": 1.0,
+        "contact_log": [
+          {
+            "round": 30,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3333,
+            "shared_symbols": 21
+          },
+          {
+            "round": 60,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3333,
+            "shared_symbols": 24
+          },
+          {
+            "round": 90,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3333,
+            "shared_symbols": 27
+          },
+          {
+            "round": 120,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3333,
+            "shared_symbols": 27
+          },
+          {
+            "round": 150,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3333,
+            "shared_symbols": 27
+          }
+        ]
+      },
+      "size_5": {
+        "community_size": 5,
+        "pre_contact_sr": 1.0,
+        "post_contact_sr": 1.0,
+        "sr_improvement": 0.0,
+        "pre_overlap": 0.3333,
+        "post_overlap": 0.3333,
+        "shared_symbols": 27,
+        "intra_sr": 0.0,
+        "stability": 1.0,
+        "contact_log": [
+          {
+            "round": 30,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3333,
+            "shared_symbols": 25
+          },
+          {
+            "round": 60,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3333,
+            "shared_symbols": 27
+          },
+          {
+            "round": 90,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3333,
+            "shared_symbols": 27
+          },
+          {
+            "round": 120,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3333,
+            "shared_symbols": 27
+          },
+          {
+            "round": 150,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3333,
+            "shared_symbols": 27
+          }
+        ]
+      },
+      "size_10": {
+        "community_size": 10,
+        "pre_contact_sr": 1.0,
+        "post_contact_sr": 1.0,
+        "sr_improvement": 0.0,
+        "pre_overlap": 0.3462,
+        "post_overlap": 0.3462,
+        "shared_symbols": 27,
+        "intra_sr": 0.0,
+        "stability": 1.0,
+        "contact_log": [
+          {
+            "round": 30,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3462,
+            "shared_symbols": 21
+          },
+          {
+            "round": 60,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3462,
+            "shared_symbols": 24
+          },
+          {
+            "round": 90,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3462,
+            "shared_symbols": 26
+          },
+          {
+            "round": 120,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3462,
+            "shared_symbols": 26
+          },
+          {
+            "round": 150,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3462,
+            "shared_symbols": 27
+          }
+        ]
+      },
+      "size_20": {
+        "community_size": 20,
+        "pre_contact_sr": 1.0,
+        "post_contact_sr": 1.0,
+        "sr_improvement": 0.0,
+        "pre_overlap": 0.3333,
+        "post_overlap": 0.3333,
+        "shared_symbols": 27,
+        "intra_sr": 0.0,
+        "stability": 1.0,
+        "contact_log": [
+          {
+            "round": 30,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3333,
+            "shared_symbols": 24
+          },
+          {
+            "round": 60,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3333,
+            "shared_symbols": 25
+          },
+          {
+            "round": 90,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3333,
+            "shared_symbols": 27
+          },
+          {
+            "round": 120,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3333,
+            "shared_symbols": 27
+          },
+          {
+            "round": 150,
+            "cross_sr": 1.0,
+            "avg_overlap": 0.3333,
+            "shared_symbols": 27
+          }
+        ]
+      }
+    },
+    "corr_size_improvement": NaN,
+    "corr_size_stability": NaN
+  }
+}

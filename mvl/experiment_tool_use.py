@@ -16,6 +16,7 @@ Speaker 必须用功能描述（"use reach for reach_object"）来区分。
 5. 稳定性验证：5 次运行
 """
 
+import json
 import numpy as np
 from typing import Dict, List
 from collections import defaultdict
@@ -299,6 +300,31 @@ def main():
     print("2. 外观相似时，功能描述是唯一区分策略")
     print("3. 工具使用需要目标依赖的物体重释")
     print("4. 与人类发展一致：工具使用在 12-18 个月发展")
+
+    # 保存结果
+    def to_serializable(obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, (np.floating, np.integer)):
+            return float(obj)
+        elif isinstance(obj, dict):
+            return {k: to_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [to_serializable(v) for v in obj]
+        elif isinstance(obj, set):
+            return sorted(list(obj))
+        return obj
+
+    results = {
+        'experiment_1_direct_action': r1,
+        'experiment_2_single_tool': r2,
+        'experiment_3_tool_selection': r3,
+        'experiment_4_comparison': r4,
+        'experiment_5_stability': r5,
+    }
+    with open('tool_use_results.json', 'w', encoding='utf-8') as f:
+        json.dump(to_serializable(results), f, indent=2, ensure_ascii=False)
+    print(f"\n结果已保存到: tool_use_results.json")
 
 
 if __name__ == '__main__':

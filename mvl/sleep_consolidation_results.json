@@ -1,0 +1,158 @@
+{
+  "experiment_1": {
+    "description": "巩固 vs 无巩固的检索准确率",
+    "num_experiences": 200,
+    "num_queries": 50,
+    "num_runs": 5,
+    "consolidated_accuracy": 1.0851,
+    "baseline_accuracy": 0.8959,
+    "improvement": 0.1892,
+    "improvement_pct": 21.12,
+    "consolidated_per_run": [
+      1.0994,
+      1.0798,
+      1.0531,
+      1.0917,
+      1.1014
+    ],
+    "baseline_per_run": [
+      0.9027,
+      0.8849,
+      0.8765,
+      0.9054,
+      0.9097
+    ]
+  },
+  "experiment_2": {
+    "description": "不同延迟下的平均记忆强度保持率",
+    "num_experiences": 200,
+    "probe_points": [
+      10,
+      20,
+      50,
+      100,
+      150,
+      200
+    ],
+    "consolidated_curve": [
+      0.9315,
+      0.8445,
+      0.6298,
+      0.387,
+      0.2386,
+      0.1433
+    ],
+    "baseline_curve": [
+      0.875,
+      0.7913,
+      0.5853,
+      0.3541,
+      0.2143,
+      0.1253
+    ],
+    "final_consolidated_retention": 0.1433,
+    "final_baseline_retention": 0.1253,
+    "retention_advantage": 0.018
+  },
+  "experiment_3": {
+    "description": "重播策略比较",
+    "num_experiences": 200,
+    "num_queries": 50,
+    "num_runs": 3,
+    "results": {
+      "random": {
+        "mean_accuracy": 1.057,
+        "std": 0.0034,
+        "per_run": [
+          1.0612,
+          1.0569,
+          1.0529
+        ]
+      },
+      "prioritize_success": {
+        "mean_accuracy": 1.0775,
+        "std": 0.019,
+        "per_run": [
+          1.0994,
+          1.0798,
+          1.0531
+        ]
+      },
+      "prioritize_recent": {
+        "mean_accuracy": 1.1103,
+        "std": 0.0092,
+        "per_run": [
+          1.1218,
+          1.1097,
+          1.0994
+        ]
+      },
+      "prioritize_surprising": {
+        "mean_accuracy": 0.9815,
+        "std": 0.007,
+        "per_run": [
+          0.9742,
+          0.991,
+          0.9794
+        ]
+      }
+    },
+    "ranking": [
+      [
+        "prioritize_recent",
+        1.1103
+      ],
+      [
+        "prioritize_success",
+        1.0775
+      ],
+      [
+        "random",
+        1.057
+      ],
+      [
+        "prioritize_surprising",
+        0.9815
+      ]
+    ],
+    "best_strategy": "prioritize_recent"
+  },
+  "experiment_4": {
+    "description": "语言-巩固交互：巩固是否促进后续检索质量",
+    "num_rounds": 300,
+    "consolidation_interval": 30,
+    "num_phases": 10,
+    "consolidated_phase_retrieval": [
+      0.8671,
+      1.0774,
+      1.1035,
+      1.1258,
+      1.0901,
+      1.1283,
+      1.1154,
+      1.1399,
+      1.093,
+      1.1302
+    ],
+    "baseline_phase_retrieval": [
+      0.855,
+      0.8669,
+      0.8987,
+      0.9123,
+      0.9381,
+      0.9381,
+      0.9357,
+      0.9286,
+      0.9289,
+      0.9242
+    ],
+    "consolidated_early": 1.0528,
+    "consolidated_late": 1.1213,
+    "baseline_early": 0.8942,
+    "baseline_late": 0.9311,
+    "post_consolidation_boost": 0.0685,
+    "baseline_drift": 0.0369,
+    "net_improvement": 0.0316,
+    "net_improvement_pct": 3.0
+  }
+}

@@ -1,0 +1,367 @@
+{
+  "exp1": {
+    "snapshots": [
+      {
+        "round": 50,
+        "vocab_size": 16,
+        "dimension_stats": {
+          "auditory": {
+            "frequency": 7,
+            "successes": 7,
+            "success_rate": 1.0
+          },
+          "shape": {
+            "frequency": 202,
+            "successes": 178,
+            "success_rate": 0.8811881188118812
+          },
+          "material": {
+            "frequency": 263,
+            "successes": 238,
+            "success_rate": 0.9049429657794676
+          },
+          "size": {
+            "frequency": 78,
+            "successes": 77,
+            "success_rate": 0.9871794871794872
+          }
+        }
+      },
+      {
+        "round": 100,
+        "vocab_size": 16,
+        "dimension_stats": {
+          "auditory": {
+            "frequency": 7,
+            "successes": 7,
+            "success_rate": 1.0
+          },
+          "shape": {
+            "frequency": 202,
+            "successes": 178,
+            "success_rate": 0.8811881188118812
+          },
+          "material": {
+            "frequency": 263,
+            "successes": 238,
+            "success_rate": 0.9049429657794676
+          },
+          "size": {
+            "frequency": 78,
+            "successes": 77,
+            "success_rate": 0.9871794871794872
+          }
+        }
+      },
+      {
+        "round": 150,
+        "vocab_size": 16,
+        "dimension_stats": {
+          "auditory": {
+            "frequency": 7,
+            "successes": 7,
+            "success_rate": 1.0
+          },
+          "shape": {
+            "frequency": 202,
+            "successes": 178,
+            "success_rate": 0.8811881188118812
+          },
+          "material": {
+            "frequency": 263,
+            "successes": 238,
+            "success_rate": 0.9049429657794676
+          },
+          "size": {
+            "frequency": 78,
+            "successes": 77,
+            "success_rate": 0.9871794871794872
+          }
+        }
+      },
+      {
+        "round": 200,
+        "vocab_size": 16,
+        "dimension_stats": {
+          "auditory": {
+            "frequency": 7,
+            "successes": 7,
+            "success_rate": 1.0
+          },
+          "shape": {
+            "frequency": 202,
+            "successes": 178,
+            "success_rate": 0.8811881188118812
+          },
+          "material": {
+            "frequency": 263,
+            "successes": 238,
+            "success_rate": 0.9049429657794676
+          },
+          "size": {
+            "frequency": 78,
+            "successes": 77,
+            "success_rate": 0.9871794871794872
+          }
+        }
+      },
+      {
+        "round": 250,
+        "vocab_size": 16,
+        "dimension_stats": {
+          "auditory": {
+            "frequency": 7,
+            "successes": 7,
+            "success_rate": 1.0
+          },
+          "shape": {
+            "frequency": 202,
+            "successes": 178,
+            "success_rate": 0.8811881188118812
+          },
+          "material": {
+            "frequency": 263,
+            "successes": 238,
+            "success_rate": 0.9049429657794676
+          },
+          "size": {
+            "frequency": 78,
+            "successes": 77,
+            "success_rate": 0.9871794871794872
+          }
+        }
+      },
+      {
+        "round": 300,
+        "vocab_size": 16,
+        "dimension_stats": {
+          "auditory": {
+            "frequency": 7,
+            "successes": 7,
+            "success_rate": 1.0
+          },
+          "shape": {
+            "frequency": 202,
+            "successes": 178,
+            "success_rate": 0.8811881188118812
+          },
+          "material": {
+            "frequency": 263,
+            "successes": 238,
+            "success_rate": 0.9049429657794676
+          },
+          "size": {
+            "frequency": 78,
+            "successes": 77,
+            "success_rate": 0.9871794871794872
+          }
+        }
+      }
+    ],
+    "final_ranking": [
+      [
+        "auditory",
+        1.0
+      ],
+      [
+        "size",
+        0.9871794871794872
+      ],
+      [
+        "material",
+        0.9049429657794676
+      ],
+      [
+        "shape",
+        0.8811881188118812
+      ]
+    ],
+    "total_games": 300
+  },
+  "exp2": {
+    "dimension_guided": 0.87,
+    "symbol_guided": 0.91,
+    "random": 0.9,
+    "dim_vs_sym": -0.040000000000000036,
+    "dim_vs_random": -0.030000000000000027,
+    "vocab_a": 15,
+    "vocab_b": 15,
+    "vocab_c": 15
+  },
+  "exp3": {
+    "full_transfer": 0.885,
+    "dimension_only": 0.89,
+    "symbol_only": 0.89,
+    "from_scratch": 0.9,
+    "dim_advantage": -0.010000000000000009,
+    "sym_advantage": -0.010000000000000009,
+    "full_curve": [
+      {
+        "round": 20,
+        "success_rate": 0.9
+      },
+      {
+        "round": 40,
+        "success_rate": 0.9
+      },
+      {
+        "round": 60,
+        "success_rate": 0.85
+      },
+      {
+        "round": 80,
+        "success_rate": 0.85
+      },
+      {
+        "round": 100,
+        "success_rate": 0.95
+      },
+      {
+        "round": 120,
+        "success_rate": 0.9
+      },
+      {
+        "round": 140,
+        "success_rate": 0.9
+      },
+      {
+        "round": 160,
+        "success_rate": 0.9
+      },
+      {
+        "round": 180,
+        "success_rate": 0.85
+      },
+      {
+        "round": 200,
+        "success_rate": 0.85
+      }
+    ],
+    "dim_curve": [
+      {
+        "round": 20,
+        "success_rate": 0.9
+      },
+      {
+        "round": 40,
+        "success_rate": 0.9
+      },
+      {
+        "round": 60,
+        "success_rate": 1.0
+      },
+      {
+        "round": 80,
+        "success_rate": 0.85
+      },
+      {
+        "round": 100,
+        "success_rate": 1.0
+      },
+      {
+        "round": 120,
+        "success_rate": 0.9
+      },
+      {
+        "round": 140,
+        "success_rate": 0.8
+      },
+      {
+        "round": 160,
+        "success_rate": 0.85
+      },
+      {
+        "round": 180,
+        "success_rate": 0.8
+      },
+      {
+        "round": 200,
+        "success_rate": 0.9
+      }
+    ],
+    "sym_curve": [
+      {
+        "round": 20,
+        "success_rate": 0.85
+      },
+      {
+        "round": 40,
+        "success_rate": 1.0
+      },
+      {
+        "round": 60,
+        "success_rate": 0.9
+      },
+      {
+        "round": 80,
+        "success_rate": 0.95
+      },
+      {
+        "round": 100,
+        "success_rate": 0.85
+      },
+      {
+        "round": 120,
+        "success_rate": 0.85
+      },
+      {
+        "round": 140,
+        "success_rate": 0.85
+      },
+      {
+        "round": 160,
+        "success_rate": 0.85
+      },
+      {
+        "round": 180,
+        "success_rate": 0.9
+      },
+      {
+        "round": 200,
+        "success_rate": 0.9
+      }
+    ],
+    "scratch_curve": [
+      {
+        "round": 20,
+        "success_rate": 0.8
+      },
+      {
+        "round": 40,
+        "success_rate": 0.95
+      },
+      {
+        "round": 60,
+        "success_rate": 0.85
+      },
+      {
+        "round": 80,
+        "success_rate": 1.0
+      },
+      {
+        "round": 100,
+        "success_rate": 0.95
+      },
+      {
+        "round": 120,
+        "success_rate": 0.9
+      },
+      {
+        "round": 140,
+        "success_rate": 0.85
+      },
+      {
+        "round": 160,
+        "success_rate": 0.9
+      },
+      {
+        "round": 180,
+        "success_rate": 0.8
+      },
+      {
+        "round": 200,
+        "success_rate": 1.0
+      }
+    ]
+  }
+}

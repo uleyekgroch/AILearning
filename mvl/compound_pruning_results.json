@@ -1,0 +1,394 @@
+{
+  "exp1": {
+    "snapshots": [
+      {
+        "round": 50,
+        "vocab_size": 16,
+        "compound_count": 0,
+        "by_length": {}
+      },
+      {
+        "round": 100,
+        "vocab_size": 16,
+        "compound_count": 2,
+        "by_length": {
+          "2": 2
+        }
+      },
+      {
+        "round": 150,
+        "vocab_size": 19,
+        "compound_count": 6,
+        "by_length": {
+          "2": 6
+        }
+      },
+      {
+        "round": 200,
+        "vocab_size": 23,
+        "compound_count": 11,
+        "by_length": {
+          "2": 11
+        }
+      },
+      {
+        "round": 250,
+        "vocab_size": 26,
+        "compound_count": 13,
+        "by_length": {
+          "2": 13
+        }
+      },
+      {
+        "round": 300,
+        "vocab_size": 31,
+        "compound_count": 15,
+        "by_length": {
+          "2": 15
+        }
+      },
+      {
+        "round": 350,
+        "vocab_size": 31,
+        "compound_count": 16,
+        "by_length": {
+          "2": 16
+        }
+      },
+      {
+        "round": 400,
+        "vocab_size": 33,
+        "compound_count": 17,
+        "by_length": {
+          "2": 17
+        }
+      },
+      {
+        "round": 450,
+        "vocab_size": 34,
+        "compound_count": 16,
+        "by_length": {
+          "2": 16
+        }
+      },
+      {
+        "round": 500,
+        "vocab_size": 35,
+        "compound_count": 18,
+        "by_length": {
+          "2": 18
+        }
+      },
+      {
+        "round": 550,
+        "vocab_size": 36,
+        "compound_count": 22,
+        "by_length": {
+          "2": 22
+        }
+      },
+      {
+        "round": 600,
+        "vocab_size": 38,
+        "compound_count": 22,
+        "by_length": {
+          "2": 22
+        }
+      },
+      {
+        "round": 650,
+        "vocab_size": 41,
+        "compound_count": 24,
+        "by_length": {
+          "2": 21,
+          "3": 3
+        }
+      },
+      {
+        "round": 700,
+        "vocab_size": 41,
+        "compound_count": 26,
+        "by_length": {
+          "2": 22,
+          "3": 4
+        }
+      },
+      {
+        "round": 750,
+        "vocab_size": 43,
+        "compound_count": 23,
+        "by_length": {
+          "2": 21,
+          "3": 2
+        }
+      },
+      {
+        "round": 800,
+        "vocab_size": 45,
+        "compound_count": 22,
+        "by_length": {
+          "2": 21,
+          "3": 1
+        }
+      }
+    ],
+    "final_compounds": {
+      "cube-plastic": {
+        "components": [
+          "cube",
+          "plastic"
+        ],
+        "frequency": 5,
+        "successes": 4,
+        "success_rate": 0.8,
+        "last_used": 791
+      },
+      "cylinder-rubber": {
+        "components": [
+          "cylinder",
+          "rubber"
+        ],
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0,
+        "last_used": 777
+      },
+      "cube-stone": {
+        "components": [
+          "cube",
+          "stone"
+        ],
+        "frequency": 6,
+        "successes": 5,
+        "success_rate": 0.8333333333333334,
+        "last_used": 798
+      },
+      "cylinder-glass": {
+        "components": [
+          "cylinder",
+          "glass"
+        ],
+        "frequency": 5,
+        "successes": 4,
+        "success_rate": 0.8,
+        "last_used": 793
+      },
+      "cube-wood": {
+        "components": [
+          "cube",
+          "wood"
+        ],
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0,
+        "last_used": 750
+      },
+      "cube-rubber": {
+        "components": [
+          "cube",
+          "rubber"
+        ],
+        "frequency": 5,
+        "successes": 4,
+        "success_rate": 0.8,
+        "last_used": 786
+      },
+      "cube-fabric": {
+        "components": [
+          "cube",
+          "fabric"
+        ],
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0,
+        "last_used": 747
+      },
+      "sphere-glass": {
+        "components": [
+          "sphere",
+          "glass"
+        ],
+        "frequency": 5,
+        "successes": 4,
+        "success_rate": 0.8,
+        "last_used": 792
+      },
+      "sphere-metal": {
+        "components": [
+          "sphere",
+          "metal"
+        ],
+        "frequency": 6,
+        "successes": 6,
+        "success_rate": 1.0,
+        "last_used": 738
+      },
+      "cylinder-fabric": {
+        "components": [
+          "cylinder",
+          "fabric"
+        ],
+        "frequency": 5,
+        "successes": 4,
+        "success_rate": 0.8,
+        "last_used": 720
+      },
+      "big-wood": {
+        "components": [
+          "big",
+          "wood"
+        ],
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0,
+        "last_used": 787
+      },
+      "cylinder-wood": {
+        "components": [
+          "cylinder",
+          "wood"
+        ],
+        "frequency": 15,
+        "successes": 12,
+        "success_rate": 0.8,
+        "last_used": 775
+      },
+      "cube-glass": {
+        "components": [
+          "cube",
+          "glass"
+        ],
+        "frequency": 8,
+        "successes": 7,
+        "success_rate": 0.875,
+        "last_used": 797
+      },
+      "cube-metal": {
+        "components": [
+          "cube",
+          "metal"
+        ],
+        "frequency": 10,
+        "successes": 10,
+        "success_rate": 1.0,
+        "last_used": 768
+      },
+      "cube-wood-heavy": {
+        "components": [
+          "cube",
+          "wood",
+          "heavy"
+        ],
+        "frequency": 2,
+        "successes": 2,
+        "success_rate": 1.0,
+        "last_used": 719
+      },
+      "medium-wood": {
+        "components": [
+          "medium",
+          "wood"
+        ],
+        "frequency": 6,
+        "successes": 5,
+        "success_rate": 0.8333333333333334,
+        "last_used": 755
+      },
+      "wood-light": {
+        "components": [
+          "wood",
+          "light"
+        ],
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0,
+        "last_used": 781
+      },
+      "sphere-rubber": {
+        "components": [
+          "sphere",
+          "rubber"
+        ],
+        "frequency": 20,
+        "successes": 16,
+        "success_rate": 0.8,
+        "last_used": 799
+      },
+      "big-cube": {
+        "components": [
+          "big",
+          "cube"
+        ],
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0,
+        "last_used": 735
+      },
+      "big-glass": {
+        "components": [
+          "big",
+          "glass"
+        ],
+        "frequency": 7,
+        "successes": 6,
+        "success_rate": 0.8571428571428571,
+        "last_used": 737
+      },
+      "small-medium": {
+        "components": [
+          "small",
+          "medium"
+        ],
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0,
+        "last_used": 753
+      },
+      "sphere-fabric": {
+        "components": [
+          "sphere",
+          "fabric"
+        ],
+        "frequency": 10,
+        "successes": 8,
+        "success_rate": 0.8,
+        "last_used": 785
+      }
+    }
+  },
+  "exp2": {
+    "with_pruning": {
+      "compounds": 19,
+      "active": 19,
+      "avg_length": 1.48,
+      "compound_usage_rate": 0.52,
+      "success_rate": 0.92
+    },
+    "without_pruning": {
+      "compounds": 23,
+      "active": 23,
+      "avg_length": 1.58,
+      "compound_usage_rate": 0.48,
+      "success_rate": 0.85
+    }
+  },
+  "exp3": {
+    "full_transfer": {
+      "avg_length": 1.445,
+      "compound_usage_rate": 0.6,
+      "success_rate": 0.9
+    },
+    "active_transfer": {
+      "avg_length": 1.465,
+      "compound_usage_rate": 0.595,
+      "success_rate": 0.9
+    },
+    "from_scratch": {
+      "avg_length": 1.82,
+      "compound_usage_rate": 0.0,
+      "success_rate": 0.9
+    },
+    "total_compounds": 24,
+    "active_compounds": 24
+  }
+}

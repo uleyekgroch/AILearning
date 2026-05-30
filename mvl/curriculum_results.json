@@ -1,0 +1,100 @@
+{
+  "experiment_1": {
+    "random": {
+      "success_rate": 0.7836,
+      "std": 0.0096,
+      "vocabulary_size": 22.0,
+      "avg_ambiguity": 0.5297
+    },
+    "easy": {
+      "success_rate": 0.9988,
+      "std": 0.001,
+      "vocabulary_size": 21.6,
+      "avg_ambiguity": 0.1827
+    },
+    "hard": {
+      "success_rate": 0.4476,
+      "std": 0.0074,
+      "vocabulary_size": 12.8,
+      "avg_ambiguity": 0.7338
+    },
+    "progressive": {
+      "success_rate": 0.7864,
+      "std": 0.0113,
+      "vocabulary_size": 22.0,
+      "avg_ambiguity": 0.5278
+    },
+    "self_paced": {
+      "success_rate": 0.6776,
+      "std": 0.0071,
+      "vocabulary_size": 20.6,
+      "avg_ambiguity": 0.6464
+    }
+  },
+  "experiment_2": {
+    "avg_success_rate": 0.684,
+    "avg_final_level": 4.95
+  },
+  "experiment_3": {
+    "1": {
+      "success_rate": 1.0,
+      "unique_attrs": 4,
+      "num_objects": 3,
+      "avg_unique_objects": 3.0
+    },
+    "2": {
+      "success_rate": 0.9917,
+      "unique_attrs": 3,
+      "num_objects": 4,
+      "avg_unique_objects": 4.0
+    },
+    "3": {
+      "success_rate": 0.9833,
+      "unique_attrs": 3,
+      "num_objects": 5,
+      "avg_unique_objects": 5.0
+    },
+    "4": {
+      "success_rate": 0.9083,
+      "unique_attrs": 2,
+      "num_objects": 5,
+      "avg_unique_objects": 4.3
+    },
+    "5": {
+      "success_rate": 0.6517,
+      "unique_attrs": 1,
+      "num_objects": 6,
+      "avg_unique_objects": 4.0
+    },
+    "6": {
+      "success_rate": 0.4917,
+      "unique_attrs": 1,
+      "num_objects": 8,
+      "avg_unique_objects": 4.3
+    },
+    "7": {
+      "success_rate": 0.475,
+      "unique_attrs": 1,
+      "num_objects": 10,
+      "avg_unique_objects": 5.0
+    }
+  },
+  "experiment_4": {
+    "low_then_high": {
+      "success_rate": 0.7968,
+      "std": 0.0183
+    },
+    "high_direct": {
+      "success_rate": 0.7856,
+      "std": 0.0172
+    },
+    "high_then_low": {
+      "success_rate": 0.816,
+      "std": 0.0121
+    },
+    "random": {
+      "success_rate": 0.7892,
+      "std": 0.0103
+    }
+  }
+}

@@ -178,7 +178,7 @@ class RegionConfig:
             },
             # 森林：偏好自然物、木质
             {
-                'material': {'wood': 0.4, 'fabric': 0.25, 'stone': 0.2, 'natural': 0.1, 'glass': 0.03, 'metal': 0.02},
+                'material': {'wood': 0.4, 'fabric': 0.25, 'stone': 0.2, 'plastic': 0.1, 'glass': 0.03, 'metal': 0.02},
                 'origin': {'natural': 0.7, 'magical': 0.2, 'artificial': 0.1},
                 'pattern': {'solid': 0.3, 'striped': 0.35, 'spotted': 0.35},
                 'texture': {'rough': 0.3, 'bumpy': 0.3, 'fuzzy': 0.25, 'smooth': 0.15},

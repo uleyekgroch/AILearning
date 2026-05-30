@@ -1,25 +1,25 @@
 {
   "mse": {
-    "final_error": 0.07426626666784505,
-    "final_symbols": 1,
-    "final_stage": "pre_operational"
+    "final_error": 1.453574277443064,
+    "final_symbols": 2,
+    "final_stage": "sensorimotor"
   },
   "fep": {
-    "final_error": 0.23354630943292506,
+    "final_error": 0.06248906515716781,
     "final_symbols": 3,
-    "final_stage": "pre_operational",
-    "avg_precision": 3.704155324471186,
-    "initial_fe": 101.7336059270695,
-    "final_fe": 24.41817854523598
+    "final_stage": "late_preoperational",
+    "avg_precision": 0.03424457577407403,
+    "initial_fe": 101.78496057358709,
+    "final_fe": -49.99575296592539
   },
   "generalization": {
-    "mse": 10.906421130404494,
-    "fep": 10.939827321994105
+    "mse": 5.893567190913518,
+    "fep": 10.187979575555264
   },
   "calibration": {
-    "coverage_1sigma": 0.4425,
-    "coverage_2sigma": 0.6075,
-    "mean_calibration_error": 1.1996318386963174,
+    "coverage_1sigma": 1.0,
+    "coverage_2sigma": 1.0,
+    "mean_calibration_error": 9.598480925896223e+35,
     "ideal_1sigma": 0.683,
     "ideal_2sigma": 0.954
   }

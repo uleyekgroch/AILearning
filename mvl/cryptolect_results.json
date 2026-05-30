@@ -1,0 +1,130 @@
+{
+  "experiment_1": {
+    "secret_vocab_size": 8,
+    "secret_vocabulary": {
+      "small": "tiny_wee",
+      "blue": "azure",
+      "green": "emerald",
+      "circle": "round_one",
+      "red": "scarlet",
+      "big": "massive",
+      "triangle": "pointy",
+      "square": "boxy"
+    },
+    "in_group_sr": 1.0,
+    "out_group_sr": 0.155,
+    "secrecy_advantage": 0.845,
+    "snapshots": [
+      {
+        "round": 40,
+        "secret_vocab_size": 4,
+        "in_group_sr": 1.0,
+        "out_group_sr": 0.425
+      },
+      {
+        "round": 80,
+        "secret_vocab_size": 8,
+        "in_group_sr": 1.0,
+        "out_group_sr": 0.2625
+      },
+      {
+        "round": 120,
+        "secret_vocab_size": 8,
+        "in_group_sr": 1.0,
+        "out_group_sr": 0.2167
+      },
+      {
+        "round": 160,
+        "secret_vocab_size": 8,
+        "in_group_sr": 1.0,
+        "out_group_sr": 0.175
+      },
+      {
+        "round": 200,
+        "secret_vocab_size": 8,
+        "in_group_sr": 1.0,
+        "out_group_sr": 0.155
+      }
+    ]
+  },
+  "experiment_2": {
+    "cryptolect": {
+      "in_group_sr": 1.0,
+      "out_group_sr": 0.202,
+      "std_in": 0.0,
+      "std_out": 0.0588
+    },
+    "open": {
+      "in_group_sr": 1.0,
+      "out_group_sr": 1.0,
+      "std_in": 0.0,
+      "std_out": 0.0
+    },
+    "secrecy_advantage_cryptolect": 0.798,
+    "secrecy_advantage_open": 0.0,
+    "num_runs": 5
+  },
+  "experiment_3": {
+    "by_group_size": {
+      "3": {
+        "secret_vocab_size": 8,
+        "in_group_sr": 1.0,
+        "out_group_sr": 0.065,
+        "leakage_rate": 0.039
+      },
+      "5": {
+        "secret_vocab_size": 8,
+        "in_group_sr": 1.0,
+        "out_group_sr": 0.055,
+        "leakage_rate": 0.045
+      },
+      "8": {
+        "secret_vocab_size": 8,
+        "in_group_sr": 1.0,
+        "out_group_sr": 0.04,
+        "leakage_rate": 0.054
+      },
+      "12": {
+        "secret_vocab_size": 8,
+        "in_group_sr": 1.0,
+        "out_group_sr": 0.09,
+        "leakage_rate": 0.066
+      }
+    },
+    "vocab_trend_per_member": 0.0,
+    "leakage_trend_per_member": 0.003
+  },
+  "experiment_4": {
+    "by_exposure": {
+      "0": {
+        "in_group_sr": 1.0,
+        "out_group_sr": 0.065,
+        "secret_symbols_cracked": 0,
+        "total_secret_symbols": 8,
+        "crack_rate": 0.0
+      },
+      "10": {
+        "in_group_sr": 1.0,
+        "out_group_sr": 0.06,
+        "secret_symbols_cracked": 4,
+        "total_secret_symbols": 8,
+        "crack_rate": 0.5
+      },
+      "50": {
+        "in_group_sr": 1.0,
+        "out_group_sr": 0.07,
+        "secret_symbols_cracked": 6,
+        "total_secret_symbols": 8,
+        "crack_rate": 0.75
+      },
+      "100": {
+        "in_group_sr": 1.0,
+        "out_group_sr": 0.105,
+        "secret_symbols_cracked": 8,
+        "total_secret_symbols": 8,
+        "crack_rate": 1.0
+      }
+    },
+    "improvement_rate_per_exposure": 0.00042
+  }
+}

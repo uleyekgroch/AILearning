@@ -1,0 +1,40 @@
+{
+  "experiment_1_individual_view": {
+    "agent0_visible": [
+      6
+    ],
+    "agent1_visible": [
+      6
+    ]
+  },
+  "experiment_3_communication_benefit": {
+    "with_comm": [
+      14,
+      14,
+      14,
+      14,
+      14
+    ],
+    "without_comm": [
+      14,
+      14,
+      14,
+      14,
+      13
+    ],
+    "solo": [
+      14,
+      14,
+      12,
+      14,
+      14
+    ]
+  },
+  "experiment_4_language_convergence": [
+    1.0000000000000002,
+    0.9999999999999999,
+    0.9999999999999999,
+    0.7000000000000001,
+    0.9999999999999999
+  ]
+}

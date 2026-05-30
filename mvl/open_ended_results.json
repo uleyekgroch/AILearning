@@ -1,0 +1,199 @@
+{
+  "experiment_1": {
+    "curiosity": {
+      "avg_error": 0.0594,
+      "avg_coverage": 500.0,
+      "avg_structures": 21.1
+    },
+    "novelty": {
+      "avg_error": 0.062,
+      "avg_coverage": 500.0,
+      "avg_structures": 22.1
+    },
+    "empowerment": {
+      "avg_error": 0.0599,
+      "avg_coverage": 499.7,
+      "avg_structures": 18.6
+    },
+    "information_gain": {
+      "avg_error": 0.0613,
+      "avg_coverage": 500.0,
+      "avg_structures": 22.5
+    },
+    "random": {
+      "avg_error": 0.062,
+      "avg_coverage": 500.0,
+      "avg_structures": 21.6
+    }
+  },
+  "experiment_2": {
+    "curiosity": [
+      {
+        "step": 100,
+        "coverage": 100.0,
+        "structures": 15.3
+      },
+      {
+        "step": 200,
+        "coverage": 200.0,
+        "structures": 18.3
+      },
+      {
+        "step": 300,
+        "coverage": 300.0,
+        "structures": 19.7
+      },
+      {
+        "step": 400,
+        "coverage": 400.0,
+        "structures": 20.0
+      },
+      {
+        "step": 500,
+        "coverage": 500.0,
+        "structures": 20.3
+      },
+      {
+        "step": 600,
+        "coverage": 600.0,
+        "structures": 20.3
+      },
+      {
+        "step": 700,
+        "coverage": 700.0,
+        "structures": 21.3
+      },
+      {
+        "step": 800,
+        "coverage": 800.0,
+        "structures": 21.7
+      },
+      {
+        "step": 900,
+        "coverage": 900.0,
+        "structures": 22.0
+      },
+      {
+        "step": 1000,
+        "coverage": 1000.0,
+        "structures": 23.0
+      }
+    ],
+    "novelty": [
+      {
+        "step": 100,
+        "coverage": 100.0,
+        "structures": 16.7
+      },
+      {
+        "step": 200,
+        "coverage": 200.0,
+        "structures": 18.0
+      },
+      {
+        "step": 300,
+        "coverage": 300.0,
+        "structures": 19.7
+      },
+      {
+        "step": 400,
+        "coverage": 400.0,
+        "structures": 20.3
+      },
+      {
+        "step": 500,
+        "coverage": 500.0,
+        "structures": 21.0
+      },
+      {
+        "step": 600,
+        "coverage": 600.0,
+        "structures": 22.3
+      },
+      {
+        "step": 700,
+        "coverage": 700.0,
+        "structures": 23.7
+      },
+      {
+        "step": 800,
+        "coverage": 800.0,
+        "structures": 24.0
+      },
+      {
+        "step": 900,
+        "coverage": 900.0,
+        "structures": 24.3
+      },
+      {
+        "step": 1000,
+        "coverage": 1000.0,
+        "structures": 24.7
+      }
+    ],
+    "random": [
+      {
+        "step": 100,
+        "coverage": 100.0,
+        "structures": 17.0
+      },
+      {
+        "step": 200,
+        "coverage": 200.0,
+        "structures": 19.3
+      },
+      {
+        "step": 300,
+        "coverage": 300.0,
+        "structures": 20.3
+      },
+      {
+        "step": 400,
+        "coverage": 400.0,
+        "structures": 21.3
+      },
+      {
+        "step": 500,
+        "coverage": 500.0,
+        "structures": 22.0
+      },
+      {
+        "step": 600,
+        "coverage": 600.0,
+        "structures": 23.7
+      },
+      {
+        "step": 700,
+        "coverage": 700.0,
+        "structures": 24.3
+      },
+      {
+        "step": 800,
+        "coverage": 800.0,
+        "structures": 24.3
+      },
+      {
+        "step": 900,
+        "coverage": 900.0,
+        "structures": 24.3
+      },
+      {
+        "step": 1000,
+        "coverage": 1000.0,
+        "structures": 24.7
+      }
+    ]
+  },
+  "experiment_3": {
+    "with_pressure": {
+      "vocabulary_size": 9.0,
+      "success_rate": 1.0,
+      "combination_rate": 1.0
+    },
+    "no_pressure": {
+      "vocabulary_size": 9.0,
+      "success_rate": 0.0,
+      "combination_rate": 0.0
+    }
+  }
+}

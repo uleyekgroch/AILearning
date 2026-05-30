@@ -1,0 +1,2735 @@
+{
+  "experiment_1_emotion_markers": {
+    "success_rate": 0.85,
+    "marker_count": 3,
+    "emerged_markers": [
+      "happy",
+      "safe",
+      "calm"
+    ],
+    "marker_counts": {
+      "happy": 97,
+      "safe": 211,
+      "calm": 106
+    },
+    "avg_cooperation": 0.85,
+    "emergence_log": [
+      {
+        "round": 1,
+        "markers": [
+          "happy"
+        ],
+        "marker_count": 1,
+        "success_rate": 1.0
+      },
+      {
+        "round": 3,
+        "markers": [
+          "happy",
+          "safe"
+        ],
+        "marker_count": 2,
+        "success_rate": 1.0
+      },
+      {
+        "round": 5,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 1.0
+      },
+      {
+        "round": 51,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8627450980392157
+      },
+      {
+        "round": 52,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8653846153846154
+      },
+      {
+        "round": 53,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8679245283018868
+      },
+      {
+        "round": 54,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8703703703703703
+      },
+      {
+        "round": 55,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8727272727272727
+      },
+      {
+        "round": 56,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.875
+      },
+      {
+        "round": 57,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8771929824561403
+      },
+      {
+        "round": 58,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8793103448275862
+      },
+      {
+        "round": 59,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8813559322033898
+      },
+      {
+        "round": 60,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8833333333333333
+      },
+      {
+        "round": 61,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8852459016393442
+      },
+      {
+        "round": 62,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8870967741935484
+      },
+      {
+        "round": 63,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8888888888888888
+      },
+      {
+        "round": 64,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.890625
+      },
+      {
+        "round": 65,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8923076923076924
+      },
+      {
+        "round": 66,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8939393939393939
+      },
+      {
+        "round": 67,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8955223880597015
+      },
+      {
+        "round": 68,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8970588235294118
+      },
+      {
+        "round": 69,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8985507246376812
+      },
+      {
+        "round": 70,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8857142857142857
+      },
+      {
+        "round": 71,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8873239436619719
+      },
+      {
+        "round": 72,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.875
+      },
+      {
+        "round": 73,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.863013698630137
+      },
+      {
+        "round": 74,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8513513513513513
+      },
+      {
+        "round": 75,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8533333333333334
+      },
+      {
+        "round": 76,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8552631578947368
+      },
+      {
+        "round": 77,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8571428571428571
+      },
+      {
+        "round": 78,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8589743589743589
+      },
+      {
+        "round": 79,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8607594936708861
+      },
+      {
+        "round": 80,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8625
+      },
+      {
+        "round": 81,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8641975308641975
+      },
+      {
+        "round": 82,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8658536585365854
+      },
+      {
+        "round": 83,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8674698795180723
+      },
+      {
+        "round": 84,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8690476190476191
+      },
+      {
+        "round": 85,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8705882352941177
+      },
+      {
+        "round": 86,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.872093023255814
+      },
+      {
+        "round": 87,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8620689655172413
+      },
+      {
+        "round": 88,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8636363636363636
+      },
+      {
+        "round": 89,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8651685393258427
+      },
+      {
+        "round": 90,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8666666666666667
+      },
+      {
+        "round": 91,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8681318681318682
+      },
+      {
+        "round": 92,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8695652173913043
+      },
+      {
+        "round": 93,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8709677419354839
+      },
+      {
+        "round": 94,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8723404255319149
+      },
+      {
+        "round": 95,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8736842105263158
+      },
+      {
+        "round": 96,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.875
+      },
+      {
+        "round": 97,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8762886597938144
+      },
+      {
+        "round": 98,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8775510204081632
+      },
+      {
+        "round": 99,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8686868686868687
+      },
+      {
+        "round": 100,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.87
+      },
+      {
+        "round": 101,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8712871287128713
+      },
+      {
+        "round": 102,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8725490196078431
+      },
+      {
+        "round": 103,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8737864077669902
+      },
+      {
+        "round": 104,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.875
+      },
+      {
+        "round": 105,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8761904761904762
+      },
+      {
+        "round": 106,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8679245283018868
+      },
+      {
+        "round": 107,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8598130841121495
+      },
+      {
+        "round": 108,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8611111111111112
+      },
+      {
+        "round": 109,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8623853211009175
+      },
+      {
+        "round": 110,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8636363636363636
+      },
+      {
+        "round": 111,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8648648648648649
+      },
+      {
+        "round": 112,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8660714285714286
+      },
+      {
+        "round": 113,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8672566371681416
+      },
+      {
+        "round": 114,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.868421052631579
+      },
+      {
+        "round": 115,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8695652173913043
+      },
+      {
+        "round": 116,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8706896551724138
+      },
+      {
+        "round": 117,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8717948717948718
+      },
+      {
+        "round": 118,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8728813559322034
+      },
+      {
+        "round": 119,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8739495798319328
+      },
+      {
+        "round": 120,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8666666666666667
+      },
+      {
+        "round": 121,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.859504132231405
+      },
+      {
+        "round": 122,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8524590163934426
+      },
+      {
+        "round": 123,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8536585365853658
+      },
+      {
+        "round": 124,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8467741935483871
+      },
+      {
+        "round": 125,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.848
+      },
+      {
+        "round": 126,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8492063492063492
+      },
+      {
+        "round": 127,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8503937007874016
+      },
+      {
+        "round": 128,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8515625
+      },
+      {
+        "round": 129,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8527131782945736
+      },
+      {
+        "round": 130,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8538461538461538
+      },
+      {
+        "round": 131,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8549618320610687
+      },
+      {
+        "round": 132,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8560606060606061
+      },
+      {
+        "round": 133,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.849624060150376
+      },
+      {
+        "round": 134,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8507462686567164
+      },
+      {
+        "round": 135,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8518518518518519
+      },
+      {
+        "round": 136,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8529411764705882
+      },
+      {
+        "round": 137,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8540145985401459
+      },
+      {
+        "round": 138,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8478260869565217
+      },
+      {
+        "round": 139,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8489208633093526
+      },
+      {
+        "round": 140,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.85
+      },
+      {
+        "round": 141,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.851063829787234
+      },
+      {
+        "round": 142,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.852112676056338
+      },
+      {
+        "round": 143,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8461538461538461
+      },
+      {
+        "round": 144,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8402777777777778
+      },
+      {
+        "round": 145,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8413793103448276
+      },
+      {
+        "round": 146,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8424657534246576
+      },
+      {
+        "round": 147,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8435374149659864
+      },
+      {
+        "round": 148,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8445945945945946
+      },
+      {
+        "round": 149,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8456375838926175
+      },
+      {
+        "round": 150,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8466666666666667
+      },
+      {
+        "round": 151,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.847682119205298
+      },
+      {
+        "round": 152,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8486842105263158
+      },
+      {
+        "round": 153,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8496732026143791
+      },
+      {
+        "round": 154,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8506493506493507
+      },
+      {
+        "round": 155,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8516129032258064
+      },
+      {
+        "round": 156,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8525641025641025
+      },
+      {
+        "round": 157,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8471337579617835
+      },
+      {
+        "round": 158,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8481012658227848
+      },
+      {
+        "round": 159,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8490566037735849
+      },
+      {
+        "round": 160,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.85
+      },
+      {
+        "round": 161,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8509316770186336
+      },
+      {
+        "round": 162,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8518518518518519
+      },
+      {
+        "round": 163,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.852760736196319
+      },
+      {
+        "round": 164,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8536585365853658
+      },
+      {
+        "round": 165,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8545454545454545
+      },
+      {
+        "round": 166,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8554216867469879
+      },
+      {
+        "round": 167,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8562874251497006
+      },
+      {
+        "round": 168,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8571428571428571
+      },
+      {
+        "round": 169,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8579881656804734
+      },
+      {
+        "round": 170,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8588235294117647
+      },
+      {
+        "round": 171,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8596491228070176
+      },
+      {
+        "round": 172,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8604651162790697
+      },
+      {
+        "round": 173,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.861271676300578
+      },
+      {
+        "round": 174,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8563218390804598
+      },
+      {
+        "round": 175,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8571428571428571
+      },
+      {
+        "round": 176,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8579545454545454
+      },
+      {
+        "round": 177,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8587570621468926
+      },
+      {
+        "round": 178,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8595505617977528
+      },
+      {
+        "round": 179,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8603351955307262
+      },
+      {
+        "round": 180,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8611111111111112
+      },
+      {
+        "round": 181,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.861878453038674
+      },
+      {
+        "round": 182,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8626373626373627
+      },
+      {
+        "round": 183,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8633879781420765
+      },
+      {
+        "round": 184,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8641304347826086
+      },
+      {
+        "round": 185,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8648648648648649
+      },
+      {
+        "round": 186,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8655913978494624
+      },
+      {
+        "round": 187,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8663101604278075
+      },
+      {
+        "round": 188,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8617021276595744
+      },
+      {
+        "round": 189,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8624338624338624
+      },
+      {
+        "round": 190,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8631578947368421
+      },
+      {
+        "round": 191,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8638743455497382
+      },
+      {
+        "round": 192,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8645833333333334
+      },
+      {
+        "round": 193,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8652849740932642
+      },
+      {
+        "round": 194,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.865979381443299
+      },
+      {
+        "round": 195,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8666666666666667
+      },
+      {
+        "round": 196,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8673469387755102
+      },
+      {
+        "round": 197,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.868020304568528
+      },
+      {
+        "round": 198,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8636363636363636
+      },
+      {
+        "round": 199,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8592964824120602
+      },
+      {
+        "round": 200,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.86
+      },
+      {
+        "round": 201,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8606965174129353
+      },
+      {
+        "round": 202,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8613861386138614
+      },
+      {
+        "round": 203,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8620689655172413
+      },
+      {
+        "round": 204,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8627450980392157
+      },
+      {
+        "round": 205,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8634146341463415
+      },
+      {
+        "round": 206,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8640776699029126
+      },
+      {
+        "round": 207,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8647342995169082
+      },
+      {
+        "round": 208,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8653846153846154
+      },
+      {
+        "round": 209,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.861244019138756
+      },
+      {
+        "round": 210,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.861904761904762
+      },
+      {
+        "round": 211,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8625592417061612
+      },
+      {
+        "round": 212,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8632075471698113
+      },
+      {
+        "round": 213,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.863849765258216
+      },
+      {
+        "round": 214,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8598130841121495
+      },
+      {
+        "round": 215,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8604651162790697
+      },
+      {
+        "round": 216,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8611111111111112
+      },
+      {
+        "round": 217,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8617511520737328
+      },
+      {
+        "round": 218,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8623853211009175
+      },
+      {
+        "round": 219,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.863013698630137
+      },
+      {
+        "round": 220,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8636363636363636
+      },
+      {
+        "round": 221,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8642533936651584
+      },
+      {
+        "round": 222,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8648648648648649
+      },
+      {
+        "round": 223,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8609865470852018
+      },
+      {
+        "round": 224,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8616071428571429
+      },
+      {
+        "round": 225,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8622222222222222
+      },
+      {
+        "round": 226,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8584070796460177
+      },
+      {
+        "round": 227,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8590308370044053
+      },
+      {
+        "round": 228,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8596491228070176
+      },
+      {
+        "round": 229,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8602620087336245
+      },
+      {
+        "round": 230,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8608695652173913
+      },
+      {
+        "round": 231,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8614718614718615
+      },
+      {
+        "round": 232,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8620689655172413
+      },
+      {
+        "round": 233,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8626609442060086
+      },
+      {
+        "round": 234,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8632478632478633
+      },
+      {
+        "round": 235,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8638297872340426
+      },
+      {
+        "round": 236,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.864406779661017
+      },
+      {
+        "round": 237,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8649789029535865
+      },
+      {
+        "round": 238,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.865546218487395
+      },
+      {
+        "round": 239,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8661087866108786
+      },
+      {
+        "round": 240,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8666666666666667
+      },
+      {
+        "round": 241,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8672199170124482
+      },
+      {
+        "round": 242,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8677685950413223
+      },
+      {
+        "round": 243,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8641975308641975
+      },
+      {
+        "round": 244,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.860655737704918
+      },
+      {
+        "round": 245,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8612244897959184
+      },
+      {
+        "round": 246,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8617886178861789
+      },
+      {
+        "round": 247,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8623481781376519
+      },
+      {
+        "round": 248,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8629032258064516
+      },
+      {
+        "round": 249,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8594377510040161
+      },
+      {
+        "round": 250,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.86
+      },
+      {
+        "round": 251,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8565737051792829
+      },
+      {
+        "round": 252,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8531746031746031
+      },
+      {
+        "round": 253,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8537549407114624
+      },
+      {
+        "round": 254,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8543307086614174
+      },
+      {
+        "round": 255,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8509803921568627
+      },
+      {
+        "round": 256,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8515625
+      },
+      {
+        "round": 257,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8521400778210116
+      },
+      {
+        "round": 258,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8527131782945736
+      },
+      {
+        "round": 259,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8532818532818532
+      },
+      {
+        "round": 260,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8538461538461538
+      },
+      {
+        "round": 261,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8544061302681992
+      },
+      {
+        "round": 262,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.851145038167939
+      },
+      {
+        "round": 263,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8517110266159695
+      },
+      {
+        "round": 264,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8522727272727273
+      },
+      {
+        "round": 265,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8528301886792453
+      },
+      {
+        "round": 266,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8533834586466166
+      },
+      {
+        "round": 267,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8539325842696629
+      },
+      {
+        "round": 268,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8544776119402985
+      },
+      {
+        "round": 269,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8550185873605948
+      },
+      {
+        "round": 270,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8555555555555555
+      },
+      {
+        "round": 271,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8560885608856088
+      },
+      {
+        "round": 272,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8566176470588235
+      },
+      {
+        "round": 273,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8534798534798534
+      },
+      {
+        "round": 274,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8540145985401459
+      },
+      {
+        "round": 275,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8545454545454545
+      },
+      {
+        "round": 276,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.855072463768116
+      },
+      {
+        "round": 277,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.855595667870036
+      },
+      {
+        "round": 278,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8561151079136691
+      },
+      {
+        "round": 279,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8530465949820788
+      },
+      {
+        "round": 280,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.85
+      },
+      {
+        "round": 281,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8505338078291815
+      },
+      {
+        "round": 282,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.851063829787234
+      },
+      {
+        "round": 283,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8515901060070671
+      },
+      {
+        "round": 284,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.852112676056338
+      },
+      {
+        "round": 285,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8526315789473684
+      },
+      {
+        "round": 286,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8531468531468531
+      },
+      {
+        "round": 287,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8536585365853658
+      },
+      {
+        "round": 288,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8506944444444444
+      },
+      {
+        "round": 289,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8512110726643599
+      },
+      {
+        "round": 290,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8517241379310345
+      },
+      {
+        "round": 291,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.852233676975945
+      },
+      {
+        "round": 292,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8527397260273972
+      },
+      {
+        "round": 293,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8532423208191127
+      },
+      {
+        "round": 294,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8537414965986394
+      },
+      {
+        "round": 295,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8542372881355932
+      },
+      {
+        "round": 296,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8547297297297297
+      },
+      {
+        "round": 297,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8518518518518519
+      },
+      {
+        "round": 298,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8489932885906041
+      },
+      {
+        "round": 299,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.8494983277591973
+      },
+      {
+        "round": 300,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_count": 3,
+        "success_rate": 0.85
+      }
+    ]
+  },
+  "experiment_2_empathetic_vs_non": {
+    "empathetic_sr": 0.8673333333333334,
+    "non_empathetic_sr": 0.8673333333333332,
+    "sr_improvement": 2.220446049250313e-16,
+    "empathetic_cooperation": 0.8673333333333334,
+    "non_empathetic_cooperation": 0.8673333333333332,
+    "cooperation_improvement": 2.220446049250313e-16,
+    "empathetic_details": [
+      {
+        "success_rate": 0.8666666666666667,
+        "avg_cooperation": 0.8666666666666667,
+        "markers": [
+          "calm",
+          "safe",
+          "happy"
+        ]
+      },
+      {
+        "success_rate": 0.8933333333333333,
+        "avg_cooperation": 0.8933333333333333,
+        "markers": [
+          "calm",
+          "safe",
+          "happy"
+        ]
+      },
+      {
+        "success_rate": 0.8433333333333334,
+        "avg_cooperation": 0.8433333333333334,
+        "markers": [
+          "calm",
+          "safe",
+          "happy"
+        ]
+      },
+      {
+        "success_rate": 0.8666666666666667,
+        "avg_cooperation": 0.8666666666666667,
+        "markers": [
+          "calm",
+          "safe",
+          "happy"
+        ]
+      },
+      {
+        "success_rate": 0.8666666666666667,
+        "avg_cooperation": 0.8666666666666667,
+        "markers": [
+          "safe",
+          "calm",
+          "happy"
+        ]
+      }
+    ],
+    "non_empathetic_details": [
+      {
+        "success_rate": 0.8666666666666667,
+        "avg_cooperation": 0.8666666666666667
+      },
+      {
+        "success_rate": 0.8666666666666667,
+        "avg_cooperation": 0.8666666666666667
+      },
+      {
+        "success_rate": 0.8733333333333333,
+        "avg_cooperation": 0.8733333333333333
+      },
+      {
+        "success_rate": 0.88,
+        "avg_cooperation": 0.88
+      },
+      {
+        "success_rate": 0.85,
+        "avg_cooperation": 0.85
+      }
+    ]
+  },
+  "experiment_3_perspective_accuracy": {
+    "initial_accuracy": 0.54,
+    "final_accuracy": 0.75,
+    "improvement": 0.20999999999999996,
+    "success_rate": 0.8666666666666667,
+    "accuracy_over_time": [
+      {
+        "round": 50,
+        "accuracy": 0.54,
+        "cumulative_accuracy": 0.54
+      },
+      {
+        "round": 100,
+        "accuracy": 0.68,
+        "cumulative_accuracy": 0.61
+      },
+      {
+        "round": 150,
+        "accuracy": 0.72,
+        "cumulative_accuracy": 0.6466666666666666
+      },
+      {
+        "round": 200,
+        "accuracy": 0.88,
+        "cumulative_accuracy": 0.705
+      },
+      {
+        "round": 250,
+        "accuracy": 0.8,
+        "cumulative_accuracy": 0.724
+      },
+      {
+        "round": 300,
+        "accuracy": 0.88,
+        "cumulative_accuracy": 0.75
+      }
+    ]
+  },
+  "experiment_4_emotional_scenarios": {
+    "scenarios": {
+      "danger": {
+        "success_rate": 0.8266666666666667,
+        "avg_cooperation": 0.8266666666666667,
+        "marker_count": 3,
+        "markers": [
+          "safe",
+          "calm",
+          "happy"
+        ],
+        "marker_usage": {
+          "safe": 203,
+          "calm": 166,
+          "happy": 48
+        },
+        "total_marker_uses": 417,
+        "perspective_accuracy": 0.8066666666666666
+      },
+      "abundance": {
+        "success_rate": 0.8033333333333333,
+        "avg_cooperation": 0.8033333333333333,
+        "marker_count": 3,
+        "markers": [
+          "happy",
+          "safe",
+          "calm"
+        ],
+        "marker_usage": {
+          "happy": 86,
+          "safe": 204,
+          "calm": 106
+        },
+        "total_marker_uses": 396,
+        "perspective_accuracy": 0.7666666666666667
+      },
+      "scarcity": {
+        "success_rate": 0.8433333333333334,
+        "avg_cooperation": 0.8433333333333334,
+        "marker_count": 3,
+        "markers": [
+          "calm",
+          "safe",
+          "happy"
+        ],
+        "marker_usage": {
+          "calm": 190,
+          "safe": 202,
+          "happy": 7
+        },
+        "total_marker_uses": 399,
+        "perspective_accuracy": 0.7666666666666667
+      },
+      "neutral": {
+        "success_rate": 0.8133333333333334,
+        "avg_cooperation": 0.8133333333333334,
+        "marker_count": 3,
+        "markers": [
+          "safe",
+          "calm",
+          "happy"
+        ],
+        "marker_usage": {
+          "safe": 189,
+          "calm": 137,
+          "happy": 62
+        },
+        "total_marker_uses": 388,
+        "perspective_accuracy": 0.81
+      }
+    },
+    "max_marker_scenario": "danger",
+    "min_marker_scenario": "neutral"
+  }
+}

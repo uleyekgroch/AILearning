@@ -1,0 +1,204 @@
+{
+  "experiment_1_shared_knowledge": {
+    "success_rate": 1.0,
+    "adjustment_used": 0,
+    "perspective_markers": [],
+    "emergence_round": -1
+  },
+  "experiment_2_hidden_object": {
+    "success_rate": 1.0,
+    "adjustment_used": 209,
+    "adjustment_success": 1.0,
+    "perspective_markers": [],
+    "emergence_round": -1
+  },
+  "experiment_3_false_belief": {
+    "success_rate": 1.0,
+    "adjustment_used": 226,
+    "perspective_markers": [],
+    "emergence_round": -1
+  },
+  "experiment_4_comparison": {
+    "有心智理论": {
+      "success_rate": 1.0,
+      "adjustment_used": 210
+    },
+    "无心智理论": {
+      "success_rate": 1.0
+    },
+    "improvement": 0.0
+  },
+  "experiment_5_stability": {
+    "avg_adjustment": 140.8,
+    "emergence_rate": 0.0,
+    "avg_success_rate": 1.0,
+    "run_details": [
+      {
+        "perspective_emerged": false,
+        "markers": [],
+        "adjustment_used": 134,
+        "success_rate": 1.0
+      },
+      {
+        "perspective_emerged": false,
+        "markers": [],
+        "adjustment_used": 137,
+        "success_rate": 1.0
+      },
+      {
+        "perspective_emerged": false,
+        "markers": [],
+        "adjustment_used": 144,
+        "success_rate": 1.0
+      },
+      {
+        "perspective_emerged": false,
+        "markers": [],
+        "adjustment_used": 147,
+        "success_rate": 1.0
+      },
+      {
+        "perspective_emerged": false,
+        "markers": [],
+        "adjustment_used": 142,
+        "success_rate": 1.0
+      }
+    ]
+  },
+  "experiment_6_confidence_baseline": {
+    "success_rate": 1.0,
+    "marker_used": 261,
+    "markers": [
+      "know"
+    ],
+    "emergence_round": 20
+  },
+  "experiment_7_confidence_difference": {
+    "success_rate": 0.696,
+    "marker_used": 467,
+    "marker_success": 0.6895074946466809,
+    "marker_counts": {
+      "know": 140,
+      "believe": 164,
+      "think": 163
+    },
+    "markers": [
+      "know",
+      "believe",
+      "think"
+    ],
+    "emergence_round": 13
+  },
+  "experiment_8_marker_impact": {
+    "有标记": {
+      "success_rate": 0.77,
+      "marker_used": 263
+    },
+    "无标记": {
+      "success_rate": 0.72
+    },
+    "improvement": 0.050000000000000044
+  },
+  "experiment_9_mixed_scenario": {
+    "success_rate": 0.8,
+    "marker_used": 263,
+    "marker_counts": {
+      "think": 180,
+      "know": 43,
+      "believe": 40
+    },
+    "markers": [
+      "think",
+      "know",
+      "believe"
+    ],
+    "emergence_round": 11
+  },
+  "experiment_10_confidence_stability": {
+    "avg_marker_used": 262.2,
+    "emergence_rate": 1.0,
+    "avg_success_rate": 0.72,
+    "run_details": [
+      {
+        "marker_emerged": true,
+        "markers": [
+          "believe",
+          "know",
+          "think"
+        ],
+        "marker_used": 263,
+        "marker_success": 0.7414448669201521,
+        "success_rate": 0.7433333333333333,
+        "marker_counts": {
+          "believe": 96,
+          "know": 89,
+          "think": 78
+        }
+      },
+      {
+        "marker_emerged": true,
+        "markers": [
+          "believe",
+          "know",
+          "think"
+        ],
+        "marker_used": 259,
+        "marker_success": 0.7567567567567568,
+        "success_rate": 0.7433333333333333,
+        "marker_counts": {
+          "believe": 72,
+          "know": 87,
+          "think": 100
+        }
+      },
+      {
+        "marker_emerged": true,
+        "markers": [
+          "believe",
+          "think",
+          "know"
+        ],
+        "marker_used": 267,
+        "marker_success": 0.6853932584269663,
+        "success_rate": 0.6866666666666666,
+        "marker_counts": {
+          "believe": 102,
+          "think": 85,
+          "know": 80
+        }
+      },
+      {
+        "marker_emerged": true,
+        "markers": [
+          "believe",
+          "think",
+          "know"
+        ],
+        "marker_used": 259,
+        "marker_success": 0.6872586872586872,
+        "success_rate": 0.7066666666666667,
+        "marker_counts": {
+          "believe": 83,
+          "think": 106,
+          "know": 70
+        }
+      },
+      {
+        "marker_emerged": true,
+        "markers": [
+          "believe",
+          "think",
+          "know"
+        ],
+        "marker_used": 263,
+        "marker_success": 0.7224334600760456,
+        "success_rate": 0.72,
+        "marker_counts": {
+          "believe": 96,
+          "think": 99,
+          "know": 68
+        }
+      }
+    ]
+  }
+}

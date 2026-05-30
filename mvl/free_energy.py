@@ -119,7 +119,9 @@ class ProbabilisticPredictor:
         d_accuracy_d_mean = -precision_weighted_error
 
         # 准确度对 log_var 的梯度
-        d_accuracy_d_logvar = 0.5 * (1.0 - precision * error**2)
+        # accuracy = 0.5 * Σ(π·ε² - log_var) = 0.5 * Σ(exp(-log_var)·ε² - log_var)
+        # d/d(log_var) = 0.5 * (-exp(-log_var)·ε² - 1) = -0.5 * (π·ε² + 1)
+        d_accuracy_d_logvar = -0.5 * (precision * error**2 + 1.0)
 
         # 梯度裁剪：防止精度放大导致梯度爆炸
         clip_val = 5.0

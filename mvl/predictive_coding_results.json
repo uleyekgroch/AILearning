@@ -1,0 +1,51 @@
+{
+  "experiment_1": {
+    "backprop": {
+      "final_error": 0.455964,
+      "mid_error": 0.372691,
+      "early_error": 0.455507
+    },
+    "predictive_coding": {
+      "final_error": 0.303456,
+      "mid_error": 0.252364,
+      "early_error": 8.69455
+    }
+  },
+  "experiment_2": {
+    "5x3": {
+      "pc_error": 0.290727,
+      "bp_error": 0.265016,
+      "ratio": 1.097
+    },
+    "10x5": {
+      "pc_error": 0.286134,
+      "bp_error": 0.463702,
+      "ratio": 0.617
+    },
+    "20x8": {
+      "pc_error": 0.422989,
+      "bp_error": 0.463501,
+      "ratio": 0.913
+    },
+    "30x10": {
+      "pc_error": 0.525364,
+      "bp_error": 0.457843,
+      "ratio": 1.147
+    }
+  },
+  "experiment_3": {
+    "predictive_coding_local": true,
+    "backprop_local": false,
+    "inference_steps_converged": 1,
+    "all_weight_updates_local": true
+  },
+  "experiment_4": {
+    "mean": 2.18,
+    "median": 1.0,
+    "min": 1,
+    "max": 50,
+    "p25": 1.0,
+    "p75": 1.0,
+    "total_observations": 1500
+  }
+}

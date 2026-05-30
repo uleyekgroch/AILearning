@@ -89,33 +89,62 @@ class PredictiveModel:
 
     def learn(self, obs: np.ndarray, action: int, actual_next_obs: np.ndarray) -> float:
         """
-        学习 = 减少预测误差
+        学习 = 预测编码 + 局部 Hebbian 更新
 
-        这是学习的核心——当预测与实际不符时，
-        调整模型以减少未来的预测误差。
+        实现 Whittington & Bogacz (2017) 的预测编码算法：
+        1. 迭代推理：每层计算局部残差 ε = μ - f(W × μ_below)
+        2. 反馈连接传输上层误差（不是链式法则）
+        3. 权重更新：ΔW = η × ε_post × f' × μ_pre^T（Hebbian）
+
+        与反向传播的根本区别：
+        - 反向传播：δ_l = δ_{l+1} @ W_{l+1}.T × f'（链式法则，非局部）
+        - 预测编码：ε_l = μ_l - f(W_l × μ_{l-1})（局部残差）
+        收敛后两者等价，但每步操作都是局部的。
         """
-        # 预测
         action_vec = np.zeros(self.action_dim)
         action_vec[action] = 1.0
 
-        hidden = np.tanh(obs @ self.W_obs + action_vec @ self.W_action)
-        prediction = hidden @ self.W_out
+        # === Step 1: 前向传播初始化 μ（信念）===
+        z_hidden = obs @ self.W_obs + action_vec @ self.W_action
+        mu_hidden = np.tanh(z_hidden)
 
-        # 计算预测误差
-        error = actual_next_obs - prediction
-        prediction_error = np.mean(error ** 2)
+        # 常量：输入不变，tanh 结果在迭代中恒定
+        predicted_hidden = mu_hidden.copy()
 
-        # 反向传播（简化的梯度下降）
-        # 输出层梯度
-        d_out = error * -2 / len(error)
-        self.W_out -= self.lr * hidden.reshape(-1, 1) @ d_out.reshape(1, -1)
+        # === Step 2: 迭代推理（自适应停止）===
+        max_steps = 50
+        inference_lr = 0.1
+        convergence_threshold = 1e-4
+        for _ in range(max_steps):
+            prev_hidden = mu_hidden.copy()
 
-        # 隐藏层梯度
-        d_hidden = d_out @ self.W_out.T * (1 - hidden ** 2)
-        self.W_obs -= self.lr * obs.reshape(-1, 1) @ d_hidden.reshape(1, -1)
-        self.W_action -= self.lr * action_vec.reshape(-1, 1) @ d_hidden.reshape(1, -1)
+            # 局部残差：每层只用自己的预测和实际值
+            epsilon_out = actual_next_obs - mu_hidden @ self.W_out
+            epsilon_hidden = mu_hidden - predicted_hidden
 
-        # 记录误差
+            # 反馈信号：通过反馈连接传输，不是链式法则
+            feedback = self.W_out @ epsilon_out * (1 - mu_hidden ** 2)
+
+            # 更新隐藏层信念
+            mu_hidden -= inference_lr * (-epsilon_hidden + feedback)
+
+            # 自适应停止
+            if np.mean((mu_hidden - prev_hidden) ** 2) < convergence_threshold:
+                break
+
+        # === Step 3: 局部 Hebbian 权重更新 ===
+        epsilon_out = actual_next_obs - mu_hidden @ self.W_out
+        epsilon_hidden = mu_hidden - predicted_hidden
+        f_prime = 1 - mu_hidden ** 2
+
+        # ΔW_out = η × μ_hidden × ε_out^T （Hebbian：突触后误差 × 突触前活动）
+        self.W_out += self.lr * np.outer(mu_hidden, epsilon_out)
+
+        # ΔW_obs = η × obs × (ε_hidden × f')^T （Hebbian）
+        self.W_obs += self.lr * np.outer(obs, epsilon_hidden * f_prime)
+        self.W_action += self.lr * np.outer(action_vec, epsilon_hidden * f_prime)
+
+        prediction_error = float(np.mean(epsilon_out ** 2))
         self.error_history.append(prediction_error)
 
         return prediction_error

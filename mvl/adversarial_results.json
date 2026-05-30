@@ -1,0 +1,242 @@
+{
+  "experiment_1": {
+    "final_overall_sr": 0.6433,
+    "deception_success_rate": 0.1942,
+    "honest_success_rate": 0.8782,
+    "trust_scores": {
+      "0": 0.95,
+      "1": 0.95,
+      "4": 0.05,
+      "3": 0.95,
+      "2": 0.05
+    },
+    "trust_markers": 2,
+    "snapshots": [
+      {
+        "round": 50,
+        "overall_sr": 0.62,
+        "deception_sr": 0.125,
+        "honest_sr": 0.8529,
+        "trust_scores": {
+          "0": 0.95,
+          "1": 0.95,
+          "4": 0.05,
+          "3": 0.95,
+          "2": 0.321
+        },
+        "trust_markers": 2
+      },
+      {
+        "round": 100,
+        "overall_sr": 0.65,
+        "deception_sr": 0.1875,
+        "honest_sr": 0.8676,
+        "trust_scores": {
+          "0": 0.95,
+          "1": 0.95,
+          "4": 0.321,
+          "3": 0.95,
+          "2": 0.321
+        },
+        "trust_markers": 2
+      },
+      {
+        "round": 150,
+        "overall_sr": 0.6267,
+        "deception_sr": 0.1569,
+        "honest_sr": 0.8687,
+        "trust_scores": {
+          "0": 0.95,
+          "1": 0.95,
+          "4": 0.05,
+          "3": 0.95,
+          "2": 0.05
+        },
+        "trust_markers": 2
+      },
+      {
+        "round": 200,
+        "overall_sr": 0.64,
+        "deception_sr": 0.1791,
+        "honest_sr": 0.8722,
+        "trust_scores": {
+          "0": 0.95,
+          "1": 0.95,
+          "4": 0.05,
+          "3": 0.95,
+          "2": 0.05
+        },
+        "trust_markers": 2
+      },
+      {
+        "round": 250,
+        "overall_sr": 0.656,
+        "deception_sr": 0.2143,
+        "honest_sr": 0.8795,
+        "trust_scores": {
+          "0": 0.95,
+          "1": 0.95,
+          "4": 0.05,
+          "3": 0.95,
+          "2": 0.05
+        },
+        "trust_markers": 2
+      },
+      {
+        "round": 300,
+        "overall_sr": 0.6433,
+        "deception_sr": 0.1942,
+        "honest_sr": 0.8782,
+        "trust_scores": {
+          "0": 0.95,
+          "1": 0.95,
+          "4": 0.05,
+          "3": 0.95,
+          "2": 0.05
+        },
+        "trust_markers": 2
+      }
+    ]
+  },
+  "experiment_2": {
+    "0.0": {
+      "trust_correlation": 1.0,
+      "trust_scores": {
+        "0": 0.05,
+        "2": 0.95,
+        "3": 0.95,
+        "4": 0.95,
+        "1": 0.95
+      },
+      "success_rate": 0.8233
+    },
+    "0.1": {
+      "trust_correlation": 1.0,
+      "trust_scores": {
+        "1": 0.95,
+        "3": 0.95,
+        "2": 0.95,
+        "0": 0.05,
+        "4": 0.95
+      },
+      "success_rate": 0.87
+    },
+    "0.2": {
+      "trust_correlation": 1.0,
+      "trust_scores": {
+        "0": 0.05,
+        "1": 0.95,
+        "4": 0.95,
+        "3": 0.95,
+        "2": 0.95
+      },
+      "success_rate": 0.8133
+    },
+    "0.3": {
+      "trust_correlation": 1.0,
+      "trust_scores": {
+        "4": 0.95,
+        "1": 0.95,
+        "0": 0.05,
+        "2": 0.95,
+        "3": 0.95
+      },
+      "success_rate": 0.8333
+    },
+    "0.5": {
+      "trust_correlation": 0.9747,
+      "trust_scores": {
+        "2": 0.95,
+        "3": 0.95,
+        "0": 0.321,
+        "1": 0.05,
+        "4": 0.95
+      },
+      "success_rate": 0.68
+    }
+  },
+  "experiment_3": {
+    "honest_to_honest_trust": 0.95,
+    "honest_to_deceptive_trust": 0.05,
+    "isolation_gap": 0.9,
+    "trust_matrix": {
+      "0": {
+        "1": 0.05,
+        "2": 0.95,
+        "3": 0.05,
+        "4": 0.95
+      },
+      "1": {
+        "0": 0.95,
+        "2": 0.95,
+        "3": 0.19,
+        "4": 0.95
+      },
+      "2": {
+        "0": 0.95,
+        "1": 0.05,
+        "3": 0.05,
+        "4": 0.95
+      },
+      "3": {
+        "0": 0.95,
+        "1": 0.05,
+        "2": 0.95,
+        "4": 0.95
+      },
+      "4": {
+        "0": 0.95,
+        "1": 0.05,
+        "2": 0.95,
+        "3": 0.05
+      }
+    }
+  },
+  "experiment_4": {
+    "trust_after_deception": 0.05,
+    "trust_after_recovery": 0.05,
+    "recovery_ratio": 0.0714,
+    "snapshots": [
+      {
+        "phase": "deceptive",
+        "round": 50,
+        "trust": 0.3214
+      },
+      {
+        "phase": "deceptive",
+        "round": 100,
+        "trust": 0.05
+      },
+      {
+        "phase": "deceptive",
+        "round": 150,
+        "trust": 0.3214
+      },
+      {
+        "phase": "deceptive",
+        "round": 200,
+        "trust": 0.05
+      },
+      {
+        "phase": "recovery",
+        "round": 25,
+        "trust": 0.05
+      },
+      {
+        "phase": "recovery",
+        "round": 50,
+        "trust": 0.05
+      },
+      {
+        "phase": "recovery",
+        "round": 75,
+        "trust": 0.05
+      },
+      {
+        "phase": "recovery",
+        "round": 100,
+        "trust": 0.05
+      }
+    ]
+  }
+}

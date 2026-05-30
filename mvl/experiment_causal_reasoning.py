@@ -15,6 +15,7 @@ Speaker 必须用 "because" 标记真正的因果关系，
 4. 稳定性验证：5 次运行，测量 "because" 涌现率
 """
 
+import json
 import numpy as np
 from typing import Dict, List
 from collections import defaultdict
@@ -255,6 +256,30 @@ def main():
     print("2. 因果推理提供预测优势")
     print("3. 标记选择本身成为通信成功的关键因素")
     print("4. 与人类语言一致：'because' 表达因果，'then' 表达时序")
+
+    # 保存结果
+    def to_serializable(obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, (np.floating, np.integer)):
+            return float(obj)
+        elif isinstance(obj, dict):
+            return {k: to_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [to_serializable(v) for v in obj]
+        elif isinstance(obj, set):
+            return sorted(list(obj))
+        return obj
+
+    results = {
+        'experiment_1_pure_causal': r1,
+        'experiment_2_spurious_correlation': r2,
+        'experiment_3_comparison': r3,
+        'experiment_4_stability': r4,
+    }
+    with open('causal_reasoning_results.json', 'w', encoding='utf-8') as f:
+        json.dump(to_serializable(results), f, indent=2, ensure_ascii=False)
+    print(f"\n结果已保存到: causal_reasoning_results.json")
 
 
 if __name__ == '__main__':

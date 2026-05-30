@@ -1,0 +1,63 @@
+{
+  "experiment_1": {
+    "independent": {
+      "avg_error": 0.0754,
+      "std": 0.1952
+    },
+    "peer_low": {
+      "avg_error": 0.0,
+      "std": 0.0
+    },
+    "peer_high": {
+      "avg_error": 0.0,
+      "std": 0.0
+    }
+  },
+  "experiment_2": {
+    "0.0": {
+      "avg_error": 0.0
+    },
+    "0.05": {
+      "avg_error": 0.0
+    },
+    "0.1": {
+      "avg_error": 0.0
+    },
+    "0.2": {
+      "avg_error": 0.0
+    },
+    "0.3": {
+      "avg_error": 0.0
+    },
+    "0.5": {
+      "avg_error": 0.0
+    },
+    "0.8": {
+      "avg_error": 0.0
+    },
+    "1.0": {
+      "avg_error": 0.0
+    }
+  },
+  "experiment_3": {
+    "novice_novice": {
+      "avg_error": 0.0
+    },
+    "novice_expert": {
+      "avg_error": 0.0
+    },
+    "expert_expert": {
+      "avg_error": 0.0
+    }
+  },
+  "experiment_4": {
+    "independent": {
+      "avg_steps": 17.0,
+      "converged": 10
+    },
+    "peer": {
+      "avg_steps": 10.0,
+      "converged": 10
+    }
+  }
+}

@@ -1,0 +1,351 @@
+{
+  "experiment_1": {
+    "final_marker_count": 5,
+    "marker_frequencies": {
+      "share": 171,
+      "ours": 171,
+      "want": 320,
+      "yours": 0,
+      "theirs": 0,
+      "give": 0,
+      "keep": 330,
+      "take": 0,
+      "mine": 822,
+      "not_yours": 0
+    },
+    "total_conflicts": 545,
+    "total_sharings": 171,
+    "conflict_rate_change": {
+      "early": 0.9127,
+      "late": 0.9038,
+      "improvement": 0.0089
+    },
+    "snapshots": [
+      {
+        "round": 50,
+        "emerged_markers": 5,
+        "marker_frequencies": {
+          "share": 28,
+          "ours": 28,
+          "want": 40,
+          "yours": 0,
+          "theirs": 0,
+          "give": 0,
+          "keep": 46,
+          "take": 0,
+          "mine": 164,
+          "not_yours": 0
+        },
+        "avg_conflict_rate": 0.79,
+        "recent_sharings": 28
+      },
+      {
+        "round": 100,
+        "emerged_markers": 5,
+        "marker_frequencies": {
+          "share": 58,
+          "ours": 58,
+          "want": 91,
+          "yours": 0,
+          "theirs": 0,
+          "give": 0,
+          "keep": 104,
+          "take": 0,
+          "mine": 288,
+          "not_yours": 0
+        },
+        "avg_conflict_rate": 0.811,
+        "recent_sharings": 30
+      },
+      {
+        "round": 150,
+        "emerged_markers": 5,
+        "marker_frequencies": {
+          "share": 84,
+          "ours": 84,
+          "want": 152,
+          "yours": 0,
+          "theirs": 0,
+          "give": 0,
+          "keep": 164,
+          "take": 0,
+          "mine": 419,
+          "not_yours": 0
+        },
+        "avg_conflict_rate": 0.8617,
+        "recent_sharings": 26
+      },
+      {
+        "round": 200,
+        "emerged_markers": 5,
+        "marker_frequencies": {
+          "share": 112,
+          "ours": 112,
+          "want": 204,
+          "yours": 0,
+          "theirs": 0,
+          "give": 0,
+          "keep": 223,
+          "take": 0,
+          "mine": 531,
+          "not_yours": 0
+        },
+        "avg_conflict_rate": 0.7833,
+        "recent_sharings": 28
+      },
+      {
+        "round": 250,
+        "emerged_markers": 5,
+        "marker_frequencies": {
+          "share": 145,
+          "ours": 145,
+          "want": 254,
+          "yours": 0,
+          "theirs": 0,
+          "give": 0,
+          "keep": 284,
+          "take": 0,
+          "mine": 694,
+          "not_yours": 0
+        },
+        "avg_conflict_rate": 0.84,
+        "recent_sharings": 33
+      },
+      {
+        "round": 300,
+        "emerged_markers": 5,
+        "marker_frequencies": {
+          "share": 171,
+          "ours": 171,
+          "want": 320,
+          "yours": 0,
+          "theirs": 0,
+          "give": 0,
+          "keep": 330,
+          "take": 0,
+          "mine": 822,
+          "not_yours": 0
+        },
+        "avg_conflict_rate": 0.855,
+        "recent_sharings": 26
+      }
+    ]
+  },
+  "experiment_2": {
+    "conditions": {
+      "with_ownership": {
+        "avg_conflict_rate": 0.7911,
+        "total_sharings": 110.4,
+        "efficiency": 0.619,
+        "runs": [
+          {
+            "avg_conflict_rate": 0.8047,
+            "total_sharings": 109,
+            "efficiency": 0.609
+          },
+          {
+            "avg_conflict_rate": 0.8117,
+            "total_sharings": 116,
+            "efficiency": 0.5991
+          },
+          {
+            "avg_conflict_rate": 0.7811,
+            "total_sharings": 115,
+            "efficiency": 0.6137
+          },
+          {
+            "avg_conflict_rate": 0.7858,
+            "total_sharings": 115,
+            "efficiency": 0.629
+          },
+          {
+            "avg_conflict_rate": 0.7721,
+            "total_sharings": 97,
+            "efficiency": 0.644
+          }
+        ]
+      },
+      "without_ownership": {
+        "avg_conflict_rate": 0.462,
+        "total_sharings": 0.0,
+        "efficiency": 0.497,
+        "runs": [
+          {
+            "avg_conflict_rate": 0.4546,
+            "total_sharings": 0,
+            "efficiency": 0.5049
+          },
+          {
+            "avg_conflict_rate": 0.4598,
+            "total_sharings": 0,
+            "efficiency": 0.5087
+          },
+          {
+            "avg_conflict_rate": 0.4402,
+            "total_sharings": 0,
+            "efficiency": 0.5048
+          },
+          {
+            "avg_conflict_rate": 0.4859,
+            "total_sharings": 0,
+            "efficiency": 0.4644
+          },
+          {
+            "avg_conflict_rate": 0.4695,
+            "total_sharings": 0,
+            "efficiency": 0.5024
+          }
+        ]
+      }
+    },
+    "conflict_reduction": -0.3291,
+    "efficiency_gain": 0.122
+  },
+  "experiment_3": {
+    "scarcity_results": {
+      "0.3": {
+        "num_resources": 7,
+        "total_sharings": 240,
+        "avg_sharing_rate": 0.8,
+        "share_marker_freq": 240,
+        "ours_marker_freq": 240,
+        "marker_history": {
+          "share": [
+            35,
+            72,
+            118,
+            163,
+            193,
+            240
+          ],
+          "ours": [
+            35,
+            72,
+            118,
+            163,
+            193,
+            240
+          ]
+        }
+      },
+      "0.5": {
+        "num_resources": 6,
+        "total_sharings": 207,
+        "avg_sharing_rate": 0.69,
+        "share_marker_freq": 207,
+        "ours_marker_freq": 207,
+        "marker_history": {
+          "share": [
+            33,
+            71,
+            106,
+            140,
+            177,
+            207
+          ],
+          "ours": [
+            33,
+            71,
+            106,
+            140,
+            177,
+            207
+          ]
+        }
+      },
+      "0.7": {
+        "num_resources": 4,
+        "total_sharings": 131,
+        "avg_sharing_rate": 0.4367,
+        "share_marker_freq": 131,
+        "ours_marker_freq": 131,
+        "marker_history": {
+          "share": [
+            15,
+            38,
+            64,
+            92,
+            113,
+            131
+          ],
+          "ours": [
+            15,
+            38,
+            64,
+            92,
+            113,
+            131
+          ]
+        }
+      },
+      "1.0": {
+        "num_resources": 2,
+        "total_sharings": 66,
+        "avg_sharing_rate": 0.22,
+        "share_marker_freq": 66,
+        "ours_marker_freq": 66,
+        "marker_history": {
+          "share": [
+            11,
+            25,
+            35,
+            44,
+            54,
+            66
+          ],
+          "ours": [
+            11,
+            25,
+            35,
+            44,
+            54,
+            66
+          ]
+        }
+      }
+    },
+    "best_scarcity_for_sharing": "0.3"
+  },
+  "experiment_4": {
+    "conditions": {
+      "with_transfer": {
+        "avg_efficiency": 0.6954,
+        "transfers": 228,
+        "give_frequency": 120,
+        "take_frequency": 108,
+        "efficiency_history": [
+          0.6639,
+          0.6999,
+          0.7099,
+          0.7146,
+          0.8077,
+          0.6688,
+          0.6604,
+          0.6201,
+          0.6776,
+          0.7308
+        ]
+      },
+      "without_transfer": {
+        "avg_efficiency": 0.5848,
+        "transfers": 0,
+        "give_frequency": 0,
+        "take_frequency": 0,
+        "efficiency_history": [
+          0.5799,
+          0.5826,
+          0.6469,
+          0.5685,
+          0.6963,
+          0.558,
+          0.507,
+          0.5859,
+          0.5671,
+          0.5561
+        ]
+      }
+    },
+    "efficiency_improvement": 0.1106,
+    "pct_improvement": 18.91
+  }
+}

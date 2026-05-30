@@ -1,0 +1,527 @@
+{
+  "experiment_1": {
+    "final_deal_rate": 0.42,
+    "final_win_win_rate": 0.0,
+    "emerged_markers": 10,
+    "marker_emergence_rounds": {
+      "deal": 2,
+      "less": 2,
+      "fair": 9,
+      "exchange": 0,
+      "no_deal": 0,
+      "split": 2,
+      "worse": 0,
+      "better": 12,
+      "more": 3,
+      "compromise": 2
+    },
+    "final_marker_usage": {
+      "exchange": 61,
+      "no_deal": 174,
+      "worse": 21,
+      "split": 24,
+      "compromise": 236,
+      "less": 149,
+      "deal": 126,
+      "more": 145,
+      "fair": 94,
+      "better": 44
+    },
+    "snapshots": [
+      {
+        "round": 50,
+        "deal_rate": 0.52,
+        "win_win_rate": 0.0,
+        "marker_usage": {
+          "deal": 26,
+          "less": 35,
+          "fair": 13,
+          "exchange": 11,
+          "no_deal": 24,
+          "split": 3,
+          "worse": 2,
+          "better": 5,
+          "more": 26,
+          "compromise": 53
+        }
+      },
+      {
+        "round": 100,
+        "deal_rate": 0.49,
+        "win_win_rate": 0.0,
+        "marker_usage": {
+          "deal": 49,
+          "less": 59,
+          "fair": 27,
+          "exchange": 22,
+          "no_deal": 51,
+          "split": 5,
+          "worse": 10,
+          "better": 14,
+          "more": 52,
+          "compromise": 84
+        }
+      },
+      {
+        "round": 150,
+        "deal_rate": 0.44,
+        "win_win_rate": 0.0,
+        "marker_usage": {
+          "deal": 66,
+          "less": 76,
+          "fair": 41,
+          "exchange": 30,
+          "no_deal": 84,
+          "split": 10,
+          "worse": 14,
+          "better": 22,
+          "more": 72,
+          "compromise": 114
+        }
+      },
+      {
+        "round": 200,
+        "deal_rate": 0.42,
+        "win_win_rate": 0.0,
+        "marker_usage": {
+          "deal": 84,
+          "less": 87,
+          "fair": 51,
+          "exchange": 42,
+          "no_deal": 116,
+          "split": 15,
+          "worse": 18,
+          "better": 29,
+          "more": 90,
+          "compromise": 134
+        }
+      },
+      {
+        "round": 250,
+        "deal_rate": 0.428,
+        "win_win_rate": 0.0,
+        "marker_usage": {
+          "deal": 107,
+          "less": 119,
+          "fair": 70,
+          "exchange": 50,
+          "no_deal": 143,
+          "split": 21,
+          "worse": 19,
+          "better": 37,
+          "more": 116,
+          "compromise": 187
+        }
+      },
+      {
+        "round": 300,
+        "deal_rate": 0.42,
+        "win_win_rate": 0.0,
+        "marker_usage": {
+          "deal": 126,
+          "less": 149,
+          "fair": 94,
+          "exchange": 61,
+          "no_deal": 174,
+          "split": 24,
+          "worse": 21,
+          "better": 44,
+          "more": 145,
+          "compromise": 236
+        }
+      }
+    ]
+  },
+  "experiment_2": {
+    "negotiation_avg_deal_rate": 0.394,
+    "negotiation_avg_winwin_rate": 0.0,
+    "negotiation_avg_gain": 0.005,
+    "baseline_avg_deal_rate": 0.524,
+    "baseline_avg_winwin_rate": 0.0,
+    "baseline_avg_gain": -0.008,
+    "winwin_advantage": 0.0,
+    "per_run": {
+      "negotiation": [
+        {
+          "deal_rate": 0.36,
+          "win_win_rate": 0.0,
+          "avg_gain_a": -0.023,
+          "avg_gain_b": 0.038,
+          "avg_rounds": 2.37,
+          "total_negotiations": 200,
+          "marker_usage": {
+            "more": 89,
+            "exchange": 41,
+            "compromise": 150,
+            "less": 95,
+            "no_deal": 128,
+            "deal": 72,
+            "fair": 57,
+            "worse": 16,
+            "better": 29,
+            "split": 10
+          }
+        },
+        {
+          "deal_rate": 0.385,
+          "win_win_rate": 0.0,
+          "avg_gain_a": -0.02,
+          "avg_gain_b": 0.029,
+          "avg_rounds": 2.48,
+          "total_negotiations": 200,
+          "marker_usage": {
+            "compromise": 195,
+            "more": 95,
+            "less": 122,
+            "fair": 58,
+            "deal": 77,
+            "no_deal": 123,
+            "exchange": 38,
+            "worse": 14,
+            "better": 22,
+            "split": 13
+          }
+        },
+        {
+          "deal_rate": 0.42,
+          "win_win_rate": 0.0,
+          "avg_gain_a": -0.024,
+          "avg_gain_b": 0.037,
+          "avg_rounds": 2.42,
+          "total_negotiations": 200,
+          "marker_usage": {
+            "fair": 59,
+            "split": 18,
+            "exchange": 52,
+            "no_deal": 116,
+            "more": 84,
+            "better": 30,
+            "compromise": 168,
+            "less": 113,
+            "deal": 84,
+            "worse": 13
+          }
+        },
+        {
+          "deal_rate": 0.425,
+          "win_win_rate": 0.0,
+          "avg_gain_a": -0.033,
+          "avg_gain_b": 0.041,
+          "avg_rounds": 2.5,
+          "total_negotiations": 200,
+          "marker_usage": {
+            "fair": 82,
+            "deal": 85,
+            "no_deal": 115,
+            "worse": 14,
+            "more": 81,
+            "exchange": 53,
+            "compromise": 204,
+            "less": 116,
+            "better": 23,
+            "split": 12
+          }
+        },
+        {
+          "deal_rate": 0.38,
+          "win_win_rate": 0.0,
+          "avg_gain_a": -0.037,
+          "avg_gain_b": 0.044,
+          "avg_rounds": 2.48,
+          "total_negotiations": 200,
+          "marker_usage": {
+            "deal": 76,
+            "no_deal": 124,
+            "worse": 18,
+            "more": 90,
+            "better": 28,
+            "compromise": 195,
+            "less": 120,
+            "fair": 61,
+            "exchange": 36,
+            "split": 7
+          }
+        }
+      ],
+      "baseline": [
+        {
+          "deal_rate": 0.45,
+          "win_win_rate": 0.0,
+          "avg_gain_a": 0.003,
+          "avg_gain_b": -0.01,
+          "avg_rounds": 2.94
+        },
+        {
+          "deal_rate": 0.565,
+          "win_win_rate": 0.0,
+          "avg_gain_a": 0.002,
+          "avg_gain_b": -0.023,
+          "avg_rounds": 3.06
+        },
+        {
+          "deal_rate": 0.545,
+          "win_win_rate": 0.0,
+          "avg_gain_a": -0.016,
+          "avg_gain_b": -0.005,
+          "avg_rounds": 3.11
+        },
+        {
+          "deal_rate": 0.575,
+          "win_win_rate": 0.0,
+          "avg_gain_a": -0.011,
+          "avg_gain_b": -0.005,
+          "avg_rounds": 2.94
+        },
+        {
+          "deal_rate": 0.485,
+          "win_win_rate": 0.0,
+          "avg_gain_a": -0.002,
+          "avg_gain_b": -0.015,
+          "avg_rounds": 2.93
+        }
+      ]
+    }
+  },
+  "experiment_3": {
+    "with_language_avg_rounds": 2.34,
+    "without_language_avg_rounds": 3.16,
+    "round_reduction": 0.82,
+    "concession_marker_usage": {
+      "compromise": 15111,
+      "less": 9522,
+      "fair": 3839
+    },
+    "snapshots": [
+      {
+        "round": 50,
+        "avg_rounds_to_deal": 2.48,
+        "deal_rate": 0.5,
+        "concession_markers": {
+          "compromise": 951,
+          "less": 565,
+          "fair": 263
+        }
+      },
+      {
+        "round": 100,
+        "avg_rounds_to_deal": 2.38,
+        "deal_rate": 0.48,
+        "concession_markers": {
+          "compromise": 4052,
+          "less": 2522,
+          "fair": 994
+        }
+      },
+      {
+        "round": 150,
+        "avg_rounds_to_deal": 2.35,
+        "deal_rate": 0.473,
+        "concession_markers": {
+          "compromise": 8839,
+          "less": 5578,
+          "fair": 2058
+        }
+      },
+      {
+        "round": 200,
+        "avg_rounds_to_deal": 2.34,
+        "deal_rate": 0.455,
+        "concession_markers": {
+          "compromise": 15111,
+          "less": 9522,
+          "fair": 3839
+        }
+      }
+    ]
+  },
+  "experiment_4": {
+    "avg_fair_rate_in_winwin": 0.0,
+    "avg_fair_rate_in_other": 0.992,
+    "fair_winwin_correlation": -0.992,
+    "per_run": [
+      {
+        "fair_rate_in_winwin": 0.0,
+        "fair_rate_in_other": 1.0,
+        "winwin_count": 0,
+        "non_winwin_deal_count": 77,
+        "fair_correlation": -1.0,
+        "marker_summary_a": {
+          "deal": 1.0,
+          "less": 1.625,
+          "fair": 1.2,
+          "exchange": 0.233,
+          "no_deal": 0.0,
+          "split": 0.833,
+          "worse": 0.0,
+          "better": 0.103,
+          "more": 0.091,
+          "compromise": 1.167
+        },
+        "marker_summary_b": {
+          "deal": 1.0,
+          "less": 0.902,
+          "fair": 1.0,
+          "exchange": 0.0,
+          "no_deal": 0.0,
+          "split": 0.0,
+          "worse": 0.0,
+          "better": 0.0,
+          "more": 0.0,
+          "compromise": 0.5
+        },
+        "snapshots": [
+          {
+            "round": 50,
+            "winwin_rate": 0.0,
+            "fair_in_winwin_rate": 0.0,
+            "fair_in_other_rate": 1.0,
+            "fair_marker_count": 15
+          },
+          {
+            "round": 100,
+            "winwin_rate": 0.0,
+            "fair_in_winwin_rate": 0.0,
+            "fair_in_other_rate": 1.0,
+            "fair_marker_count": 29
+          },
+          {
+            "round": 150,
+            "winwin_rate": 0.0,
+            "fair_in_winwin_rate": 0.0,
+            "fair_in_other_rate": 1.0,
+            "fair_marker_count": 43
+          },
+          {
+            "round": 200,
+            "winwin_rate": 0.0,
+            "fair_in_winwin_rate": 0.0,
+            "fair_in_other_rate": 1.0,
+            "fair_marker_count": 58
+          }
+        ]
+      },
+      {
+        "fair_rate_in_winwin": 0.0,
+        "fair_rate_in_other": 0.989,
+        "winwin_count": 0,
+        "non_winwin_deal_count": 89,
+        "fair_correlation": -0.989,
+        "marker_summary_a": {
+          "deal": 1.0,
+          "less": 1.862,
+          "fair": 1.2,
+          "exchange": 0.231,
+          "no_deal": 0.0,
+          "split": 0.769,
+          "worse": 0.0,
+          "better": 0.115,
+          "more": 0.082,
+          "compromise": 1.217
+        },
+        "marker_summary_b": {
+          "deal": 1.0,
+          "less": 0.79,
+          "fair": 1.0,
+          "exchange": 0.0,
+          "no_deal": 0.0,
+          "split": 0.0,
+          "worse": 0.0,
+          "better": 0.0,
+          "more": 0.0,
+          "compromise": 0.5
+        },
+        "snapshots": [
+          {
+            "round": 50,
+            "winwin_rate": 0.0,
+            "fair_in_winwin_rate": 0.0,
+            "fair_in_other_rate": 0.938,
+            "fair_marker_count": 13
+          },
+          {
+            "round": 100,
+            "winwin_rate": 0.0,
+            "fair_in_winwin_rate": 0.0,
+            "fair_in_other_rate": 0.976,
+            "fair_marker_count": 25
+          },
+          {
+            "round": 150,
+            "winwin_rate": 0.0,
+            "fair_in_winwin_rate": 0.0,
+            "fair_in_other_rate": 0.984,
+            "fair_marker_count": 45
+          },
+          {
+            "round": 200,
+            "winwin_rate": 0.0,
+            "fair_in_winwin_rate": 0.0,
+            "fair_in_other_rate": 0.989,
+            "fair_marker_count": 57
+          }
+        ]
+      },
+      {
+        "fair_rate_in_winwin": 0.0,
+        "fair_rate_in_other": 0.986,
+        "winwin_count": 0,
+        "non_winwin_deal_count": 70,
+        "fair_correlation": -0.986,
+        "marker_summary_a": {
+          "deal": 1.0,
+          "less": 1.92,
+          "fair": 1.32,
+          "exchange": 0.182,
+          "no_deal": 0.0,
+          "split": 1.0,
+          "worse": 0.0,
+          "better": 0.0,
+          "more": 0.039,
+          "compromise": 1.314
+        },
+        "marker_summary_b": {
+          "deal": 1.0,
+          "less": 0.887,
+          "fair": 1.0,
+          "exchange": 0.0,
+          "no_deal": 0.0,
+          "split": 0.0,
+          "worse": 0.0,
+          "better": 0.0,
+          "more": 0.0,
+          "compromise": 0.5
+        },
+        "snapshots": [
+          {
+            "round": 50,
+            "winwin_rate": 0.0,
+            "fair_in_winwin_rate": 0.0,
+            "fair_in_other_rate": 0.929,
+            "fair_marker_count": 12
+          },
+          {
+            "round": 100,
+            "winwin_rate": 0.0,
+            "fair_in_winwin_rate": 0.0,
+            "fair_in_other_rate": 0.968,
+            "fair_marker_count": 30
+          },
+          {
+            "round": 150,
+            "winwin_rate": 0.0,
+            "fair_in_winwin_rate": 0.0,
+            "fair_in_other_rate": 0.98,
+            "fair_marker_count": 45
+          },
+          {
+            "round": 200,
+            "winwin_rate": 0.0,
+            "fair_in_winwin_rate": 0.0,
+            "fair_in_other_rate": 0.986,
+            "fair_marker_count": 56
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "experiment_1_simple_clause": {
+    "clause_emerged": false,
+    "utterance": [
+      "big"
+    ],
+    "success": true
+  },
+  "experiment_2_emergence": {
+    "success_rate": 1.0,
+    "clause_rate": 0.0,
+    "clause_success_rate": 0.0,
+    "vocab_size": 28,
+    "clause_symbols": [],
+    "emergence_round": -1,
+    "clause_emerged": false
+  },
+  "experiment_3_complexity_levels": {
+    "简单": {
+      "clause_rate": 0.0,
+      "clause_symbols": [],
+      "success_rate": 1.0
+    },
+    "中等": {
+      "clause_rate": 0.0,
+      "clause_symbols": [],
+      "success_rate": 1.0
+    },
+    "复杂": {
+      "clause_rate": 0.0,
+      "clause_symbols": [],
+      "success_rate": 1.0
+    },
+    "极端": {
+      "clause_rate": 0.0,
+      "clause_symbols": [],
+      "success_rate": 1.0
+    }
+  },
+  "experiment_4_multiple_runs": {
+    "avg_clause_rate": 0.0,
+    "emergence_rate": 0.0,
+    "avg_success_rate": 1.0,
+    "run_details": [
+      {
+        "clause_rate": 0.0,
+        "clause_emerged": false,
+        "success_rate": 1.0
+      },
+      {
+        "clause_rate": 0.0,
+        "clause_emerged": false,
+        "success_rate": 1.0
+      },
+      {
+        "clause_rate": 0.0,
+        "clause_emerged": false,
+        "success_rate": 1.0
+      },
+      {
+        "clause_rate": 0.0,
+        "clause_emerged": false,
+        "success_rate": 1.0
+      },
+      {
+        "clause_rate": 0.0,
+        "clause_emerged": false,
+        "success_rate": 1.0
+      }
+    ]
+  },
+  "experiment_5_forced_clause": {
+    "utterance": [
+      "red",
+      "circle",
+      "push"
+    ],
+    "has_clause": false,
+    "clause_result": null
+  }
+}

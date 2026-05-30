@@ -4,7 +4,9 @@ Phase 24 实验：统一语言系统
 5 个实验验证多种符号系统能否组合使用。
 """
 
+import json
 import random
+import numpy as np
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -247,4 +249,22 @@ def run_all_experiments():
 
 
 if __name__ == '__main__':
-    run_all_experiments()
+    results = run_all_experiments()
+
+    # 保存结果
+    def to_serializable(obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, (np.floating, np.integer)):
+            return float(obj)
+        elif isinstance(obj, dict):
+            return {k: to_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [to_serializable(v) for v in obj]
+        elif isinstance(obj, set):
+            return sorted(list(obj))
+        return obj
+
+    with open('unified_language_results.json', 'w', encoding='utf-8') as f:
+        json.dump(to_serializable(results), f, indent=2, ensure_ascii=False)
+    print(f"\n结果已保存到: unified_language_results.json")

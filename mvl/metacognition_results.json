@@ -1,0 +1,67 @@
+{
+  "experiment_1_basic_metacognition": {
+    "success_rate": 0.8733333333333333,
+    "signal_rate": 1.0,
+    "signal_success_rate": 0.8733333333333333,
+    "help_requests": 0,
+    "teacher_adaptations": 0,
+    "metacognitive_symbols": [],
+    "emergence_round": -1,
+    "signal_emerged": false
+  },
+  "experiment_2_difficult_scenes": {
+    "success_rate": 0.8166666666666667,
+    "signal_rate": 1.0,
+    "help_requests": 0,
+    "teacher_adaptations": 0,
+    "metacognitive_symbols": []
+  },
+  "experiment_3_comparison": {
+    "有元认知": {
+      "success_rate": 0.8966666666666666,
+      "signal_rate": 1.0,
+      "help_requests": 0
+    },
+    "无元认知": {
+      "success_rate": 0.8133333333333334
+    },
+    "improvement": 0.08333333333333326
+  },
+  "experiment_4_stability": {
+    "avg_signal_rate": 1.0,
+    "emergence_rate": 0.0,
+    "avg_success_rate": 0.9120000000000001,
+    "run_details": [
+      {
+        "signal_emerged": false,
+        "signal_rate": 1.0,
+        "success_rate": 0.92,
+        "help_requests": 0
+      },
+      {
+        "signal_emerged": false,
+        "signal_rate": 1.0,
+        "success_rate": 0.925,
+        "help_requests": 0
+      },
+      {
+        "signal_emerged": false,
+        "signal_rate": 1.0,
+        "success_rate": 0.935,
+        "help_requests": 0
+      },
+      {
+        "signal_emerged": false,
+        "signal_rate": 1.0,
+        "success_rate": 0.915,
+        "help_requests": 0
+      },
+      {
+        "signal_emerged": false,
+        "signal_rate": 1.0,
+        "success_rate": 0.865,
+        "help_requests": 0
+      }
+    ]
+  }
+}

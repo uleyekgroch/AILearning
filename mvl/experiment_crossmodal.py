@@ -16,6 +16,7 @@ Speaker 必须用听觉或触觉特征描述。
 5. 稳定性验证：5 次运行
 """
 
+import json
 import numpy as np
 from typing import Dict, List
 from collections import defaultdict
@@ -306,6 +307,31 @@ def main():
     print("2. 听觉/触觉特征在视觉无法区分时成为必要描述")
     print("3. 与人类发展一致：多模态感知整合在婴儿期开始")
     print("4. 符号接地不限于视觉——所有感知模态都能接地")
+
+    # 保存结果
+    def to_serializable(obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, (np.floating, np.integer)):
+            return float(obj)
+        elif isinstance(obj, dict):
+            return {k: to_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [to_serializable(v) for v in obj]
+        elif isinstance(obj, set):
+            return sorted(list(obj))
+        return obj
+
+    results = {
+        'experiment_1_visual_unique': r1,
+        'experiment_2_visual_ambiguous': r2,
+        'experiment_3_crossmodal_only': r3,
+        'experiment_4_comparison': r4,
+        'experiment_5_stability': r5,
+    }
+    with open('crossmodal_results.json', 'w', encoding='utf-8') as f:
+        json.dump(to_serializable(results), f, indent=2, ensure_ascii=False)
+    print(f"\n结果已保存到: crossmodal_results.json")
 
 
 if __name__ == '__main__':

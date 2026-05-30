@@ -1,0 +1,278 @@
+{
+  "experiment_1": {
+    "with_transfer": [
+      {
+        "generation": 0,
+        "success_rate": 0.9083,
+        "vocabulary_size": 40.0,
+        "difficulty": 4
+      },
+      {
+        "generation": 1,
+        "success_rate": 0.855,
+        "vocabulary_size": 39.7,
+        "difficulty": 5
+      },
+      {
+        "generation": 2,
+        "success_rate": 0.9533,
+        "vocabulary_size": 40.0,
+        "difficulty": 6
+      },
+      {
+        "generation": 3,
+        "success_rate": 0.9533,
+        "vocabulary_size": 40.0,
+        "difficulty": 7
+      },
+      {
+        "generation": 4,
+        "success_rate": 0.985,
+        "vocabulary_size": 39.7,
+        "difficulty": 8
+      },
+      {
+        "generation": 5,
+        "success_rate": 0.9833,
+        "vocabulary_size": 40.0,
+        "difficulty": 9
+      },
+      {
+        "generation": 6,
+        "success_rate": 0.9933,
+        "vocabulary_size": 40.0,
+        "difficulty": 10
+      },
+      {
+        "generation": 7,
+        "success_rate": 0.9933,
+        "vocabulary_size": 40.0,
+        "difficulty": 10
+      },
+      {
+        "generation": 8,
+        "success_rate": 1.0,
+        "vocabulary_size": 39.3,
+        "difficulty": 10
+      },
+      {
+        "generation": 9,
+        "success_rate": 0.9983,
+        "vocabulary_size": 40.0,
+        "difficulty": 10
+      }
+    ],
+    "without_transfer": [
+      {
+        "generation": 0,
+        "success_rate": 0.9167,
+        "vocabulary_size": 39.7
+      },
+      {
+        "generation": 1,
+        "success_rate": 0.8767,
+        "vocabulary_size": 39.7
+      },
+      {
+        "generation": 2,
+        "success_rate": 0.9517,
+        "vocabulary_size": 40.0
+      },
+      {
+        "generation": 3,
+        "success_rate": 0.9517,
+        "vocabulary_size": 40.0
+      },
+      {
+        "generation": 4,
+        "success_rate": 0.9833,
+        "vocabulary_size": 40.0
+      },
+      {
+        "generation": 5,
+        "success_rate": 0.9733,
+        "vocabulary_size": 39.7
+      },
+      {
+        "generation": 6,
+        "success_rate": 0.9917,
+        "vocabulary_size": 40.0
+      },
+      {
+        "generation": 7,
+        "success_rate": 0.9983,
+        "vocabulary_size": 40.0
+      },
+      {
+        "generation": 8,
+        "success_rate": 0.9983,
+        "vocabulary_size": 39.7
+      },
+      {
+        "generation": 9,
+        "success_rate": 1.0,
+        "vocabulary_size": 40.0
+      }
+    ]
+  },
+  "experiment_2": [
+    {
+      "generation": 0,
+      "total_symbols": 39.8,
+      "new_symbols": 39.8,
+      "innovation_rate": 1.0
+    },
+    {
+      "generation": 1,
+      "total_symbols": 40.0,
+      "new_symbols": 0.2,
+      "innovation_rate": 0.005
+    },
+    {
+      "generation": 2,
+      "total_symbols": 40.0,
+      "new_symbols": 0.0,
+      "innovation_rate": 0.0
+    },
+    {
+      "generation": 3,
+      "total_symbols": 40.0,
+      "new_symbols": 0.0,
+      "innovation_rate": 0.0
+    },
+    {
+      "generation": 4,
+      "total_symbols": 40.0,
+      "new_symbols": 0.0,
+      "innovation_rate": 0.0
+    },
+    {
+      "generation": 5,
+      "total_symbols": 40.0,
+      "new_symbols": 0.0,
+      "innovation_rate": 0.0
+    },
+    {
+      "generation": 6,
+      "total_symbols": 40.0,
+      "new_symbols": 0.0,
+      "innovation_rate": 0.0
+    },
+    {
+      "generation": 7,
+      "total_symbols": 40.0,
+      "new_symbols": 0.0,
+      "innovation_rate": 0.0
+    },
+    {
+      "generation": 8,
+      "total_symbols": 40.0,
+      "new_symbols": 0.0,
+      "innovation_rate": 0.0
+    },
+    {
+      "generation": 9,
+      "total_symbols": 40.0,
+      "new_symbols": 0.0,
+      "innovation_rate": 0.0
+    }
+  ],
+  "experiment_3": {
+    "0.0": {
+      "final_sr": 0.974,
+      "final_vocab": 40.0
+    },
+    "0.2": {
+      "final_sr": 0.978,
+      "final_vocab": 40.0
+    },
+    "0.4": {
+      "final_sr": 0.987,
+      "final_vocab": 40.0
+    },
+    "0.6": {
+      "final_sr": 0.98,
+      "final_vocab": 39.8
+    },
+    "0.8": {
+      "final_sr": 0.982,
+      "final_vocab": 40.0
+    },
+    "1.0": {
+      "final_sr": 0.984,
+      "final_vocab": 40.0
+    }
+  },
+  "experiment_4": [
+    {
+      "generation": 0,
+      "combination_rate": 0.375,
+      "tri_symbol_rate": 0.0,
+      "grammar_rules": 0.0,
+      "order_consistency": 0.8375
+    },
+    {
+      "generation": 1,
+      "combination_rate": 0.4683,
+      "tri_symbol_rate": 0.0,
+      "grammar_rules": 0.0,
+      "order_consistency": 0.8787
+    },
+    {
+      "generation": 2,
+      "combination_rate": 0.415,
+      "tri_symbol_rate": 0.0083,
+      "grammar_rules": 0.0,
+      "order_consistency": 0.7931
+    },
+    {
+      "generation": 3,
+      "combination_rate": 0.5683,
+      "tri_symbol_rate": 0.0133,
+      "grammar_rules": 0.0,
+      "order_consistency": 0.719
+    },
+    {
+      "generation": 4,
+      "combination_rate": 0.5433,
+      "tri_symbol_rate": 0.005,
+      "grammar_rules": 0.0,
+      "order_consistency": 0.7278
+    },
+    {
+      "generation": 5,
+      "combination_rate": 0.6067,
+      "tri_symbol_rate": 0.0117,
+      "grammar_rules": 0.0,
+      "order_consistency": 0.677
+    },
+    {
+      "generation": 6,
+      "combination_rate": 0.6333,
+      "tri_symbol_rate": 0.015,
+      "grammar_rules": 0.0,
+      "order_consistency": 0.6898
+    },
+    {
+      "generation": 7,
+      "combination_rate": 0.6217,
+      "tri_symbol_rate": 0.015,
+      "grammar_rules": 0.0,
+      "order_consistency": 0.7911
+    },
+    {
+      "generation": 8,
+      "combination_rate": 0.5917,
+      "tri_symbol_rate": 0.0017,
+      "grammar_rules": 0.0,
+      "order_consistency": 0.7278
+    },
+    {
+      "generation": 9,
+      "combination_rate": 0.6167,
+      "tri_symbol_rate": 0.0033,
+      "grammar_rules": 0.0,
+      "order_consistency": 0.8641
+    }
+  ]
+}

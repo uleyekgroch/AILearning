@@ -18,10 +18,16 @@ from collections import defaultdict
 from itertools import combinations
 
 # 符号分类常量
-COLORS = {'red', 'blue', 'green', 'yellow'}
-SHAPES = {'circle', 'square', 'triangle', 'sphere', 'cube', 'cylinder'}
-SIZES = {'big', 'small', 'medium', 'mid'}
-MATERIALS = {'metal', 'wood', 'plastic', 'glass', 'rubber', 'stone', 'fabric'}
+COLORS = {'red', 'blue', 'green', 'yellow', 'white', 'black'}
+SHAPES = {'circle', 'square', 'triangle', 'star', 'diamond', 'sphere', 'cube', 'cylinder'}
+SIZES = {'tiny', 'small', 'medium', 'big', 'huge', 'mid'}
+MATERIALS = {'metal', 'wood', 'plastic', 'stone', 'fabric', 'glass', 'rubber'}
+TEXTURES = {'smooth', 'rough', 'bumpy', 'fuzzy'}
+WEIGHTS = {'light', 'medium', 'heavy'}
+TEMPERATURES = {'hot', 'warm', 'cold'}
+BRIGHTNESSES = {'bright', 'dim', 'dark'}
+PATTERNS = {'solid', 'striped', 'spotted'}
+ORIGINS = {'natural', 'artificial', 'magical'}
 DEFAULT_MODIFIER_ORDER = ['size', 'color', 'material']
 
 # 动作符号常量
@@ -84,6 +90,18 @@ def _symbol_category(sym: str) -> Optional[str]:
         return 'material'
     if sym in SHAPES:
         return 'shape'
+    if sym in TEXTURES:
+        return 'texture'
+    if sym in WEIGHTS:
+        return 'weight'
+    if sym in TEMPERATURES:
+        return 'temperature'
+    if sym in BRIGHTNESSES:
+        return 'brightness'
+    if sym in PATTERNS:
+        return 'pattern'
+    if sym in ORIGINS:
+        return 'origin'
     if sym in ACTIONS:
         return 'action'
     if sym in ACTION_EFFECT_VALUES:

@@ -1,0 +1,344 @@
+{
+  "exp1": {
+    "snapshots": [
+      {
+        "round": 50,
+        "success_rate": 0.92,
+        "vocab_size": 16,
+        "compound_count": 0,
+        "avg_desc_length": 1.8,
+        "compound_usage_rate": 0.0
+      },
+      {
+        "round": 100,
+        "success_rate": 0.92,
+        "vocab_size": 16,
+        "compound_count": 1,
+        "avg_desc_length": 1.82,
+        "compound_usage_rate": 0.04
+      },
+      {
+        "round": 150,
+        "success_rate": 0.9266666666666666,
+        "vocab_size": 22,
+        "compound_count": 8,
+        "avg_desc_length": 1.66,
+        "compound_usage_rate": 0.2
+      },
+      {
+        "round": 200,
+        "success_rate": 0.905,
+        "vocab_size": 23,
+        "compound_count": 11,
+        "avg_desc_length": 1.76,
+        "compound_usage_rate": 0.28
+      },
+      {
+        "round": 250,
+        "success_rate": 0.904,
+        "vocab_size": 25,
+        "compound_count": 14,
+        "avg_desc_length": 1.58,
+        "compound_usage_rate": 0.4
+      },
+      {
+        "round": 300,
+        "success_rate": 0.9133333333333333,
+        "vocab_size": 30,
+        "compound_count": 18,
+        "avg_desc_length": 1.52,
+        "compound_usage_rate": 0.46
+      },
+      {
+        "round": 350,
+        "success_rate": 0.9085714285714286,
+        "vocab_size": 30,
+        "compound_count": 18,
+        "avg_desc_length": 1.48,
+        "compound_usage_rate": 0.48
+      },
+      {
+        "round": 400,
+        "success_rate": 0.9025,
+        "vocab_size": 35,
+        "compound_count": 20,
+        "avg_desc_length": 1.64,
+        "compound_usage_rate": 0.5
+      },
+      {
+        "round": 450,
+        "success_rate": 0.9044444444444445,
+        "vocab_size": 35,
+        "compound_count": 22,
+        "avg_desc_length": 1.5,
+        "compound_usage_rate": 0.54
+      },
+      {
+        "round": 500,
+        "success_rate": 0.904,
+        "vocab_size": 36,
+        "compound_count": 24,
+        "avg_desc_length": 1.34,
+        "compound_usage_rate": 0.62
+      }
+    ],
+    "final_compounds": {
+      "cylinder-wood": {
+        "components": [
+          "cylinder",
+          "wood"
+        ],
+        "frequency": 5,
+        "successes": 4,
+        "success_rate": 0.8
+      },
+      "cylinder-metal": {
+        "components": [
+          "cylinder",
+          "metal"
+        ],
+        "frequency": 5,
+        "successes": 4,
+        "success_rate": 0.8
+      },
+      "cylinder-stone": {
+        "components": [
+          "cylinder",
+          "stone"
+        ],
+        "frequency": 5,
+        "successes": 4,
+        "success_rate": 0.8
+      },
+      "cube-plastic": {
+        "components": [
+          "cube",
+          "plastic"
+        ],
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0
+      },
+      "sphere-fabric": {
+        "components": [
+          "sphere",
+          "fabric"
+        ],
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0
+      },
+      "cylinder-rubber": {
+        "components": [
+          "cylinder",
+          "rubber"
+        ],
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0
+      },
+      "cylinder-glass": {
+        "components": [
+          "cylinder",
+          "glass"
+        ],
+        "frequency": 5,
+        "successes": 4,
+        "success_rate": 0.8
+      },
+      "sphere-stone": {
+        "components": [
+          "sphere",
+          "stone"
+        ],
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0
+      },
+      "sphere-glass": {
+        "components": [
+          "sphere",
+          "glass"
+        ],
+        "frequency": 6,
+        "successes": 5,
+        "success_rate": 0.8333333333333334
+      },
+      "cube-metal": {
+        "components": [
+          "cube",
+          "metal"
+        ],
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0
+      },
+      "cube-fabric": {
+        "components": [
+          "cube",
+          "fabric"
+        ],
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0
+      },
+      "cube-glass": {
+        "components": [
+          "cube",
+          "glass"
+        ],
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0
+      },
+      "cube-rubber": {
+        "components": [
+          "cube",
+          "rubber"
+        ],
+        "frequency": 5,
+        "successes": 4,
+        "success_rate": 0.8
+      },
+      "cube-wood": {
+        "components": [
+          "cube",
+          "wood"
+        ],
+        "frequency": 5,
+        "successes": 4,
+        "success_rate": 0.8
+      },
+      "cube-stone": {
+        "components": [
+          "cube",
+          "stone"
+        ],
+        "frequency": 5,
+        "successes": 4,
+        "success_rate": 0.8
+      },
+      "medium-fabric": {
+        "components": [
+          "medium",
+          "fabric"
+        ],
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0
+      },
+      "sphere-metal": {
+        "components": [
+          "sphere",
+          "metal"
+        ],
+        "frequency": 6,
+        "successes": 5,
+        "success_rate": 0.8333333333333334
+      },
+      "cylinder-fabric": {
+        "components": [
+          "cylinder",
+          "fabric"
+        ],
+        "frequency": 5,
+        "successes": 4,
+        "success_rate": 0.8
+      },
+      "sphere-rubber": {
+        "components": [
+          "sphere",
+          "rubber"
+        ],
+        "frequency": 10,
+        "successes": 8,
+        "success_rate": 0.8
+      },
+      "medium-wood": {
+        "components": [
+          "medium",
+          "wood"
+        ],
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0
+      },
+      "big-glass": {
+        "components": [
+          "big",
+          "glass"
+        ],
+        "frequency": 5,
+        "successes": 4,
+        "success_rate": 0.8
+      },
+      "cylinder-plastic": {
+        "components": [
+          "cylinder",
+          "plastic"
+        ],
+        "frequency": 10,
+        "successes": 8,
+        "success_rate": 0.8
+      },
+      "big-metal": {
+        "components": [
+          "big",
+          "metal"
+        ],
+        "frequency": 5,
+        "successes": 4,
+        "success_rate": 0.8
+      },
+      "sphere-plastic": {
+        "components": [
+          "sphere",
+          "plastic"
+        ],
+        "frequency": 10,
+        "successes": 8,
+        "success_rate": 0.8
+      }
+    },
+    "total_games": 500
+  },
+  "exp2": {
+    "with_compounds": {
+      "avg_length": 1.46,
+      "compound_usage_rate": 0.49,
+      "success_rate": 0.9,
+      "total": 100
+    },
+    "without_compounds": {
+      "avg_length": 1.77,
+      "compound_usage_rate": 0.0,
+      "success_rate": 0.89,
+      "total": 100
+    },
+    "compound_count": 17,
+    "success_rate_diff": 0.010000000000000009,
+    "length_diff": -0.31000000000000005
+  },
+  "exp3": {
+    "transfer": {
+      "avg_length": 1.66,
+      "compound_usage_rate": 0.265,
+      "success_rate": 0.875,
+      "total": 200
+    },
+    "basic": {
+      "avg_length": 1.945,
+      "compound_usage_rate": 0.0,
+      "success_rate": 0.85,
+      "total": 200
+    },
+    "fresh": {
+      "avg_length": 1.845,
+      "compound_usage_rate": 0.0,
+      "success_rate": 0.89,
+      "total": 200
+    },
+    "compound_count": 12,
+    "transfer_vs_fresh": -0.015000000000000013
+  }
+}

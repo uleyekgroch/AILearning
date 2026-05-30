@@ -1,0 +1,118 @@
+{
+  "experiment_1_success_by_maxlen": {
+    "max_len=1": {
+      "success_rate": 0.5172413793103449,
+      "negation_rate": 0.3482758620689655,
+      "clause_rate": 0.0,
+      "vocab_size": 17,
+      "negation_symbols": [
+        "not"
+      ],
+      "clause_symbols": []
+    },
+    "max_len=2": {
+      "success_rate": 0.7925170068027211,
+      "negation_rate": 0.3435374149659864,
+      "clause_rate": 0.0,
+      "vocab_size": 17,
+      "negation_symbols": [
+        "not"
+      ],
+      "clause_symbols": []
+    },
+    "max_len=3": {
+      "success_rate": 1.0,
+      "negation_rate": 0.3231292517006803,
+      "clause_rate": 0.0,
+      "vocab_size": 17,
+      "negation_symbols": [
+        "not"
+      ],
+      "clause_symbols": []
+    },
+    "max_len=4": {
+      "success_rate": 1.0,
+      "negation_rate": 0.3333333333333333,
+      "clause_rate": 0.0,
+      "vocab_size": 17,
+      "negation_symbols": [
+        "not"
+      ],
+      "clause_symbols": []
+    },
+    "无限制": {
+      "success_rate": 1.0,
+      "negation_rate": 0.36486486486486486,
+      "clause_rate": 0.0,
+      "vocab_size": 17,
+      "negation_symbols": [
+        "not"
+      ],
+      "clause_symbols": []
+    }
+  },
+  "experiment_2_strategy_distribution": {
+    "max_len=1": {
+      "single": 0.684,
+      "negation": 0.316
+    },
+    "max_len=2": {
+      "single": 0.536,
+      "positive_combo": 0.132,
+      "negation": 0.332
+    },
+    "max_len=3": {
+      "positive_combo": 0.13,
+      "negation": 0.358,
+      "single": 0.512
+    },
+    "无限制": {
+      "positive_combo": 0.126,
+      "single": 0.54,
+      "negation": 0.334
+    }
+  },
+  "experiment_3_negation_under_pressure": {
+    "max_len=1": {
+      "negation_emerged": true,
+      "emergence_round": 3,
+      "negation_rate": 0.3122448979591837,
+      "success_rate": 0.5755102040816327,
+      "negation_symbols": [
+        "not"
+      ]
+    },
+    "max_len=2": {
+      "negation_emerged": true,
+      "emergence_round": 0,
+      "negation_rate": 0.3008130081300813,
+      "success_rate": 0.7926829268292683,
+      "negation_symbols": [
+        "not"
+      ]
+    }
+  },
+  "experiment_4_clause_under_pressure": {
+    "max_len=2": {
+      "clause_emerged": false,
+      "emergence_round": -1,
+      "clause_rate": 0.0,
+      "success_rate": 1.0,
+      "clause_symbols": []
+    },
+    "max_len=3": {
+      "clause_emerged": false,
+      "emergence_round": -1,
+      "clause_rate": 0.0,
+      "success_rate": 1.0,
+      "clause_symbols": []
+    },
+    "无限制": {
+      "clause_emerged": false,
+      "emergence_round": -1,
+      "clause_rate": 0.0,
+      "success_rate": 1.0,
+      "clause_symbols": []
+    }
+  }
+}

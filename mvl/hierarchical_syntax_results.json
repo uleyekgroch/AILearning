@@ -1,0 +1,109 @@
+{
+  "experiment_1": {
+    "final_consistency": 1.0,
+    "final_success_rate": 0.9967,
+    "snapshots": [
+      {
+        "round": 50,
+        "consistency": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "round": 100,
+        "consistency": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "round": 150,
+        "consistency": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "round": 200,
+        "consistency": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "round": 250,
+        "consistency": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "round": 300,
+        "consistency": 1.0,
+        "success_rate": 0.9967
+      }
+    ]
+  },
+  "experiment_2": {
+    "final_sr": 0.995,
+    "embedding_count": 8,
+    "has_that": true,
+    "snapshots": [
+      {
+        "round": 50,
+        "embedding_count": 1,
+        "has_that_marker": true,
+        "success_rate": 1.0
+      },
+      {
+        "round": 100,
+        "embedding_count": 3,
+        "has_that_marker": true,
+        "success_rate": 1.0
+      },
+      {
+        "round": 150,
+        "embedding_count": 5,
+        "has_that_marker": true,
+        "success_rate": 1.0
+      },
+      {
+        "round": 200,
+        "embedding_count": 8,
+        "has_that_marker": true,
+        "success_rate": 0.995
+      }
+    ]
+  },
+  "experiment_3": {
+    "hierarchical_sr": 0.997,
+    "bag_sr": 0.988,
+    "improvement_pct": 0.91
+  },
+  "experiment_4": {
+    "convergence_rate": 1.0,
+    "most_common_order": [
+      "color",
+      "action",
+      "color"
+    ],
+    "all_orders": [
+      [
+        "color",
+        "action",
+        "color"
+      ],
+      [
+        "color",
+        "action",
+        "color"
+      ],
+      [
+        "color",
+        "action",
+        "color"
+      ],
+      [
+        "color",
+        "action",
+        "color"
+      ],
+      [
+        "color",
+        "action",
+        "color"
+      ]
+    ]
+  }
+}

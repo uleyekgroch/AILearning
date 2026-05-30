@@ -13,6 +13,7 @@ Listener 根据标记调整选择策略。
 6-10: Phase 20b 置信度实验（视角标记涌现）
 """
 
+import json
 import numpy as np
 from typing import Dict, List, Set
 from collections import defaultdict
@@ -555,6 +556,36 @@ def main():
     print("2. 'know' = 高置信度，'think' = 中置信度")
     print("3. Listener 根据标记调整选择策略")
     print("4. 与人类发展一致：心智理论在 4-5 岁发展")
+
+    # 保存结果
+    def to_serializable(obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, (np.floating, np.integer)):
+            return float(obj)
+        elif isinstance(obj, dict):
+            return {k: to_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [to_serializable(v) for v in obj]
+        elif isinstance(obj, set):
+            return sorted(list(obj))
+        return obj
+
+    results = {
+        'experiment_1_shared_knowledge': r1,
+        'experiment_2_hidden_object': r2,
+        'experiment_3_false_belief': r3,
+        'experiment_4_comparison': r4,
+        'experiment_5_stability': r5,
+        'experiment_6_confidence_baseline': r6,
+        'experiment_7_confidence_difference': r7,
+        'experiment_8_marker_impact': r8,
+        'experiment_9_mixed_scenario': r9,
+        'experiment_10_confidence_stability': r10,
+    }
+    with open('theory_of_mind_results.json', 'w', encoding='utf-8') as f:
+        json.dump(to_serializable(results), f, indent=2, ensure_ascii=False)
+    print(f"\n结果已保存到: theory_of_mind_results.json")
 
 
 if __name__ == '__main__':

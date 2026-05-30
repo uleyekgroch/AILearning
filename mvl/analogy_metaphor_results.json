@@ -1,0 +1,115 @@
+{
+  "experiment_1": {
+    "temperature_emotion": {
+      "accuracy": 1.0,
+      "mapping": {
+        "hot": "angry",
+        "warm": "friendly",
+        "cold": "unfriendly"
+      },
+      "expected": {
+        "hot": "angry",
+        "warm": "friendly",
+        "cold": "unfriendly"
+      }
+    },
+    "weight_importance": {
+      "accuracy": 1.0,
+      "mapping": {
+        "heavy": "important",
+        "light": "trivial"
+      },
+      "expected": {
+        "heavy": "important",
+        "light": "trivial"
+      }
+    },
+    "brightness_intelligence": {
+      "accuracy": 1.0,
+      "mapping": {
+        "bright": "smart",
+        "dark": "confused"
+      },
+      "expected": {
+        "bright": "smart",
+        "dark": "confused"
+      }
+    },
+    "height_power": {
+      "accuracy": 1.0,
+      "mapping": {
+        "big": "powerful",
+        "small": "weak"
+      },
+      "expected": {
+        "big": "powerful",
+        "small": "weak"
+      }
+    },
+    "cleanliness_morality": {
+      "accuracy": 1.0,
+      "mapping": {
+        "smooth": "honest",
+        "rough": "suspicious"
+      },
+      "expected": {
+        "smooth": "honest",
+        "rough": "suspicious"
+      }
+    }
+  },
+  "experiment_2": {
+    "baseline": {
+      "avg_sr": 0.9944,
+      "avg_vocab": 28.8,
+      "avg_metaphor": 1.0,
+      "avg_affect_symbols": 14.0
+    },
+    "analogy_only": {
+      "avg_sr": 0.9944,
+      "avg_vocab": 28.8,
+      "avg_metaphor": 1.0,
+      "avg_affect_symbols": 14.0
+    },
+    "embodiment_only": {
+      "avg_sr": 0.9952,
+      "avg_vocab": 29.0,
+      "avg_metaphor": 0.5933,
+      "avg_affect_symbols": 29.0
+    },
+    "both": {
+      "avg_sr": 0.9956,
+      "avg_vocab": 28.8,
+      "avg_metaphor": 0.7067,
+      "avg_affect_symbols": 28.8
+    }
+  },
+  "experiment_3": {
+    "baseline": {
+      "source_sr": 0.9984,
+      "target_sr": 0.998,
+      "vocab": 30.6,
+      "affect_symbols": 0.0
+    },
+    "embodied": {
+      "source_sr": 0.9984,
+      "target_sr": 0.996,
+      "vocab": 30.6,
+      "affect_symbols": 23.0
+    }
+  },
+  "experiment_4": {
+    "source_first": {
+      "avg_sr": 0.9972,
+      "avg_vocab": 31.0,
+      "avg_combo": 0.128,
+      "avg_affect": 31.0
+    },
+    "target_first": {
+      "avg_sr": 0.9976,
+      "avg_vocab": 30.8,
+      "avg_combo": 0.1316,
+      "avg_affect": 30.8
+    }
+  }
+}

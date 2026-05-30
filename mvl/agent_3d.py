@@ -9,6 +9,9 @@
 - 好奇心驱动动作选择
 
 复用：SensoryEncoder、NeuralNetworkPredictor、EmergingLanguage
+
+兼容别名：
+- LearningAgent3D = LearningAgent（实验脚本使用旧名称）
 """
 
 import numpy as np
@@ -404,3 +407,10 @@ class Agent3D:
         self._last_encoded = None
         self._last_action = None
         self._action_history.clear()
+
+
+# ============================================================
+# 兼容别名：实验脚本使用 LearningAgent3D，实际指向 LearningAgent
+# ============================================================
+
+from agent import LearningAgent as LearningAgent3D

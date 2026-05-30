@@ -1,0 +1,223 @@
+{
+  "experiment_1_visual_unique": {
+    "success_rate": 1.0,
+    "visual_used": 300,
+    "crossmodal_used": 0,
+    "crossmodal_symbols": [],
+    "emergence_round": -1
+  },
+  "experiment_2_visual_ambiguous": {
+    "success_rate": 1.0,
+    "visual_used": 0,
+    "crossmodal_used": 500,
+    "crossmodal_success": 1.0,
+    "crossmodal_symbols": [
+      "soft",
+      "smooth",
+      "quiet",
+      "hot",
+      "sharp",
+      "cold",
+      "crack",
+      "soft_tactile",
+      "buzz",
+      "high",
+      "sharp_tactile",
+      "wet",
+      "loud",
+      "hard",
+      "click",
+      "low",
+      "fuzzy",
+      "dry",
+      "rough",
+      "hum"
+    ],
+    "emergence_round": 0
+  },
+  "experiment_3_crossmodal_only": {
+    "success_rate": 1.0,
+    "crossmodal_used": 500,
+    "crossmodal_success": 1.0,
+    "crossmodal_symbols": [
+      "crack",
+      "smooth",
+      "click",
+      "soft_tactile",
+      "quiet",
+      "rough",
+      "dry",
+      "loud",
+      "wet",
+      "soft",
+      "sharp",
+      "high",
+      "hot",
+      "hum",
+      "low",
+      "sharp_tactile",
+      "hard",
+      "cold",
+      "fuzzy",
+      "buzz"
+    ],
+    "emergence_round": 0
+  },
+  "experiment_4_comparison": {
+    "跨模态": {
+      "success_rate": 1.0,
+      "crossmodal_used": 300
+    },
+    "纯视觉": {
+      "success_rate": 0.5233333333333333
+    },
+    "improvement": 0.4766666666666667
+  },
+  "experiment_5_stability": {
+    "avg_crossmodal_used": 300.0,
+    "emergence_rate": 1.0,
+    "avg_success_rate": 1.0,
+    "run_details": [
+      {
+        "crossmodal_emerged": true,
+        "markers": [
+          "soft",
+          "fuzzy",
+          "click",
+          "cold",
+          "low",
+          "high",
+          "dry",
+          "hard",
+          "quiet",
+          "crack",
+          "sharp_tactile",
+          "buzz",
+          "hum",
+          "soft_tactile",
+          "loud",
+          "hot",
+          "sharp",
+          "wet",
+          "smooth",
+          "rough"
+        ],
+        "crossmodal_used": 300,
+        "crossmodal_success": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "crossmodal_emerged": true,
+        "markers": [
+          "loud",
+          "fuzzy",
+          "hot",
+          "hard",
+          "high",
+          "rough",
+          "low",
+          "sharp",
+          "quiet",
+          "soft_tactile",
+          "smooth",
+          "crack",
+          "hum",
+          "wet",
+          "click",
+          "cold",
+          "dry",
+          "soft",
+          "buzz",
+          "sharp_tactile"
+        ],
+        "crossmodal_used": 300,
+        "crossmodal_success": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "crossmodal_emerged": true,
+        "markers": [
+          "hum",
+          "dry",
+          "quiet",
+          "rough",
+          "sharp",
+          "low",
+          "smooth",
+          "crack",
+          "soft",
+          "cold",
+          "hot",
+          "buzz",
+          "fuzzy",
+          "sharp_tactile",
+          "click",
+          "loud",
+          "wet",
+          "soft_tactile",
+          "high",
+          "hard"
+        ],
+        "crossmodal_used": 300,
+        "crossmodal_success": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "crossmodal_emerged": true,
+        "markers": [
+          "click",
+          "sharp_tactile",
+          "rough",
+          "hum",
+          "cold",
+          "soft",
+          "hard",
+          "sharp",
+          "wet",
+          "dry",
+          "buzz",
+          "loud",
+          "crack",
+          "smooth",
+          "quiet",
+          "hot",
+          "soft_tactile",
+          "high",
+          "low",
+          "fuzzy"
+        ],
+        "crossmodal_used": 300,
+        "crossmodal_success": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "crossmodal_emerged": true,
+        "markers": [
+          "soft",
+          "rough",
+          "fuzzy",
+          "buzz",
+          "wet",
+          "loud",
+          "soft_tactile",
+          "low",
+          "hard",
+          "high",
+          "quiet",
+          "cold",
+          "click",
+          "hot",
+          "sharp",
+          "sharp_tactile",
+          "dry",
+          "crack",
+          "smooth",
+          "hum"
+        ],
+        "crossmodal_used": 300,
+        "crossmodal_success": 1.0,
+        "success_rate": 1.0
+      }
+    ]
+  }
+}

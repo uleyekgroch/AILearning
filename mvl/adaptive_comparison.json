@@ -1,14 +1,14 @@
 {
   "\u56fa\u5b9a\u7ebf\u6027": {
-    "final_error": 0.0879944322797307,
-    "final_symbols": 1
+    "final_error": 0.2297919617274451,
+    "final_symbols": 4
   },
   "\u56fa\u5b9a\u795e\u7ecf\u7f51\u7edc": {
-    "final_error": 0.09628871893475743,
-    "final_symbols": 0
+    "final_error": 0.0998536254636692,
+    "final_symbols": 5
   },
   "\u81ea\u9002\u5e94\u9009\u62e9": {
-    "final_error": 0.17796070367257677,
-    "final_symbols": 1
+    "final_error": 1.5791452689843404,
+    "final_symbols": 5
   }
 }

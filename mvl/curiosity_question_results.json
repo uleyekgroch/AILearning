@@ -1,0 +1,181 @@
+{
+  "experiment_1": {
+    "snapshots": [
+      {
+        "round": 50,
+        "why_freq": 0,
+        "what_freq": 43,
+        "how_freq": 1,
+        "total_questions": 44,
+        "accuracy": 0.64,
+        "predictions": 33
+      },
+      {
+        "round": 100,
+        "why_freq": 0,
+        "what_freq": 69,
+        "how_freq": 1,
+        "total_questions": 70,
+        "accuracy": 0.75,
+        "predictions": 45
+      },
+      {
+        "round": 150,
+        "why_freq": 1,
+        "what_freq": 101,
+        "how_freq": 1,
+        "total_questions": 103,
+        "accuracy": 0.82,
+        "predictions": 53
+      },
+      {
+        "round": 200,
+        "why_freq": 2,
+        "what_freq": 131,
+        "how_freq": 1,
+        "total_questions": 134,
+        "accuracy": 0.86,
+        "predictions": 58
+      },
+      {
+        "round": 250,
+        "why_freq": 3,
+        "what_freq": 162,
+        "how_freq": 1,
+        "total_questions": 166,
+        "accuracy": 0.884,
+        "predictions": 59
+      },
+      {
+        "round": 300,
+        "why_freq": 5,
+        "what_freq": 191,
+        "how_freq": 1,
+        "total_questions": 197,
+        "accuracy": 0.9033333333333333,
+        "predictions": 59
+      }
+    ],
+    "total_questions": 197,
+    "total_surprises": 197,
+    "knowledge_accuracy": 0.9033333333333333,
+    "marker_stats": {
+      "why": {
+        "frequency": 5,
+        "successes": 5,
+        "success_rate": 1.0
+      },
+      "what": {
+        "frequency": 191,
+        "successes": 191,
+        "success_rate": 1.0
+      },
+      "how": {
+        "frequency": 1,
+        "successes": 1,
+        "success_rate": 1.0
+      }
+    },
+    "vocab_markers": [
+      "what",
+      "how",
+      "why"
+    ]
+  },
+  "experiment_2": {
+    "curious_avg_accuracy": 0.86,
+    "baseline_avg_accuracy": 0.49000000000000005,
+    "accuracy_improvement": 0.36999999999999994,
+    "curious_avg_predictions": 57.6,
+    "baseline_avg_predictions": 57.8,
+    "curious_avg_confidence": 0.9154585085595344,
+    "baseline_avg_confidence": 0.25846737496869,
+    "num_runs": 5
+  },
+  "experiment_3": {
+    "threshold_results": {
+      "0.1": {
+        "threshold": 0.1,
+        "accuracy": 0.86,
+        "total_questions": 147,
+        "total_surprises": 147,
+        "prediction_count": 56,
+        "avg_confidence": 0.9026785714285713,
+        "vocab_size": 50
+      },
+      "0.3": {
+        "threshold": 0.3,
+        "accuracy": 0.865,
+        "total_questions": 136,
+        "total_surprises": 136,
+        "prediction_count": 56,
+        "avg_confidence": 0.9187500000000001,
+        "vocab_size": 49
+      },
+      "0.5": {
+        "threshold": 0.5,
+        "accuracy": 0.86,
+        "total_questions": 132,
+        "total_surprises": 132,
+        "prediction_count": 59,
+        "avg_confidence": 0.8966101694915254,
+        "vocab_size": 50
+      },
+      "0.7": {
+        "threshold": 0.7,
+        "accuracy": 0.7,
+        "total_questions": 36,
+        "total_surprises": 36,
+        "prediction_count": 57,
+        "avg_confidence": 0.5114035087719297,
+        "vocab_size": 26
+      }
+    },
+    "best_threshold": 0.3,
+    "best_accuracy": 0.865
+  },
+  "experiment_4": {
+    "avg_transfer_rate": 1.0379233511586452,
+    "avg_color_questions": 138.2,
+    "avg_shape_questions_trained": 89.4,
+    "avg_shape_questions_untrained": 86.2,
+    "avg_shape_accuracy": 0.10600000000000001,
+    "run_details": [
+      {
+        "color_questions": 151,
+        "shape_questions_trained": 91,
+        "shape_questions_untrained": 84,
+        "transfer_rate": 1.0833333333333333,
+        "shape_accuracy_trained": 0.09
+      },
+      {
+        "color_questions": 133,
+        "shape_questions_trained": 87,
+        "shape_questions_untrained": 88,
+        "transfer_rate": 0.9886363636363636,
+        "shape_accuracy_trained": 0.13
+      },
+      {
+        "color_questions": 134,
+        "shape_questions_trained": 89,
+        "shape_questions_untrained": 89,
+        "transfer_rate": 1.0,
+        "shape_accuracy_trained": 0.11
+      },
+      {
+        "color_questions": 134,
+        "shape_questions_trained": 94,
+        "shape_questions_untrained": 85,
+        "transfer_rate": 1.1058823529411765,
+        "shape_accuracy_trained": 0.06
+      },
+      {
+        "color_questions": 139,
+        "shape_questions_trained": 86,
+        "shape_questions_untrained": 85,
+        "transfer_rate": 1.011764705882353,
+        "shape_accuracy_trained": 0.14
+      }
+    ]
+  }
+}

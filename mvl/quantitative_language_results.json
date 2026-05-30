@@ -1,0 +1,615 @@
+{
+  "experiment_1": {
+    "final_success_rate": 0.97,
+    "numbers_in_vocab": [
+      "5",
+      "1",
+      "3",
+      "4",
+      "2"
+    ],
+    "number_stats": {
+      "1": {
+        "frequency": 22,
+        "successes": 22,
+        "success_rate": 1.0
+      },
+      "2": {
+        "frequency": 24,
+        "successes": 24,
+        "success_rate": 1.0
+      },
+      "3": {
+        "frequency": 18,
+        "successes": 18,
+        "success_rate": 1.0
+      },
+      "4": {
+        "frequency": 25,
+        "successes": 25,
+        "success_rate": 1.0
+      },
+      "5": {
+        "frequency": 27,
+        "successes": 27,
+        "success_rate": 1.0
+      }
+    },
+    "snapshots": [
+      {
+        "round": 50,
+        "success_rate": 0.98,
+        "numbers_in_vocab": [],
+        "number_stats": {
+          "1": {
+            "frequency": 0,
+            "successes": 0,
+            "success_rate": 0.0
+          },
+          "2": {
+            "frequency": 0,
+            "successes": 0,
+            "success_rate": 0.0
+          },
+          "3": {
+            "frequency": 0,
+            "successes": 0,
+            "success_rate": 0.0
+          },
+          "4": {
+            "frequency": 0,
+            "successes": 0,
+            "success_rate": 0.0
+          },
+          "5": {
+            "frequency": 0,
+            "successes": 0,
+            "success_rate": 0.0
+          }
+        },
+        "vocab_size": 11,
+        "mode_usage": {
+          "repetition": 50,
+          "explicit": 0
+        }
+      },
+      {
+        "round": 100,
+        "success_rate": 0.97,
+        "numbers_in_vocab": [
+          "5",
+          "1"
+        ],
+        "number_stats": {
+          "1": {
+            "frequency": 1,
+            "successes": 1,
+            "success_rate": 1.0
+          },
+          "2": {
+            "frequency": 0,
+            "successes": 0,
+            "success_rate": 0.0
+          },
+          "3": {
+            "frequency": 0,
+            "successes": 0,
+            "success_rate": 0.0
+          },
+          "4": {
+            "frequency": 0,
+            "successes": 0,
+            "success_rate": 0.0
+          },
+          "5": {
+            "frequency": 2,
+            "successes": 2,
+            "success_rate": 1.0
+          }
+        },
+        "vocab_size": 13,
+        "mode_usage": {
+          "repetition": 97,
+          "explicit": 3
+        }
+      },
+      {
+        "round": 150,
+        "success_rate": 0.9666666666666667,
+        "numbers_in_vocab": [
+          "5",
+          "1",
+          "3",
+          "4"
+        ],
+        "number_stats": {
+          "1": {
+            "frequency": 3,
+            "successes": 3,
+            "success_rate": 1.0
+          },
+          "2": {
+            "frequency": 0,
+            "successes": 0,
+            "success_rate": 0.0
+          },
+          "3": {
+            "frequency": 5,
+            "successes": 5,
+            "success_rate": 1.0
+          },
+          "4": {
+            "frequency": 2,
+            "successes": 2,
+            "success_rate": 1.0
+          },
+          "5": {
+            "frequency": 5,
+            "successes": 5,
+            "success_rate": 1.0
+          }
+        },
+        "vocab_size": 15,
+        "mode_usage": {
+          "repetition": 135,
+          "explicit": 15
+        }
+      },
+      {
+        "round": 200,
+        "success_rate": 0.965,
+        "numbers_in_vocab": [
+          "5",
+          "1",
+          "3",
+          "4",
+          "2"
+        ],
+        "number_stats": {
+          "1": {
+            "frequency": 7,
+            "successes": 7,
+            "success_rate": 1.0
+          },
+          "2": {
+            "frequency": 7,
+            "successes": 7,
+            "success_rate": 1.0
+          },
+          "3": {
+            "frequency": 8,
+            "successes": 8,
+            "success_rate": 1.0
+          },
+          "4": {
+            "frequency": 6,
+            "successes": 6,
+            "success_rate": 1.0
+          },
+          "5": {
+            "frequency": 9,
+            "successes": 9,
+            "success_rate": 1.0
+          }
+        },
+        "vocab_size": 16,
+        "mode_usage": {
+          "repetition": 163,
+          "explicit": 37
+        }
+      },
+      {
+        "round": 250,
+        "success_rate": 0.968,
+        "numbers_in_vocab": [
+          "5",
+          "1",
+          "3",
+          "4",
+          "2"
+        ],
+        "number_stats": {
+          "1": {
+            "frequency": 14,
+            "successes": 14,
+            "success_rate": 1.0
+          },
+          "2": {
+            "frequency": 12,
+            "successes": 12,
+            "success_rate": 1.0
+          },
+          "3": {
+            "frequency": 12,
+            "successes": 12,
+            "success_rate": 1.0
+          },
+          "4": {
+            "frequency": 16,
+            "successes": 16,
+            "success_rate": 1.0
+          },
+          "5": {
+            "frequency": 19,
+            "successes": 19,
+            "success_rate": 1.0
+          }
+        },
+        "vocab_size": 16,
+        "mode_usage": {
+          "repetition": 177,
+          "explicit": 73
+        }
+      },
+      {
+        "round": 300,
+        "success_rate": 0.97,
+        "numbers_in_vocab": [
+          "5",
+          "1",
+          "3",
+          "4",
+          "2"
+        ],
+        "number_stats": {
+          "1": {
+            "frequency": 22,
+            "successes": 22,
+            "success_rate": 1.0
+          },
+          "2": {
+            "frequency": 24,
+            "successes": 24,
+            "success_rate": 1.0
+          },
+          "3": {
+            "frequency": 18,
+            "successes": 18,
+            "success_rate": 1.0
+          },
+          "4": {
+            "frequency": 25,
+            "successes": 25,
+            "success_rate": 1.0
+          },
+          "5": {
+            "frequency": 27,
+            "successes": 27,
+            "success_rate": 1.0
+          }
+        },
+        "vocab_size": 16,
+        "mode_usage": {
+          "repetition": 184,
+          "explicit": 116
+        }
+      }
+    ],
+    "total_rounds": 300,
+    "mode_usage": {
+      "repetition": 184,
+      "explicit": 116
+    }
+  },
+  "experiment_2": {
+    "avg_quantitative": 0.922,
+    "avg_baseline": 0.6990000000000001,
+    "improvement": 0.22299999999999998,
+    "quant_rates": [
+      0.91,
+      0.915,
+      0.935,
+      0.935,
+      0.915
+    ],
+    "baseline_rates": [
+      0.7,
+      0.69,
+      0.73,
+      0.715,
+      0.66
+    ],
+    "num_runs": 5
+  },
+  "experiment_3": {
+    "final_success_rate": 0.9266666666666666,
+    "markers_in_vocab": [
+      "less",
+      "more",
+      "same"
+    ],
+    "comparison_used": {
+      "less": 66,
+      "more": 182,
+      "same": 52
+    },
+    "marker_stats": {
+      "less": {
+        "frequency": 66,
+        "successes": 66,
+        "success_rate": 1.0
+      },
+      "more": {
+        "frequency": 182,
+        "successes": 182,
+        "success_rate": 1.0
+      },
+      "same": {
+        "frequency": 52,
+        "successes": 30,
+        "success_rate": 0.5769230769230769
+      }
+    },
+    "snapshots": [
+      {
+        "round": 50,
+        "success_rate": 0.88,
+        "markers_in_vocab": [
+          "less",
+          "more",
+          "same"
+        ],
+        "comparison_used": {
+          "less": 9,
+          "more": 30,
+          "same": 11
+        }
+      },
+      {
+        "round": 100,
+        "success_rate": 0.92,
+        "markers_in_vocab": [
+          "less",
+          "more",
+          "same"
+        ],
+        "comparison_used": {
+          "less": 22,
+          "more": 57,
+          "same": 21
+        }
+      },
+      {
+        "round": 150,
+        "success_rate": 0.92,
+        "markers_in_vocab": [
+          "less",
+          "more",
+          "same"
+        ],
+        "comparison_used": {
+          "less": 33,
+          "more": 87,
+          "same": 30
+        }
+      },
+      {
+        "round": 200,
+        "success_rate": 0.92,
+        "markers_in_vocab": [
+          "less",
+          "more",
+          "same"
+        ],
+        "comparison_used": {
+          "less": 42,
+          "more": 118,
+          "same": 40
+        }
+      },
+      {
+        "round": 250,
+        "success_rate": 0.924,
+        "markers_in_vocab": [
+          "less",
+          "more",
+          "same"
+        ],
+        "comparison_used": {
+          "less": 58,
+          "more": 149,
+          "same": 43
+        }
+      },
+      {
+        "round": 300,
+        "success_rate": 0.9266666666666666,
+        "markers_in_vocab": [
+          "less",
+          "more",
+          "same"
+        ],
+        "comparison_used": {
+          "less": 66,
+          "more": 182,
+          "same": 52
+        }
+      }
+    ]
+  },
+  "experiment_4": {
+    "avg_train_rate": 0.916,
+    "avg_test_rate": 0.982,
+    "avg_novel_rate": 0.9945945945945945,
+    "avg_familiar_rate": 0.9734827674987174,
+    "generalization_gap": -0.02111182709587711,
+    "run_details": [
+      {
+        "train_rate": 0.88,
+        "test_rate": 0.99,
+        "novel_rate": 1.0,
+        "familiar_rate": 0.9814814814814815,
+        "novel_total": 46,
+        "familiar_total": 54,
+        "number_stats": {
+          "1": {
+            "frequency": 20,
+            "successes": 20,
+            "success_rate": 1.0
+          },
+          "2": {
+            "frequency": 25,
+            "successes": 25,
+            "success_rate": 1.0
+          },
+          "3": {
+            "frequency": 18,
+            "successes": 18,
+            "success_rate": 1.0
+          },
+          "4": {
+            "frequency": 16,
+            "successes": 16,
+            "success_rate": 1.0
+          },
+          "5": {
+            "frequency": 17,
+            "successes": 17,
+            "success_rate": 1.0
+          }
+        }
+      },
+      {
+        "train_rate": 0.945,
+        "test_rate": 0.99,
+        "novel_rate": 1.0,
+        "familiar_rate": 0.9827586206896551,
+        "novel_total": 42,
+        "familiar_total": 58,
+        "number_stats": {
+          "1": {
+            "frequency": 21,
+            "successes": 21,
+            "success_rate": 1.0
+          },
+          "2": {
+            "frequency": 30,
+            "successes": 29,
+            "success_rate": 0.9666666666666667
+          },
+          "3": {
+            "frequency": 33,
+            "successes": 33,
+            "success_rate": 1.0
+          },
+          "4": {
+            "frequency": 14,
+            "successes": 14,
+            "success_rate": 1.0
+          },
+          "5": {
+            "frequency": 16,
+            "successes": 16,
+            "success_rate": 1.0
+          }
+        }
+      },
+      {
+        "train_rate": 0.915,
+        "test_rate": 0.96,
+        "novel_rate": 0.972972972972973,
+        "familiar_rate": 0.9523809523809523,
+        "novel_total": 37,
+        "familiar_total": 63,
+        "number_stats": {
+          "1": {
+            "frequency": 35,
+            "successes": 35,
+            "success_rate": 1.0
+          },
+          "2": {
+            "frequency": 30,
+            "successes": 30,
+            "success_rate": 1.0
+          },
+          "3": {
+            "frequency": 30,
+            "successes": 29,
+            "success_rate": 0.9666666666666667
+          },
+          "4": {
+            "frequency": 11,
+            "successes": 11,
+            "success_rate": 1.0
+          },
+          "5": {
+            "frequency": 15,
+            "successes": 14,
+            "success_rate": 0.9333333333333333
+          }
+        }
+      },
+      {
+        "train_rate": 0.93,
+        "test_rate": 0.98,
+        "novel_rate": 1.0,
+        "familiar_rate": 0.967741935483871,
+        "novel_total": 38,
+        "familiar_total": 62,
+        "number_stats": {
+          "1": {
+            "frequency": 35,
+            "successes": 34,
+            "success_rate": 0.9714285714285714
+          },
+          "2": {
+            "frequency": 28,
+            "successes": 28,
+            "success_rate": 1.0
+          },
+          "3": {
+            "frequency": 27,
+            "successes": 27,
+            "success_rate": 1.0
+          },
+          "4": {
+            "frequency": 15,
+            "successes": 15,
+            "success_rate": 1.0
+          },
+          "5": {
+            "frequency": 14,
+            "successes": 14,
+            "success_rate": 1.0
+          }
+        }
+      },
+      {
+        "train_rate": 0.91,
+        "test_rate": 0.99,
+        "novel_rate": 1.0,
+        "familiar_rate": 0.9830508474576272,
+        "novel_total": 41,
+        "familiar_total": 59,
+        "number_stats": {
+          "1": {
+            "frequency": 38,
+            "successes": 38,
+            "success_rate": 1.0
+          },
+          "2": {
+            "frequency": 22,
+            "successes": 22,
+            "success_rate": 1.0
+          },
+          "3": {
+            "frequency": 23,
+            "successes": 22,
+            "success_rate": 0.9565217391304348
+          },
+          "4": {
+            "frequency": 17,
+            "successes": 17,
+            "success_rate": 1.0
+          },
+          "5": {
+            "frequency": 15,
+            "successes": 15,
+            "success_rate": 1.0
+          }
+        }
+      }
+    ],
+    "num_runs": 5
+  }
+}

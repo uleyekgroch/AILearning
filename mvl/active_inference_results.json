@@ -1,0 +1,74 @@
+{
+  "experiment_1": {
+    "random": {
+      "avg_error": 3.9989,
+      "std_error": 6.42,
+      "action_coverage": 1.0
+    },
+    "curiosity": {
+      "avg_error": 21.224,
+      "std_error": 14.2962,
+      "action_coverage": 0.125
+    },
+    "goal_directed": {
+      "avg_error": 15.2927,
+      "std_error": 16.0663,
+      "action_coverage": 0.35
+    },
+    "active_inference": {
+      "avg_error": 10.3986,
+      "std_error": 16.0601,
+      "action_coverage": 0.3875
+    }
+  },
+  "experiment_2": {
+    "early": {
+      "avg_info_gain": 25.6162,
+      "avg_pragmatic": -723.5973,
+      "explore_ratio": 0.0342
+    },
+    "mid": {
+      "avg_info_gain": 26.2748,
+      "avg_pragmatic": -826.1484,
+      "explore_ratio": 0.0308
+    },
+    "late": {
+      "avg_info_gain": 26.2229,
+      "avg_pragmatic": -826.1684,
+      "explore_ratio": 0.0308
+    }
+  },
+  "experiment_3": {
+    "0.0": {
+      "avg_gef": 411.2413,
+      "safe_ratio": 1.0
+    },
+    "0.1": {
+      "avg_gef": 160189.4419,
+      "safe_ratio": 1.0
+    },
+    "0.5": {
+      "avg_gef": 545.0609,
+      "safe_ratio": 1.0
+    },
+    "1.0": {
+      "avg_gef": 636.1384,
+      "safe_ratio": 1.0
+    },
+    "2.0": {
+      "avg_gef": 951.3499,
+      "safe_ratio": 1.0
+    }
+  },
+  "experiment_4": {
+    "random": {
+      "new_task_error": 15.6227
+    },
+    "curiosity": {
+      "new_task_error": 14.8316
+    },
+    "active_inference": {
+      "new_task_error": 18.708
+    }
+  }
+}

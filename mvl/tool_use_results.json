@@ -1,0 +1,98 @@
+{
+  "experiment_1_direct_action": {
+    "success_rate": 1.0,
+    "functional_used": 0,
+    "appearance_used": 0,
+    "tool_markers": [],
+    "emergence_round": -1
+  },
+  "experiment_2_single_tool": {
+    "success_rate": 1.0,
+    "functional_used": 195,
+    "functional_success": 1.0,
+    "appearance_used": 154,
+    "appearance_success": 1.0,
+    "tool_markers": [
+      "use",
+      "for"
+    ],
+    "emergence_round": 0
+  },
+  "experiment_3_tool_selection": {
+    "success_rate": 1.0,
+    "functional_used": 137,
+    "functional_success": 1.0,
+    "tool_markers": [
+      "use",
+      "for"
+    ],
+    "emergence_round": 0
+  },
+  "experiment_4_comparison": {
+    "有工具推理": {
+      "success_rate": 1.0,
+      "functional_used": 116
+    },
+    "无工具推理": {
+      "success_rate": 1.0
+    },
+    "improvement": 0.0
+  },
+  "experiment_5_stability": {
+    "avg_functional_used": 87.0,
+    "emergence_rate": 1.0,
+    "avg_success_rate": 1.0,
+    "run_details": [
+      {
+        "functional_emerged": true,
+        "markers": [
+          "use",
+          "for"
+        ],
+        "functional_used": 83,
+        "functional_success": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "functional_emerged": true,
+        "markers": [
+          "use",
+          "for"
+        ],
+        "functional_used": 84,
+        "functional_success": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "functional_emerged": true,
+        "markers": [
+          "use",
+          "for"
+        ],
+        "functional_used": 101,
+        "functional_success": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "functional_emerged": true,
+        "markers": [
+          "use",
+          "for"
+        ],
+        "functional_used": 78,
+        "functional_success": 1.0,
+        "success_rate": 1.0
+      },
+      {
+        "functional_emerged": true,
+        "markers": [
+          "use",
+          "for"
+        ],
+        "functional_used": 89,
+        "functional_success": 1.0,
+        "success_rate": 1.0
+      }
+    ]
+  }
+}

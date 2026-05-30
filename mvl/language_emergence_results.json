@@ -3,22 +3,36 @@
     "single": {
       "vocabulary_size": 3,
       "total_games": 500,
-      "total_successes": 113,
-      "success_rate": 0.226,
+      "total_successes": 122,
+      "success_rate": 0.244,
       "combination_rate": 0.0,
+      "tri_symbol_rate": 0.0,
       "order_consistency": 0.0,
       "preferred_order": "modifier_first",
-      "grammar_rules": 0
+      "preferred_modifier_order": [
+        "size",
+        "color",
+        "material"
+      ],
+      "grammar_rules": 0,
+      "ngram_patterns": 0
     },
     "compositional": {
-      "vocabulary_size": 7,
+      "vocabulary_size": 19,
       "total_games": 500,
       "total_successes": 500,
       "success_rate": 1.0,
-      "combination_rate": 1.0,
-      "order_consistency": 1.0,
+      "combination_rate": 0.174,
+      "tri_symbol_rate": 0.0,
+      "order_consistency": 0.6666666666666666,
       "preferred_order": "modifier_first",
-      "grammar_rules": 0
+      "preferred_modifier_order": [
+        "size",
+        "color",
+        "material"
+      ],
+      "grammar_rules": 0,
+      "ngram_patterns": 22
     }
   },
   "convergence": {
@@ -35,16 +49,16 @@
       1.0
     ],
     "order_consistency": [
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0
+      0.56,
+      0.6708860759493671,
+      0.6627906976744186,
+      0.6666666666666666,
+      0.6666666666666666,
+      0.6666666666666666,
+      0.6666666666666666,
+      0.6666666666666666,
+      0.6666666666666666,
+      0.6666666666666666
     ]
   }
 }

@@ -1,0 +1,222 @@
+{
+  "experiment_1": {
+    "final_markers": [
+      "wow",
+      "very",
+      "big_big",
+      "like",
+      "funny",
+      "haha",
+      "so_so",
+      "super"
+    ],
+    "marker_count": 8,
+    "total_possible": 8,
+    "snapshots": [
+      {
+        "round": 50,
+        "markers": [
+          "wow",
+          "very",
+          "big_big",
+          "like",
+          "funny",
+          "haha",
+          "so_so",
+          "super"
+        ],
+        "marker_count": 8,
+        "playful_rate": 0.36,
+        "cohesion": 0.587,
+        "vocab_size": 36
+      },
+      {
+        "round": 100,
+        "markers": [
+          "wow",
+          "very",
+          "big_big",
+          "like",
+          "funny",
+          "haha",
+          "so_so",
+          "super"
+        ],
+        "marker_count": 8,
+        "playful_rate": 0.42,
+        "cohesion": 0.762,
+        "vocab_size": 36
+      },
+      {
+        "round": 150,
+        "markers": [
+          "wow",
+          "very",
+          "big_big",
+          "like",
+          "funny",
+          "haha",
+          "so_so",
+          "super"
+        ],
+        "marker_count": 8,
+        "playful_rate": 0.4267,
+        "cohesion": 0.881,
+        "vocab_size": 36
+      },
+      {
+        "round": 200,
+        "markers": [
+          "wow",
+          "very",
+          "big_big",
+          "like",
+          "funny",
+          "haha",
+          "so_so",
+          "super"
+        ],
+        "marker_count": 8,
+        "playful_rate": 0.425,
+        "cohesion": 0.974,
+        "vocab_size": 36
+      },
+      {
+        "round": 250,
+        "markers": [
+          "wow",
+          "very",
+          "big_big",
+          "like",
+          "funny",
+          "haha",
+          "so_so",
+          "super"
+        ],
+        "marker_count": 8,
+        "playful_rate": 0.42,
+        "cohesion": 0.988,
+        "vocab_size": 36
+      },
+      {
+        "round": 300,
+        "markers": [
+          "wow",
+          "very",
+          "big_big",
+          "like",
+          "funny",
+          "haha",
+          "so_so",
+          "super"
+        ],
+        "marker_count": 8,
+        "playful_rate": 0.41,
+        "cohesion": 1.0,
+        "vocab_size": 36
+      }
+    ],
+    "final_cohesion": 1.0
+  },
+  "experiment_2": {
+    "accuracy": 1.0,
+    "funny_rate": 0.335,
+    "offensive_rate": 0.0,
+    "avg_social_signal": 0.335,
+    "funny_marker_emerged": true,
+    "funny_emergence_round": 9,
+    "markers_in_vocab": {
+      "wow": 3,
+      "very": 3,
+      "big_big": 3,
+      "like": 3,
+      "funny": 3,
+      "haha": 3,
+      "so_so": 3,
+      "super": 3
+    }
+  },
+  "experiment_3": {
+    "play_group": {
+      "final_cohesion": 0.98,
+      "cooperation_rate": 0.38,
+      "cohesion_trajectory": [
+        0.705,
+        0.872,
+        1.0,
+        0.98,
+        0.98
+      ]
+    },
+    "info_group": {
+      "final_cohesion": 0.682,
+      "cooperation_rate": 0.37,
+      "cohesion_trajectory": [
+        0.546,
+        0.562,
+        0.593,
+        0.633,
+        0.682
+      ]
+    },
+    "cohesion_boost": 0.298,
+    "cooperation_boost": 0.01
+  },
+  "experiment_4": {
+    "final_novelty": 1.0,
+    "final_diversity": 0.9767,
+    "final_elaboration": 1.2,
+    "final_creativity_score": 0.7922,
+    "creativity_growth": 0.0878,
+    "snapshots": [
+      {
+        "round": 50,
+        "novelty": 1.0,
+        "diversity": 1.0,
+        "elaboration": 0.34,
+        "creativity_score": 0.7044,
+        "unique_utterances": 50
+      },
+      {
+        "round": 100,
+        "novelty": 1.0,
+        "diversity": 1.0,
+        "elaboration": 0.58,
+        "creativity_score": 0.7311,
+        "unique_utterances": 100
+      },
+      {
+        "round": 150,
+        "novelty": 1.0,
+        "diversity": 1.0,
+        "elaboration": 1.08,
+        "creativity_score": 0.7867,
+        "unique_utterances": 150
+      },
+      {
+        "round": 200,
+        "novelty": 0.98,
+        "diversity": 0.985,
+        "elaboration": 0.86,
+        "creativity_score": 0.7506,
+        "unique_utterances": 197
+      },
+      {
+        "round": 250,
+        "novelty": 1.0,
+        "diversity": 0.98,
+        "elaboration": 0.74,
+        "creativity_score": 0.7422,
+        "unique_utterances": 245
+      },
+      {
+        "round": 300,
+        "novelty": 1.0,
+        "diversity": 0.9767,
+        "elaboration": 1.2,
+        "creativity_score": 0.7922,
+        "unique_utterances": 293
+      }
+    ]
+  }
+}

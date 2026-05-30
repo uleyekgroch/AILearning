@@ -1119,6 +1119,30 @@ class PhysicsWorld3D:
 
         return visible
 
+    def get_observation(self) -> dict:
+        """
+        获取兼容 LearningAgent 的观测字典。
+
+        将内部状态转换为 agent.py::LearningAgent.perceive() 期望的格式：
+        {
+            'agent_position': np.ndarray (3,),
+            'visible_objects': [{'object': ..., 'distance': float}, ...],
+        }
+        """
+        visible = self.get_visible_objects()
+        visible_objects = []
+        for feat in visible:
+            adapter = _ObjectAdapter(feat)
+            visible_objects.append({
+                'object': adapter,
+                'distance': feat['distance'],
+            })
+
+        return {
+            'agent_position': self.agent_pos.copy(),
+            'visible_objects': visible_objects,
+        }
+
     def reset(self):
         self.objects.clear()
         self.next_id = 0
@@ -1131,3 +1155,65 @@ class PhysicsWorld3D:
         self._audio_events = []
         self._fluid_system = None
         self._soft_bodies = []
+
+
+# ============================================================
+# ObjectAdapter（兼容 LearningAgent.perceive）
+# ============================================================
+
+class _ObjectAdapter:
+    """将 get_visible_objects() 返回的特征字典适配为 agent 期望的 object 接口"""
+
+    def __init__(self, features: Dict):
+        self.features = features
+
+    def to_observation(self) -> np.ndarray:
+        """返回 10 维观测向量：位置特征(3) + 材质one-hot(4) + 形状one-hot(3)"""
+        f = self.features
+        # 位置特征：用距离和高度编码
+        height = f.get('height', 'mid')
+        height_val = {'high': 1.0, 'mid': 0.5, 'low': 0.0}.get(height, 0.5)
+        motion = f.get('motion', 'still')
+        motion_val = {'fast': 1.0, 'moving': 0.5, 'still': 0.0}.get(motion, 0.0)
+        dist = min(f.get('distance', 5.0) / 10.0, 1.0)
+        pos = np.array([dist, height_val, motion_val])
+
+        # 材质 one-hot (4 维)
+        material = f.get('material', 'wood')
+        mat_names = ['metal', 'wood', 'plastic', 'glass']
+        mat_vec = np.zeros(4)
+        if material in mat_names:
+            mat_vec[mat_names.index(material)] = 1.0
+        else:
+            mat_vec[1] = 1.0  # 默认 wood
+
+        # 形状 one-hot (3 维)
+        shape = f.get('shape', 'sphere')
+        shape_names = ['sphere', 'cube', 'cylinder']
+        shape_vec = np.zeros(3)
+        if shape in shape_names:
+            shape_vec[shape_names.index(shape)] = 1.0
+        else:
+            shape_vec[0] = 1.0  # 默认 sphere
+
+        return np.concatenate([pos, mat_vec, shape_vec])
+
+
+# ============================================================
+# 工厂函数（实验脚本使用）
+# ============================================================
+
+def create_simple_3d_world() -> PhysicsWorld3D:
+    """创建简单的 3D 世界（基本物理、少量物体）"""
+    world = PhysicsWorld3D(bounds=(8.0, 8.0, 4.0))
+    world.add_random_objects(count=3)
+    return world
+
+
+def create_rich_3d_world() -> PhysicsWorld3D:
+    """创建丰富的 3D 世界（多种形状、材质、更多物体）"""
+    world = PhysicsWorld3D(bounds=(10.0, 10.0, 5.0))
+    world.add_random_objects(count=8, shapes=['sphere', 'cube', 'cylinder'],
+                             materials=['metal', 'wood', 'plastic', 'glass',
+                                        'rubber', 'stone', 'fabric'])
+    return world

@@ -14,6 +14,7 @@ Phase 15: 复合特征否定实验
 4. 多 Agent 社会：否定在多 Agent 中的传播
 """
 
+import json
 import numpy as np
 from typing import Dict, List
 from collections import defaultdict
@@ -249,6 +250,30 @@ def main():
     print("2. 子集关系是否定涌现的必要条件")
     print("3. 否定描述（2符号）比正向描述（3+符号）更高效")
     print("4. 'not' 符号进入词汇表，成为固化交流习惯")
+
+    # 保存结果
+    def to_serializable(obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, (np.floating, np.integer)):
+            return float(obj)
+        elif isinstance(obj, dict):
+            return {k: to_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [to_serializable(v) for v in obj]
+        elif isinstance(obj, set):
+            return sorted(list(obj))
+        return obj
+
+    results = {
+        'experiment_1_simple_subset': r1,
+        'experiment_2_emergence': r2,
+        'experiment_3_complexity_levels': r3,
+        'experiment_4_multiple_runs': r4,
+    }
+    with open('compound_negation_results.json', 'w', encoding='utf-8') as f:
+        json.dump(to_serializable(results), f, indent=2, ensure_ascii=False)
+    print(f"\n结果已保存到: compound_negation_results.json")
 
 
 if __name__ == '__main__':

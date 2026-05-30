@@ -1,0 +1,76 @@
+{
+  "experiment_1": {
+    "with_color_words": {
+      "visual": 121.0,
+      "audio": 1.0,
+      "position": 61.0
+    },
+    "without_color_words": {
+      "visual": 53.8,
+      "audio": 1.0,
+      "position": 1.0
+    },
+    "visual_boost_ratio": 2.2491,
+    "learned_colors": [
+      "black",
+      "white",
+      "green",
+      "blue",
+      "yellow",
+      "red"
+    ]
+  },
+  "experiment_2": {
+    "with_attention_avg_steps": 1.0,
+    "without_attention_avg_steps": 1.0,
+    "search_improvement_pct": 0.0,
+    "found_rate_with": 1.0,
+    "found_rate_without": 1.0
+  },
+  "experiment_3": {
+    "sharpness_with_attention": 1.3262,
+    "sharpness_without_attention": 1.3183,
+    "enhancement_pct": 0.6
+  },
+  "experiment_4": {
+    "initial_weights": [
+      {
+        "visual": 1.0,
+        "audio": 1.0,
+        "position": 1.0
+      },
+      {
+        "visual": 1.0,
+        "audio": 1.0,
+        "position": 1.0
+      },
+      {
+        "visual": 1.0,
+        "audio": 1.0,
+        "position": 1.0
+      }
+    ],
+    "final_weights": [
+      {
+        "visual": 181.0,
+        "audio": 1.0,
+        "position": 91.0
+      },
+      {
+        "visual": 121.0,
+        "audio": 1.0,
+        "position": 61.0
+      },
+      {
+        "visual": 121.0,
+        "audio": 1.0,
+        "position": 61.0
+      }
+    ],
+    "avg_alignment": 1.0,
+    "per_agent_alignment": [
+      1.0,
+      1.0
+    ]
+  }
+}

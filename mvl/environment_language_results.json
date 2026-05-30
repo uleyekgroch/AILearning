@@ -1,0 +1,29 @@
+{
+  "experiment_3_exploration_communication": {
+    "total_games": 252,
+    "success_rate": 1.0
+  },
+  "experiment_4_comparison": {
+    "exploration": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "random": [
+      0.892,
+      0.89,
+      0.862,
+      0.846,
+      0.892
+    ],
+    "fixed": [
+      0.874,
+      0.894,
+      0.87,
+      0.872,
+      0.862
+    ]
+  }
+}

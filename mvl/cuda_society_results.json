@@ -2,39 +2,40 @@
   "scale_comparison": {
     "100": {
       "final_success_rate": 1.0,
-      "final_similarity": 0.9618475437164307,
-      "total_time": 0.6565821170806885,
-      "rounds_per_sec": 3046.0774790706287
+      "final_similarity": 0.9596696496009827,
+      "total_time": 0.6646132469177246,
+      "rounds_per_sec": 3009.2689384019886
     },
     "500": {
       "final_success_rate": 1.0,
-      "final_similarity": 0.7990429401397705,
-      "total_time": 0.6043908596038818,
-      "rounds_per_sec": 3309.1168872255967
+      "final_similarity": 0.8142721056938171,
+      "total_time": 0.6148257255554199,
+      "rounds_per_sec": 3252.9543200119747
     },
     "1000": {
       "final_success_rate": 1.0,
-      "final_similarity": 0.6190084218978882,
-      "total_time": 0.6799478530883789,
-      "rounds_per_sec": 2941.4020368118468
+      "final_similarity": 0.6477209329605103,
+      "total_time": 1.2613580226898193,
+      "rounds_per_sec": 1585.5926422341552
     }
   },
   "family_detection": {
-    "num_families_fast": 4,
-    "num_families_orig": 259,
-    "time_fast": 0.17018842697143555,
-    "time_orig": 0.26048731803894043,
-    "speedup": 1.5305818537394476,
+    "num_families_fast": 6,
+    "num_families_orig": 256,
+    "time_fast": 0.42124342918395996,
+    "time_orig": 0.5404016971588135,
+    "speedup": 1.2828727042833379,
     "top_5_sizes": [
-      997,
+      995,
+      1,
       1,
       1,
       1
     ]
   },
   "dialect_divergence": {
-    "intra_similarity": 0.8037775158882141,
-    "inter_similarity": 0.7983123064041138,
-    "dialect_divergence": 0.0067993998527526855
+    "intra_similarity": 0.8083997368812561,
+    "inter_similarity": 0.810626208782196,
+    "dialect_divergence": -0.00275421142578125
   }
 }

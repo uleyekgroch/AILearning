@@ -4,6 +4,7 @@ Phase 26 实验：语言与环境探索整合
 4 个实验验证语言是否从真实环境探索中涌现。
 """
 
+import json
 import random
 import sys
 import os
@@ -15,6 +16,7 @@ from environment_language_bridge import (
 )
 from grounding_unified_language import UnifiedObject, UnifiedScene, generate_unified_scenario
 from adaptive_strategy import AdaptiveCommunicationGame
+import numpy as np
 
 
 def experiment_1_feature_derivation():
@@ -273,11 +275,37 @@ if __name__ == '__main__':
     print("Phase 26: 语言与环境探索整合实验")
     print("=" * 60)
 
-    experiment_1_feature_derivation()
-    experiment_2_bridge_conversion()
-    experiment_3_exploration_communication()
-    experiment_4_comparison()
+    r1 = experiment_1_feature_derivation()
+    r2 = experiment_2_bridge_conversion()
+    r3_game, r3_gen = experiment_3_exploration_communication()
+    r4 = experiment_4_comparison()
 
     print("\n" + "=" * 60)
     print("所有实验完成")
     print("=" * 60)
+
+    # 保存结果
+    def to_serializable(obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, (np.floating, np.integer)):
+            return float(obj)
+        elif isinstance(obj, dict):
+            return {k: to_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [to_serializable(v) for v in obj]
+        elif isinstance(obj, set):
+            return sorted(list(obj))
+        return obj
+
+    r3_stats = r3_game.get_stats()
+    results = {
+        'experiment_3_exploration_communication': {
+            'total_games': r3_stats['total_games'],
+            'success_rate': r3_stats['success_rate'],
+        },
+        'experiment_4_comparison': r4,
+    }
+    with open('environment_language_results.json', 'w', encoding='utf-8') as f:
+        json.dump(to_serializable(results), f, indent=2, ensure_ascii=False)
+    print(f"\n结果已保存到: environment_language_results.json")

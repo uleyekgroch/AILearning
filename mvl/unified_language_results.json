@@ -1,0 +1,329 @@
+{
+  "single_module": {
+    "visual_ambiguous": {
+      "total_games": 300,
+      "total_successes": 291,
+      "success_rate": 0.97,
+      "vocabulary_size": 36,
+      "strategy_usage": {
+        "visual": 0,
+        "crossmodal": 283,
+        "negation": 0,
+        "tool": 0,
+        "causal": 0,
+        "confidence": 0
+      },
+      "symbol_categories_used": [
+        "auditory",
+        "color",
+        "material",
+        "shape",
+        "size",
+        "tactile",
+        "temperature",
+        "texture"
+      ],
+      "num_categories": 8
+    },
+    "crossmodal": {
+      "total_games": 300,
+      "total_successes": 300,
+      "success_rate": 1.0,
+      "vocabulary_size": 27,
+      "strategy_usage": {
+        "visual": 300,
+        "crossmodal": 0,
+        "negation": 0,
+        "tool": 0,
+        "causal": 0,
+        "confidence": 0
+      },
+      "symbol_categories_used": [
+        "color",
+        "material",
+        "shape",
+        "size"
+      ],
+      "num_categories": 4
+    },
+    "subset": {
+      "total_games": 300,
+      "total_successes": 167,
+      "success_rate": 0.5566666666666666,
+      "vocabulary_size": 27,
+      "strategy_usage": {
+        "visual": 300,
+        "crossmodal": 0,
+        "negation": 0,
+        "tool": 0,
+        "causal": 0,
+        "confidence": 0
+      },
+      "symbol_categories_used": [
+        "color",
+        "material",
+        "shape",
+        "size"
+      ],
+      "num_categories": 4
+    },
+    "causal": {
+      "total_games": 300,
+      "total_successes": 300,
+      "success_rate": 1.0,
+      "vocabulary_size": 27,
+      "strategy_usage": {
+        "visual": 300,
+        "crossmodal": 0,
+        "negation": 0,
+        "tool": 0,
+        "causal": 0,
+        "confidence": 0
+      },
+      "symbol_categories_used": [
+        "color",
+        "material",
+        "shape",
+        "size"
+      ],
+      "num_categories": 4
+    },
+    "confidence": {
+      "total_games": 300,
+      "total_successes": 300,
+      "success_rate": 1.0,
+      "vocabulary_size": 27,
+      "strategy_usage": {
+        "visual": 300,
+        "crossmodal": 0,
+        "negation": 0,
+        "tool": 0,
+        "causal": 0,
+        "confidence": 0
+      },
+      "symbol_categories_used": [
+        "color",
+        "material",
+        "shape",
+        "size"
+      ],
+      "num_categories": 4
+    },
+    "tool": {
+      "total_games": 300,
+      "total_successes": 273,
+      "success_rate": 0.91,
+      "vocabulary_size": 22,
+      "strategy_usage": {
+        "visual": 0,
+        "crossmodal": 0,
+        "negation": 0,
+        "tool": 300,
+        "causal": 0,
+        "confidence": 0
+      },
+      "symbol_categories_used": [
+        "color",
+        "shape",
+        "tool"
+      ],
+      "num_categories": 3
+    }
+  },
+  "dual_combination": {
+    "visual+crossmodal": {
+      "total_games": 300,
+      "total_successes": 291,
+      "success_rate": 0.97,
+      "vocabulary_size": 39,
+      "strategy_usage": {
+        "visual": 0,
+        "crossmodal": 281,
+        "negation": 0,
+        "tool": 0,
+        "causal": 0,
+        "confidence": 0
+      },
+      "symbol_categories_used": [
+        "auditory",
+        "color",
+        "material",
+        "shape",
+        "size",
+        "tactile",
+        "temperature",
+        "texture"
+      ],
+      "num_categories": 8
+    },
+    "visual+subset": {
+      "total_games": 300,
+      "total_successes": 296,
+      "success_rate": 0.9866666666666667,
+      "vocabulary_size": 47,
+      "strategy_usage": {
+        "visual": 0,
+        "crossmodal": 272,
+        "negation": 300,
+        "tool": 0,
+        "causal": 0,
+        "confidence": 0
+      },
+      "symbol_categories_used": [
+        "auditory",
+        "color",
+        "material",
+        "negation",
+        "shape",
+        "size",
+        "tactile",
+        "temperature",
+        "texture"
+      ],
+      "num_categories": 9
+    },
+    "crossmodal+causal": {
+      "total_games": 300,
+      "total_successes": 300,
+      "success_rate": 1.0,
+      "vocabulary_size": 27,
+      "strategy_usage": {
+        "visual": 300,
+        "crossmodal": 0,
+        "negation": 0,
+        "tool": 0,
+        "causal": 0,
+        "confidence": 0
+      },
+      "symbol_categories_used": [
+        "color",
+        "material",
+        "shape",
+        "size"
+      ],
+      "num_categories": 4
+    },
+    "subset+confidence": {
+      "total_games": 300,
+      "total_successes": 158,
+      "success_rate": 0.5266666666666666,
+      "vocabulary_size": 27,
+      "strategy_usage": {
+        "visual": 300,
+        "crossmodal": 0,
+        "negation": 0,
+        "tool": 0,
+        "causal": 0,
+        "confidence": 0
+      },
+      "symbol_categories_used": [
+        "color",
+        "material",
+        "shape",
+        "size"
+      ],
+      "num_categories": 4
+    },
+    "tool+crossmodal": {
+      "total_games": 300,
+      "total_successes": 299,
+      "success_rate": 0.9966666666666667,
+      "vocabulary_size": 35,
+      "strategy_usage": {
+        "visual": 0,
+        "crossmodal": 269,
+        "negation": 0,
+        "tool": 31,
+        "causal": 0,
+        "confidence": 0
+      },
+      "symbol_categories_used": [
+        "auditory",
+        "color",
+        "shape",
+        "tactile",
+        "temperature",
+        "texture",
+        "tool"
+      ],
+      "num_categories": 7
+    }
+  },
+  "full_combination": {
+    "total_games": 500,
+    "total_successes": 484,
+    "success_rate": 0.968,
+    "vocabulary_size": 51,
+    "strategy_usage": {
+      "visual": 0,
+      "crossmodal": 416,
+      "negation": 500,
+      "tool": 0,
+      "causal": 500,
+      "confidence": 500
+    },
+    "symbol_categories_used": [
+      "auditory",
+      "causal",
+      "color",
+      "material",
+      "negation",
+      "perspective",
+      "shape",
+      "size",
+      "tactile",
+      "temperature",
+      "texture"
+    ],
+    "num_categories": 11
+  },
+  "comparison": {
+    "unified": {
+      "total_games": 300,
+      "total_successes": 299,
+      "success_rate": 0.9966666666666667,
+      "vocabulary_size": 51,
+      "strategy_usage": {
+        "visual": 0,
+        "crossmodal": 279,
+        "negation": 300,
+        "tool": 0,
+        "causal": 300,
+        "confidence": 300
+      },
+      "symbol_categories_used": [
+        "auditory",
+        "causal",
+        "color",
+        "material",
+        "negation",
+        "perspective",
+        "shape",
+        "size",
+        "tactile",
+        "temperature",
+        "texture"
+      ],
+      "num_categories": 11
+    },
+    "baseline": {
+      "total_games": 300,
+      "total_successes": 137,
+      "success_rate": 0.45666666666666667,
+      "vocabulary_size": 27
+    },
+    "improvement": 0.54
+  },
+  "stability": {
+    "avg_success_rate": 0.9853333333333334,
+    "avg_categories": 11.0,
+    "avg_vocabulary": 50.4,
+    "all_success_rates": [
+      0.98,
+      0.9866666666666667,
+      0.9933333333333333,
+      0.98,
+      0.9866666666666667
+    ]
+  }
+}

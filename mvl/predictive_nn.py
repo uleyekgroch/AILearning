@@ -16,20 +16,28 @@ from collections import deque
 
 class NeuralNetworkPredictor:
     """
-    神经网络预测器
+    神经网络预测器 — 预测编码实现
 
     架构：输入 → 隐藏层1 → 隐藏层2 → 输出
     激活函数：ReLU
-    学习率：自适应
+    学习规则：预测编码 + 局部 Hebbian 更新
 
-    与线性模型的区别：
-    - 能学习非线性映射
-    - 更强的表达能力
-    - 更好的泛化
+    核心原理（Whittington & Bogacz, 2017）：
+    1. 每层维护信念 μ 和局部残差 ε = μ - f(W × μ_below)
+    2. 迭代推理让信念收敛到最优估计
+    3. 权重更新 ΔW = η × ε_post × f' × μ_pre^T（纯局部 Hebbian）
+
+    与反向传播的区别：
+    - 反向传播需要链式法则穿层（非局部）
+    - 预测编码每层只看相邻层的信号（局部）
+    - 收敛后等价于反向传播的梯度
     """
 
     def __init__(self, obs_dim: int, action_dim: int,
-                 hidden1_dim: int = 128, hidden2_dim: int = 64):
+                 hidden1_dim: int = 128, hidden2_dim: int = 64,
+                 inference_lr: float = 0.05,
+                 max_inference_steps: int = 50,
+                 convergence_threshold: float = 1e-4):
         self.obs_dim = obs_dim
         self.action_dim = action_dim
         self.hidden1_dim = hidden1_dim
@@ -51,11 +59,20 @@ class NeuralNetworkPredictor:
         # 学习率
         self.lr = 0.001
 
+        # 预测编码推理参数
+        self.inference_lr = inference_lr
+        self.max_inference_steps = max_inference_steps
+        self.convergence_threshold = convergence_threshold
+        self.clip_val = 3.0
+
         # 预测误差历史
         self.error_history = deque(maxlen=100)
 
         # 缓存前向传播结果
         self._cache = {}
+
+        # 推理步数统计
+        self._inference_steps_log = []
 
     def _relu(self, x: np.ndarray) -> np.ndarray:
         """ReLU激活函数"""
@@ -110,53 +127,83 @@ class NeuralNetworkPredictor:
 
     def learn(self, obs: np.ndarray, action, actual_next_obs: np.ndarray) -> float:
         """
-        学习 = 减少预测误差
+        学习 = 预测编码 + 局部 Hebbian 更新
 
-        反向传播：
-        1. 计算输出误差
-        2. 反向传播到隐藏层
-        3. 更新权重
+        三步走：
+        1. 前向初始化 μ（信念）
+        2. 迭代推理：局部残差 + 反馈连接 → 收敛
+        3. Hebbian 权重更新：ΔW = η × ε_post × f' × μ_pre^T
         """
-        # 前向传播
-        prediction = self.predict(obs, action)
+        # 编码动作
+        if isinstance(action, np.ndarray):
+            action_vec = action[:self.action_dim]
+        else:
+            action_vec = np.zeros(self.action_dim)
+            action_vec[action] = 1.0
 
-        # 计算误差
-        error = actual_next_obs - prediction
-        prediction_error = np.mean(error ** 2)
+        x = np.concatenate([obs, action_vec])
 
-        # 反向传播
-        # 输出层梯度
-        d_output = -2 * error / len(error)
+        # === Step 1: 前向初始化 μ ===
+        mu_h1 = self._relu(x @ self.W1 + self.b1)
+        mu_h2 = self._relu(mu_h1 @ self.W2 + self.b2)
+        # mu_output = actual_next_obs （clamp 目标）
 
-        # W3, b3梯度
-        d_W3 = np.outer(self._cache['h2'], d_output)
-        d_b3 = d_output
+        # === Step 2: 迭代推理（自适应停止）===
+        steps_taken = 0
+        cv = self.clip_val
+        z1 = x @ self.W1 + self.b1
+        z2 = mu_h1 @ self.W2 + self.b2
+        for t in range(self.max_inference_steps):
+            prev_h1 = mu_h1.copy()
+            prev_h2 = mu_h2.copy()
 
-        # 隐藏层2梯度
-        d_h2 = d_output @ self.W3.T
-        d_z2 = d_h2 * self._relu_derivative(self._cache['z2'])
+            # 局部残差（每层独立计算）
+            z1 = x @ self.W1 + self.b1
+            z2 = mu_h1 @ self.W2 + self.b2
+            pred_out = mu_h2 @ self.W3 + self.b3
 
-        # W2, b2梯度
-        d_W2 = np.outer(self._cache['h1'], d_z2)
-        d_b2 = d_z2
+            epsilon_out = np.clip(actual_next_obs - pred_out, -cv, cv)
+            epsilon_h2 = np.clip(mu_h2 - self._relu(z2), -cv, cv)
+            epsilon_h1 = np.clip(mu_h1 - self._relu(z1), -cv, cv)
 
-        # 隐藏层1梯度
-        d_h1 = d_z2 @ self.W2.T
-        d_z1 = d_h1 * self._relu_derivative(self._cache['z1'])
+            # 反馈信号（通过反馈连接，不是链式法则）
+            feedback_h2 = np.clip(self.W3 @ epsilon_out, -cv, cv) * self._relu_derivative(z2)
+            e_h2_scaled = np.clip(epsilon_h2 * self._relu_derivative(z2), -cv, cv)
+            feedback_h1 = np.clip(self.W2 @ e_h2_scaled, -cv, cv) * self._relu_derivative(z1)
 
-        # W1, b1梯度
-        d_W1 = np.outer(self._cache['x'], d_z1)
-        d_b1 = d_z1
+            # 更新信念
+            mu_h1 = np.clip(mu_h1 - self.inference_lr * np.clip(-epsilon_h1 + feedback_h1, -cv, cv), -cv, cv)
+            mu_h2 = np.clip(mu_h2 - self.inference_lr * np.clip(-epsilon_h2 + feedback_h2, -cv, cv), -cv, cv)
 
-        # 更新权重
-        self.W3 -= self.lr * d_W3
-        self.b3 -= self.lr * d_b3
-        self.W2 -= self.lr * d_W2
-        self.b2 -= self.lr * d_b2
-        self.W1 -= self.lr * d_W1
-        self.b1 -= self.lr * d_b1
+            steps_taken = t + 1
 
-        # 记录误差
+            # 自适应停止
+            change = 0.5 * (np.mean((mu_h1 - prev_h1) ** 2) + np.mean((mu_h2 - prev_h2) ** 2))
+            if change < self.convergence_threshold:
+                break
+
+        self._inference_steps_log.append(steps_taken)
+
+        # === Step 3: 最终残差（复用循环最后的 z1/z2）===
+        pred_out = mu_h2 @ self.W3 + self.b3
+        epsilon_out = actual_next_obs - pred_out
+        epsilon_h2 = mu_h2 - self._relu(z2)
+        epsilon_h1 = mu_h1 - self._relu(z1)
+
+        # === Step 4: 局部 Hebbian 权重更新 ===
+        # ΔW3 = η × μ_h2 × ε_out^T
+        self.W3 += self.lr * np.outer(mu_h2, epsilon_out)
+        self.b3 += self.lr * epsilon_out
+
+        # ΔW2 = η × μ_h1 × (ε_h2 × f')^T
+        self.W2 += self.lr * np.outer(mu_h1, epsilon_h2 * self._relu_derivative(z2))
+        self.b2 += self.lr * epsilon_h2 * self._relu_derivative(z2)
+
+        # ΔW1 = η × x × (ε_h1 × f')^T
+        self.W1 += self.lr * np.outer(x, epsilon_h1 * self._relu_derivative(z1))
+        self.b1 += self.lr * epsilon_h1 * self._relu_derivative(z1)
+
+        prediction_error = float(np.mean(epsilon_out ** 2))
         self.error_history.append(prediction_error)
 
         return prediction_error
@@ -164,51 +211,71 @@ class NeuralNetworkPredictor:
     def learn_and_get_input_gradient(self, obs: np.ndarray, action,
                                       actual_next_obs: np.ndarray) -> Tuple[float, np.ndarray]:
         """
-        学习并返回输入梯度
+        学习并返回输入梯度（端到端学习）
 
-        与 learn() 相同的反向传播，但额外返回 d_loss/d_obs。
-        这个梯度传回编码器，实现端到端学习。
+        与 learn() 相同的预测编码，但额外返回 ε_input 作为编码器的梯度信号。
 
         Returns: (prediction_error, d_obs)
         """
-        # 前向传播
-        prediction = self.predict(obs, action)
+        # 编码动作
+        if isinstance(action, np.ndarray):
+            action_vec = action[:self.action_dim]
+        else:
+            action_vec = np.zeros(self.action_dim)
+            action_vec[action] = 1.0
 
-        # 计算误差
-        error = actual_next_obs - prediction
-        prediction_error = np.mean(error ** 2)
+        x = np.concatenate([obs, action_vec])
 
-        # 反向传播（与 learn() 相同）
-        d_output = -2 * error / len(error)
+        # === Step 1: 前向初始化 ===
+        mu_h1 = self._relu(x @ self.W1 + self.b1)
+        mu_h2 = self._relu(mu_h1 @ self.W2 + self.b2)
 
-        d_W3 = np.outer(self._cache['h2'], d_output)
-        d_b3 = d_output
+        # === Step 2: 迭代推理 ===
+        cv = self.clip_val
+        z1 = x @ self.W1 + self.b1
+        z2 = mu_h1 @ self.W2 + self.b2
+        for t in range(self.max_inference_steps):
+            prev_h1 = mu_h1.copy()
+            prev_h2 = mu_h2.copy()
 
-        d_h2 = d_output @ self.W3.T
-        d_z2 = d_h2 * self._relu_derivative(self._cache['z2'])
+            z1 = x @ self.W1 + self.b1
+            z2 = mu_h1 @ self.W2 + self.b2
+            pred_out = mu_h2 @ self.W3 + self.b3
 
-        d_W2 = np.outer(self._cache['h1'], d_z2)
-        d_b2 = d_z2
+            epsilon_out = np.clip(actual_next_obs - pred_out, -cv, cv)
+            epsilon_h2 = np.clip(mu_h2 - self._relu(z2), -cv, cv)
+            epsilon_h1 = np.clip(mu_h1 - self._relu(z1), -cv, cv)
 
-        d_h1 = d_z2 @ self.W2.T
-        d_z1 = d_h1 * self._relu_derivative(self._cache['z1'])
+            feedback_h2 = np.clip(self.W3 @ epsilon_out, -cv, cv) * self._relu_derivative(z2)
+            e_h2_scaled = np.clip(epsilon_h2 * self._relu_derivative(z2), -cv, cv)
+            feedback_h1 = np.clip(self.W2 @ e_h2_scaled, -cv, cv) * self._relu_derivative(z1)
 
-        d_W1 = np.outer(self._cache['x'], d_z1)
-        d_b1 = d_z1
+            mu_h1 = np.clip(mu_h1 - self.inference_lr * np.clip(-epsilon_h1 + feedback_h1, -cv, cv), -cv, cv)
+            mu_h2 = np.clip(mu_h2 - self.inference_lr * np.clip(-epsilon_h2 + feedback_h2, -cv, cv), -cv, cv)
 
-        # 计算输入梯度（端到端关键，必须在权重更新前）
-        d_x = d_z1 @ self.W1.T
-        d_obs = d_x[:self.obs_dim]
+            change = 0.5 * (np.mean((mu_h1 - prev_h1) ** 2) + np.mean((mu_h2 - prev_h2) ** 2))
+            if change < self.convergence_threshold:
+                break
 
-        # 更新权重
-        self.W3 -= self.lr * d_W3
-        self.b3 -= self.lr * d_b3
-        self.W2 -= self.lr * d_W2
-        self.b2 -= self.lr * d_b2
-        self.W1 -= self.lr * d_W1
-        self.b1 -= self.lr * d_b1
+        # === Step 3: 最终残差 + 输入梯度（复用循环最后的 z1/z2）===
+        pred_out = mu_h2 @ self.W3 + self.b3
+        epsilon_out = actual_next_obs - pred_out
+        epsilon_h2 = mu_h2 - self._relu(z2)
+        epsilon_h1 = mu_h1 - self._relu(z1)
 
-        # 记录误差
+        # 输入梯度：ε_input 传回编码器
+        epsilon_input = epsilon_h1 * self._relu_derivative(z1) @ self.W1.T
+        d_obs = epsilon_input[:self.obs_dim]
+
+        # === Step 4: Hebbian 权重更新 ===
+        self.W3 += self.lr * np.outer(mu_h2, epsilon_out)
+        self.b3 += self.lr * epsilon_out
+        self.W2 += self.lr * np.outer(mu_h1, epsilon_h2 * self._relu_derivative(z2))
+        self.b2 += self.lr * epsilon_h2 * self._relu_derivative(z2)
+        self.W1 += self.lr * np.outer(x, epsilon_h1 * self._relu_derivative(z1))
+        self.b1 += self.lr * epsilon_h1 * self._relu_derivative(z1)
+
+        prediction_error = float(np.mean(epsilon_out ** 2))
         self.error_history.append(prediction_error)
 
         return prediction_error, d_obs

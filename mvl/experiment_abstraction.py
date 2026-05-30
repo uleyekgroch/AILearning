@@ -18,6 +18,7 @@ Listener 只理解已知领域的特征。当目标在不熟悉领域时，
 6. 稳定性验证：5 次运行
 """
 
+import json
 import numpy as np
 from typing import Dict, List, Set
 from collections import defaultdict
@@ -365,6 +366,32 @@ def main():
     print("2. 特征隔离是类比涌现的充要条件")
     print("3. 类比是 Listener 不理解目标领域时的唯一沟通桥梁")
     print("4. 与人类发展一致：类比能力在 4-6 岁发展")
+
+    # 保存结果
+    def to_serializable(obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, (np.floating, np.integer)):
+            return float(obj)
+        elif isinstance(obj, dict):
+            return {k: to_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [to_serializable(v) for v in obj]
+        elif isinstance(obj, set):
+            return sorted(list(obj))
+        return obj
+
+    results = {
+        'experiment_1_concrete_baseline': r1,
+        'experiment_2_cross_domain': r2,
+        'experiment_3_structural_match': r3,
+        'experiment_4_metaphor': r4,
+        'experiment_5_comparison': r5,
+        'experiment_6_stability': r6,
+    }
+    with open('abstraction_results.json', 'w', encoding='utf-8') as f:
+        json.dump(to_serializable(results), f, indent=2, ensure_ascii=False)
+    print(f"\n结果已保存到: abstraction_results.json")
 
 
 if __name__ == '__main__':

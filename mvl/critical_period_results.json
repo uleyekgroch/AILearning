@@ -1,0 +1,102 @@
+{
+  "experiment_1": {
+    "none": {
+      "avg_sr": 1.0,
+      "avg_vocab": 9.0,
+      "avg_combo": 1.0,
+      "avg_grammar": 0.0
+    },
+    "exponential": {
+      "avg_sr": 1.0,
+      "avg_vocab": 9.0,
+      "avg_combo": 1.0,
+      "avg_grammar": 0.0
+    },
+    "sigmoid": {
+      "avg_sr": 1.0,
+      "avg_vocab": 9.0,
+      "avg_combo": 1.0,
+      "avg_grammar": 0.0
+    },
+    "linear": {
+      "avg_sr": 1.0,
+      "avg_vocab": 9.0,
+      "avg_combo": 1.0,
+      "avg_grammar": 0.0
+    },
+    "step": {
+      "avg_sr": 1.0,
+      "avg_vocab": 9.0,
+      "avg_combo": 1.0,
+      "avg_grammar": 0.0
+    }
+  },
+  "experiment_2": {
+    "0.0": {
+      "avg_sr": 1.0,
+      "avg_vocab": 9.0,
+      "avg_combo": 1.0
+    },
+    "0.05": {
+      "avg_sr": 1.0,
+      "avg_vocab": 9.0,
+      "avg_combo": 1.0
+    },
+    "0.1": {
+      "avg_sr": 1.0,
+      "avg_vocab": 9.0,
+      "avg_combo": 1.0
+    },
+    "0.2": {
+      "avg_sr": 1.0,
+      "avg_vocab": 9.0,
+      "avg_combo": 1.0
+    },
+    "0.3": {
+      "avg_sr": 1.0,
+      "avg_vocab": 9.0,
+      "avg_combo": 1.0
+    },
+    "0.5": {
+      "avg_sr": 1.0,
+      "avg_vocab": 9.0,
+      "avg_combo": 1.0
+    },
+    "1.0": {
+      "avg_sr": 1.0,
+      "avg_vocab": 9.0,
+      "avg_combo": 1.0
+    }
+  },
+  "experiment_3": {
+    "no_critical_period": {
+      "before_sr": 1.0,
+      "after_sr": 0.996,
+      "vocab_gain": 30.4
+    },
+    "sigmoid_close": {
+      "before_sr": 1.0,
+      "after_sr": 0.9981,
+      "vocab_gain": 23.6
+    },
+    "step_close": {
+      "before_sr": 1.0,
+      "after_sr": 0.9994,
+      "vocab_gain": 11.0
+    }
+  },
+  "experiment_4": {
+    "phase1_open": {
+      "sr": 1.0,
+      "vocab": 9.0
+    },
+    "phase2_closed": {
+      "sr": 0.997,
+      "vocab": 37.7
+    },
+    "phase3_reopened": {
+      "sr": 0.9945,
+      "vocab": 40.0
+    }
+  }
+}

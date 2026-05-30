@@ -13,6 +13,7 @@ Phase 17: 叙事与篇章涌现实验
 4. 涌现统计：叙事连接词的涌现率
 """
 
+import json
 import numpy as np
 from typing import Dict, List
 from collections import defaultdict
@@ -258,6 +259,30 @@ def main():
     print("2. 时序连接词（'then'）比因果连接词（'because'）更容易涌现")
     print("3. 叙事结构是超越句子的语言扩展")
     print("4. 多事件场景是叙事涌现的必要条件")
+
+    # 保存结果
+    def to_serializable(obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, (np.floating, np.integer)):
+            return float(obj)
+        elif isinstance(obj, dict):
+            return {k: to_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [to_serializable(v) for v in obj]
+        elif isinstance(obj, set):
+            return sorted(list(obj))
+        return obj
+
+    results = {
+        'experiment_1_simple_narrative': r1,
+        'experiment_2_causal_narrative': r2,
+        'experiment_3_multi_event': r3,
+        'experiment_4_stability': r4,
+    }
+    with open('narrative_results.json', 'w', encoding='utf-8') as f:
+        json.dump(to_serializable(results), f, indent=2, ensure_ascii=False)
+    print(f"\n结果已保存到: narrative_results.json")
 
 
 if __name__ == '__main__':

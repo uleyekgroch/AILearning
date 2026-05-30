@@ -1,0 +1,94 @@
+{
+  "experiment_1": {
+    "temperature_emotion": {
+      "avg_success_rate": 0.9936,
+      "avg_vocab": 40.0,
+      "avg_combo": 0.2244,
+      "description": "温度 → 情感（warm person = 友善的）"
+    },
+    "weight_importance": {
+      "avg_success_rate": 0.9868,
+      "avg_vocab": 40.0,
+      "avg_combo": 0.2248,
+      "description": "重量 → 重要性（heavy responsibility = 重要的）"
+    },
+    "brightness_intelligence": {
+      "avg_success_rate": 0.9912,
+      "avg_vocab": 40.0,
+      "avg_combo": 0.2352,
+      "description": "亮度 → 智慧（bright idea = 聪明的）"
+    },
+    "height_power": {
+      "avg_success_rate": 0.9896,
+      "avg_vocab": 40.0,
+      "avg_combo": 0.2276,
+      "description": "高度 → 权力（high status = 有权力的）"
+    },
+    "cleanliness_morality": {
+      "avg_success_rate": 0.9876,
+      "avg_vocab": 40.0,
+      "avg_combo": 0.2392,
+      "description": "质地 → 道德（clean conscience = 无辜的）"
+    }
+  },
+  "experiment_2": {
+    "temperature_emotion": {
+      "avg_score": 0.0,
+      "description": "温度 → 情感（warm person = 友善的）"
+    },
+    "weight_importance": {
+      "avg_score": 0.0,
+      "description": "重量 → 重要性（heavy responsibility = 重要的）"
+    },
+    "brightness_intelligence": {
+      "avg_score": 0.0,
+      "description": "亮度 → 智慧（bright idea = 聪明的）"
+    },
+    "height_power": {
+      "avg_score": 0.0,
+      "description": "高度 → 权力（high status = 有权力的）"
+    },
+    "cleanliness_morality": {
+      "avg_score": 0.0,
+      "description": "质地 → 道德（clean conscience = 无辜的）"
+    }
+  },
+  "experiment_3": {
+    "literal_only": {
+      "avg_sr": 0.996,
+      "avg_vocab": 22.0,
+      "avg_combo": 0.1073,
+      "avg_tri": 0.0
+    },
+    "metaphor_source": {
+      "avg_sr": 0.9947,
+      "avg_vocab": 19.0,
+      "avg_combo": 0.1507,
+      "avg_tri": 0.0
+    },
+    "metaphor_target": {
+      "avg_sr": 0.9933,
+      "avg_vocab": 20.0,
+      "avg_combo": 0.1313,
+      "avg_tri": 0.0
+    },
+    "mixed": {
+      "avg_sr": 0.9967,
+      "avg_vocab": 18.0,
+      "avg_combo": 0.1647,
+      "avg_tri": 0.0007
+    }
+  },
+  "experiment_4": {
+    "forward_source_to_target": {
+      "avg_sr": 0.9968,
+      "avg_vocab": 22.8,
+      "avg_combo": 0.1484
+    },
+    "backward_target_to_source": {
+      "avg_sr": 0.9972,
+      "avg_vocab": 23.0,
+      "avg_combo": 0.1376
+    }
+  }
+}

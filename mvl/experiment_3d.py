@@ -1,5 +1,5 @@
 """
-3D环境对比实验
+3D环境对比实验（已弃用 — 请使用 experiment_3d_physics.py）
 
 比较2D和3D环境的学习效果。
 
@@ -52,7 +52,7 @@ def run_2d_experiment(num_steps: int = 300):
 
         # 学习体行动
         action = agent.act(obs)
-        next_obs, _, done = env.step(action)
+        next_obs = env.step(action)
         error = agent.learn_from_experience(obs, action, next_obs)
 
         # 记录
@@ -60,9 +60,6 @@ def run_2d_experiment(num_steps: int = 300):
         trajectory['prediction_errors'].append(error)
         trajectory['symbols'].append(len(agent.grounding.get_grounded_symbols()))
         trajectory['learning_progress'].append(agent.predictive_model.get_learning_progress())
-
-        if done:
-            env.reset()
 
     return trajectory
 
@@ -84,12 +81,9 @@ def run_3d_experiment(num_steps: int = 300):
     for step in range(num_steps):
         obs = env.get_observation()
 
-        # 教师教学（简化版，因为3D环境的观测格式不同）
-        # 这里可以扩展教师模块以支持3D环境
-
         # 学习体行动
         action = agent.act(obs)
-        next_obs, _, done = env.step(action)
+        next_obs = env.step(action)
         error = agent.learn_from_experience(obs, action, next_obs)
 
         # 记录
@@ -180,10 +174,10 @@ def main():
         }
     }
 
-    with open('D:/mayAi/AILearning_v0527/mvl/2d_vs_3d_comparison.json', 'w') as f:
-        json.dump(output, f, indent=2)
+    with open('D:/mayAi/AILearning_v0527/mvl/3d_comparison_results.json', 'w', encoding='utf-8') as f:
+        json.dump(output, f, indent=2, ensure_ascii=False)
 
-    print("\n结果已保存到: 2d_vs_3d_comparison.json")
+    print("\n结果已保存到: 3d_comparison_results.json")
 
 
 if __name__ == '__main__':

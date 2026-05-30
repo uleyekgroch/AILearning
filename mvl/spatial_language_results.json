@@ -1,0 +1,282 @@
+{
+  "experiment_1": {
+    "final_sr": 0.97,
+    "final_ambiguous_sr": 0.9211,
+    "total_spatial_used": 114,
+    "markers": {
+      "above": {
+        "frequency": 23,
+        "successes": 23,
+        "success_rate": 1.0
+      },
+      "right": {
+        "frequency": 29,
+        "successes": 27,
+        "success_rate": 0.931
+      },
+      "left": {
+        "frequency": 23,
+        "successes": 22,
+        "success_rate": 0.9565
+      },
+      "near": {
+        "frequency": 17,
+        "successes": 11,
+        "success_rate": 0.6471
+      },
+      "below": {
+        "frequency": 22,
+        "successes": 22,
+        "success_rate": 1.0
+      }
+    },
+    "snapshots": [
+      {
+        "round": 50,
+        "success_rate": 0.98,
+        "ambiguous_sr": 0.9583,
+        "spatial_used": 24,
+        "markers": {
+          "above": {
+            "frequency": 8,
+            "successes": 8,
+            "success_rate": 1.0
+          },
+          "right": {
+            "frequency": 3,
+            "successes": 3,
+            "success_rate": 1.0
+          },
+          "left": {
+            "frequency": 6,
+            "successes": 6,
+            "success_rate": 1.0
+          },
+          "near": {
+            "frequency": 4,
+            "successes": 3,
+            "success_rate": 0.75
+          },
+          "below": {
+            "frequency": 3,
+            "successes": 3,
+            "success_rate": 1.0
+          }
+        }
+      },
+      {
+        "round": 100,
+        "success_rate": 0.97,
+        "ambiguous_sr": 0.925,
+        "spatial_used": 40,
+        "markers": {
+          "above": {
+            "frequency": 12,
+            "successes": 12,
+            "success_rate": 1.0
+          },
+          "right": {
+            "frequency": 7,
+            "successes": 7,
+            "success_rate": 1.0
+          },
+          "left": {
+            "frequency": 9,
+            "successes": 9,
+            "success_rate": 1.0
+          },
+          "near": {
+            "frequency": 6,
+            "successes": 3,
+            "success_rate": 0.5
+          },
+          "below": {
+            "frequency": 6,
+            "successes": 6,
+            "success_rate": 1.0
+          }
+        }
+      },
+      {
+        "round": 150,
+        "success_rate": 0.98,
+        "ambiguous_sr": 0.9464,
+        "spatial_used": 56,
+        "markers": {
+          "above": {
+            "frequency": 14,
+            "successes": 14,
+            "success_rate": 1.0
+          },
+          "right": {
+            "frequency": 14,
+            "successes": 14,
+            "success_rate": 1.0
+          },
+          "left": {
+            "frequency": 12,
+            "successes": 12,
+            "success_rate": 1.0
+          },
+          "near": {
+            "frequency": 7,
+            "successes": 4,
+            "success_rate": 0.5714
+          },
+          "below": {
+            "frequency": 9,
+            "successes": 9,
+            "success_rate": 1.0
+          }
+        }
+      },
+      {
+        "round": 200,
+        "success_rate": 0.985,
+        "ambiguous_sr": 0.9605,
+        "spatial_used": 76,
+        "markers": {
+          "above": {
+            "frequency": 20,
+            "successes": 20,
+            "success_rate": 1.0
+          },
+          "right": {
+            "frequency": 16,
+            "successes": 16,
+            "success_rate": 1.0
+          },
+          "left": {
+            "frequency": 17,
+            "successes": 17,
+            "success_rate": 1.0
+          },
+          "near": {
+            "frequency": 9,
+            "successes": 6,
+            "success_rate": 0.6667
+          },
+          "below": {
+            "frequency": 14,
+            "successes": 14,
+            "success_rate": 1.0
+          }
+        }
+      },
+      {
+        "round": 250,
+        "success_rate": 0.98,
+        "ambiguous_sr": 0.9457,
+        "spatial_used": 92,
+        "markers": {
+          "above": {
+            "frequency": 22,
+            "successes": 22,
+            "success_rate": 1.0
+          },
+          "right": {
+            "frequency": 22,
+            "successes": 21,
+            "success_rate": 0.9545
+          },
+          "left": {
+            "frequency": 19,
+            "successes": 19,
+            "success_rate": 1.0
+          },
+          "near": {
+            "frequency": 11,
+            "successes": 7,
+            "success_rate": 0.6364
+          },
+          "below": {
+            "frequency": 18,
+            "successes": 18,
+            "success_rate": 1.0
+          }
+        }
+      },
+      {
+        "round": 300,
+        "success_rate": 0.97,
+        "ambiguous_sr": 0.9211,
+        "spatial_used": 114,
+        "markers": {
+          "above": {
+            "frequency": 23,
+            "successes": 23,
+            "success_rate": 1.0
+          },
+          "right": {
+            "frequency": 29,
+            "successes": 27,
+            "success_rate": 0.931
+          },
+          "left": {
+            "frequency": 23,
+            "successes": 22,
+            "success_rate": 0.9565
+          },
+          "near": {
+            "frequency": 17,
+            "successes": 11,
+            "success_rate": 0.6471
+          },
+          "below": {
+            "frequency": 22,
+            "successes": 22,
+            "success_rate": 1.0
+          }
+        }
+      }
+    ]
+  },
+  "experiment_2": {
+    "spatial_sr": 0.978,
+    "baseline_sr": 0.793,
+    "improvement_pct": 23.33,
+    "spatial_ambiguous_sr": 0.941,
+    "baseline_ambiguous_sr": 0.4841,
+    "ambiguous_improvement_pct": 94.38
+  },
+  "experiment_3": {
+    "allocentric_sr": 0.98,
+    "egocentric_sr": 0.925,
+    "allocentric_used": 85,
+    "egocentric_used": 71,
+    "winner": "allocentric",
+    "ego_markers": {
+      "right": {
+        "freq": 15,
+        "sr": 0.9333
+      },
+      "left": {
+        "freq": 8,
+        "sr": 0.875
+      },
+      "above": {
+        "freq": 43,
+        "sr": 0.6977
+      },
+      "near": {
+        "freq": 5,
+        "sr": 1.0
+      }
+    }
+  },
+  "experiment_4": {
+    "learned_pairs": 171,
+    "inference_tests": 200,
+    "inference_accuracy": 0.24,
+    "inference_coverage": 1.0,
+    "when_inferred_accuracy": 0.24,
+    "chain_game_sr": 0.975,
+    "relation_distribution": {
+      "above": 0.2345,
+      "below": 0.2251,
+      "right": 0.2668,
+      "left": 0.2642,
+      "near": 0.0094
+    }
+  }
+}

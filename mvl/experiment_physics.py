@@ -1,5 +1,5 @@
 """
-物理效果对比实验
+物理效果对比实验（已弃用 — 请使用 experiment_3d_physics.py）
 
 比较简单物理和真实物理的学习效果。
 
@@ -16,7 +16,7 @@ from typing import Dict, List
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-from environment_3d import create_rich_3d_world, GridWorld3D
+from environment_3d import create_rich_3d_world
 from environment_physics import create_rich_physics_world, PhysicsEnvironment
 from agent_3d import LearningAgent3D
 
@@ -39,7 +39,7 @@ def run_simple_physics_experiment(num_steps: int = 300):
 
         # 学习体行动
         action = agent.act(obs)
-        next_obs, _, done = env.step(action)
+        next_obs = env.step(action)
         error = agent.learn_from_experience(obs, action, next_obs)
 
         # 记录
@@ -47,9 +47,6 @@ def run_simple_physics_experiment(num_steps: int = 300):
         trajectory['prediction_errors'].append(error)
         trajectory['symbols'].append(len(agent.grounding.get_grounded_symbols()))
         trajectory['learning_progress'].append(agent.predictive_model.get_learning_progress())
-
-        if done:
-            env.reset()
 
     return trajectory
 
@@ -72,7 +69,7 @@ def run_real_physics_experiment(num_steps: int = 300):
 
         # 学习体行动
         action = agent.act(obs)
-        next_obs, _, done = env.step(action)
+        next_obs = env.step(action)
         error = agent.learn_from_experience(obs, action, next_obs)
 
         # 记录
@@ -80,9 +77,6 @@ def run_real_physics_experiment(num_steps: int = 300):
         trajectory['prediction_errors'].append(error)
         trajectory['symbols'].append(len(agent.grounding.get_grounded_symbols()))
         trajectory['learning_progress'].append(agent.predictive_model.get_learning_progress())
-
-        if done:
-            env.reset()
 
     return trajectory
 

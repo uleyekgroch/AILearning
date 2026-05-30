@@ -1,0 +1,209 @@
+{
+  "experiment_1_vocab_growth": {
+    "correlation": {
+      "pearson_r": 0.9979,
+      "p_value": 0.0
+    },
+    "system_curve_fit": {
+      "best_model": "power_law",
+      "r_squared": 0.7171,
+      "all_models": {
+        "sigmoid": 0.4891,
+        "exponential": 0.3719,
+        "power_law": 0.7171,
+        "linear": 0.3719
+      }
+    },
+    "infant_curve_fit": {
+      "best_model": "power_law",
+      "r_squared": 0.9987,
+      "all_models": {
+        "exponential": 0.9984,
+        "power_law": 0.9987,
+        "linear": 0.8894
+      }
+    },
+    "system_vocab_trajectory": {
+      "rounds": [
+        50,
+        100,
+        150,
+        200,
+        250,
+        300,
+        350,
+        400,
+        450,
+        500,
+        550,
+        600,
+        650,
+        700,
+        750,
+        800,
+        850,
+        900,
+        950,
+        1000
+      ],
+      "avg_vocab": [
+        25.7,
+        32.0,
+        35.3,
+        38.7,
+        39.7,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0
+      ]
+    },
+    "verdict": "PASS"
+  },
+  "experiment_2_prediction_error": {
+    "correlation": {
+      "pearson_r": 0,
+      "p_value": 1.0,
+      "note": "no_overlap"
+    },
+    "growth_curve_fit": {
+      "best_model": "exponential",
+      "r_squared": 0.999,
+      "all_models": {
+        "sigmoid": 0.999,
+        "exponential": 0.999,
+        "power_law": 0.9978,
+        "linear": 0.317
+      }
+    },
+    "habituation_fit": {
+      "best_model": "sigmoid",
+      "r_squared": 0.9988,
+      "all_models": {
+        "sigmoid": 0.9988,
+        "exponential": 0.9988,
+        "power_law": 0.9941,
+        "linear": 0.9099
+      }
+    },
+    "growth_trajectory": {
+      "rounds": [
+        100,
+        150,
+        200,
+        250,
+        300,
+        350,
+        400,
+        450,
+        500,
+        550,
+        600,
+        650,
+        700,
+        750,
+        800,
+        850,
+        900,
+        950,
+        1000
+      ],
+      "growth_rates": [
+        0.2,
+        0.0733,
+        0.0267,
+        0.0133,
+        0.0067,
+        0.0067,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "verdict": "REVIEW"
+  },
+  "experiment_3_grammar_timeline": {
+    "milestones": {
+      "combination_50pct": 50.0,
+      "tri_symbol_10pct": 50.0,
+      "grammar_1_rule": null,
+      "order_consistency_50pct": 50.0
+    },
+    "milestones_equivalent_months": {
+      "combination_50pct": 3.6,
+      "tri_symbol_10pct": 3.6,
+      "grammar_1_rule": null,
+      "order_consistency_50pct": 3.6
+    },
+    "system_order": [
+      "combination_50pct",
+      "tri_symbol_10pct",
+      "order_consistency_50pct"
+    ],
+    "neural_order": [
+      "MMN_phonemic",
+      "N400_semantic",
+      "P600_syntactic",
+      "left_lateralization"
+    ],
+    "verdict": "PASS"
+  },
+  "experiment_4_stage_transitions": {
+    "transitions": {},
+    "order_consistent": true,
+    "verdict": "REVIEW"
+  },
+  "experiment_5_critical_period": {
+    "conditions": {
+      "normal": {
+        "condition": "normal",
+        "success_rate": 0.994,
+        "vocabulary_size": 40.0,
+        "combination_rate": 0.65,
+        "dimensions_covered": 10.0,
+        "num_runs": 5
+      },
+      "delayed": {
+        "condition": "delayed",
+        "success_rate": 0.9933,
+        "vocabulary_size": 39.2,
+        "combination_rate": 0.6887,
+        "dimensions_covered": 10.0,
+        "num_runs": 5
+      },
+      "restricted": {
+        "condition": "restricted",
+        "success_rate": 0.9772,
+        "vocabulary_size": 39.6,
+        "combination_rate": 0.4912,
+        "dimensions_covered": 10.0,
+        "num_runs": 5
+      }
+    },
+    "gap_delayed": 0.0007,
+    "gap_restricted": 0.0168,
+    "has_critical_period_effect": true,
+    "verdict": "PASS"
+  }
+}

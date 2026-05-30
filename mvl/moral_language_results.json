@@ -1,0 +1,279 @@
+{
+  "experiment_1": {
+    "final_marker_count": 3,
+    "marker_frequencies": {
+      "fair": 679,
+      "unfair": 221,
+      "share": 205,
+      "greedy": 0,
+      "kind": 0
+    },
+    "snapshots": [
+      {
+        "round": 50,
+        "markers_in_vocab": 3,
+        "marker_frequencies": {
+          "fair": 109,
+          "unfair": 41,
+          "share": 38,
+          "greedy": 0,
+          "kind": 0
+        },
+        "recent_fairness": 0.7427
+      },
+      {
+        "round": 100,
+        "markers_in_vocab": 3,
+        "marker_frequencies": {
+          "fair": 217,
+          "unfair": 83,
+          "share": 74,
+          "greedy": 0,
+          "kind": 0
+        },
+        "recent_fairness": 0.7427
+      },
+      {
+        "round": 150,
+        "markers_in_vocab": 3,
+        "marker_frequencies": {
+          "fair": 330,
+          "unfair": 120,
+          "share": 110,
+          "greedy": 0,
+          "kind": 0
+        },
+        "recent_fairness": 0.7427
+      },
+      {
+        "round": 200,
+        "markers_in_vocab": 3,
+        "marker_frequencies": {
+          "fair": 445,
+          "unfair": 155,
+          "share": 140,
+          "greedy": 0,
+          "kind": 0
+        },
+        "recent_fairness": 0.7427
+      },
+      {
+        "round": 250,
+        "markers_in_vocab": 3,
+        "marker_frequencies": {
+          "fair": 563,
+          "unfair": 187,
+          "share": 173,
+          "greedy": 0,
+          "kind": 0
+        },
+        "recent_fairness": 0.7427
+      },
+      {
+        "round": 300,
+        "markers_in_vocab": 3,
+        "marker_frequencies": {
+          "fair": 679,
+          "unfair": 221,
+          "share": 205,
+          "greedy": 0,
+          "kind": 0
+        },
+        "recent_fairness": 0.7427
+      }
+    ]
+  },
+  "experiment_2": {
+    "conditions": {
+      "with_moral_language": {
+        "avg_fairness": 0.7584,
+        "cooperation_rate": 0.8183,
+        "runs": [
+          {
+            "avg_fairness": 0.7552,
+            "cooperation_rate": 0.81
+          },
+          {
+            "avg_fairness": 0.761,
+            "cooperation_rate": 0.825
+          },
+          {
+            "avg_fairness": 0.7589,
+            "cooperation_rate": 0.82
+          }
+        ]
+      },
+      "without_moral_language": {
+        "avg_fairness": 0.7149,
+        "cooperation_rate": 0.49,
+        "runs": [
+          {
+            "avg_fairness": 0.7242,
+            "cooperation_rate": 0.53
+          },
+          {
+            "avg_fairness": 0.6975,
+            "cooperation_rate": 0.415
+          },
+          {
+            "avg_fairness": 0.7231,
+            "cooperation_rate": 0.525
+          }
+        ]
+      }
+    },
+    "fairness_improvement": 0.0435,
+    "cooperation_improvement": 0.3283
+  },
+  "experiment_3": {
+    "final_reputations": {
+      "0": 0.95,
+      "1": 0.95,
+      "2": 0.95,
+      "3": 0.95,
+      "4": 0.47
+    },
+    "selfish_reputation": 0.47,
+    "moral_avg_reputation": 0.95,
+    "ostracism_gap": 0.48,
+    "selfish_partner_selection_rate": 0.0,
+    "snapshots": [
+      {
+        "round": 100,
+        "reputations": {
+          "0": 0.95,
+          "1": 0.95,
+          "2": 0.95,
+          "3": 0.95,
+          "4": 0.452
+        },
+        "selfish_reputation": 0.452,
+        "moral_avg_reputation": 0.95,
+        "ostracism_gap": 0.498
+      },
+      {
+        "round": 200,
+        "reputations": {
+          "0": 0.95,
+          "1": 0.95,
+          "2": 0.95,
+          "3": 0.95,
+          "4": 0.461
+        },
+        "selfish_reputation": 0.461,
+        "moral_avg_reputation": 0.95,
+        "ostracism_gap": 0.489
+      },
+      {
+        "round": 300,
+        "reputations": {
+          "0": 0.95,
+          "1": 0.95,
+          "2": 0.95,
+          "3": 0.95,
+          "4": 0.447
+        },
+        "selfish_reputation": 0.447,
+        "moral_avg_reputation": 0.95,
+        "ostracism_gap": 0.503
+      },
+      {
+        "round": 400,
+        "reputations": {
+          "0": 0.95,
+          "1": 0.95,
+          "2": 0.95,
+          "3": 0.95,
+          "4": 0.478
+        },
+        "selfish_reputation": 0.478,
+        "moral_avg_reputation": 0.95,
+        "ostracism_gap": 0.472
+      },
+      {
+        "round": 500,
+        "reputations": {
+          "0": 0.95,
+          "1": 0.95,
+          "2": 0.95,
+          "3": 0.95,
+          "4": 0.47
+        },
+        "selfish_reputation": 0.47,
+        "moral_avg_reputation": 0.95,
+        "ostracism_gap": 0.48
+      }
+    ]
+  },
+  "experiment_4": {
+    "with_moral_language": {
+      "altruist_rep_history": [
+        0.8412,
+        0.8943,
+        0.8154,
+        0.8939,
+        0.9221,
+        0.8918,
+        0.8334,
+        0.9042
+      ],
+      "non_altruist_rep_history": [
+        0.9108,
+        0.9109,
+        0.9109,
+        0.9109,
+        0.9109,
+        0.9109,
+        0.9109,
+        0.9109
+      ],
+      "signal_amplification": [
+        -0.0696,
+        -0.0167,
+        -0.0955,
+        -0.017,
+        0.0112,
+        -0.0192,
+        -0.0775,
+        -0.0067
+      ],
+      "final_altruist_rep": 0.9042,
+      "final_non_altruist_rep": 0.9109
+    },
+    "without_moral_language": {
+      "altruist_rep_history": [
+        0.8915,
+        0.8846,
+        0.8215,
+        0.8213,
+        0.8469,
+        0.855,
+        0.822,
+        0.8806
+      ],
+      "non_altruist_rep_history": [
+        0.9109,
+        0.9109,
+        0.9109,
+        0.9109,
+        0.9109,
+        0.9109,
+        0.9109,
+        0.9109
+      ],
+      "signal_amplification": [
+        -0.0194,
+        -0.0263,
+        -0.0894,
+        -0.0896,
+        -0.0641,
+        -0.0559,
+        -0.0889,
+        -0.0303
+      ],
+      "final_altruist_rep": 0.8806,
+      "final_non_altruist_rep": 0.9109
+    },
+    "signal_amplification_diff": 0.0216
+  }
+}

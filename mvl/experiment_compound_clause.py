@@ -17,6 +17,7 @@ Phase 16a: 从句在多值特征系统中涌现实验
 4. 多次运行验证稳定性
 """
 
+import json
 import numpy as np
 from typing import Dict, List
 from collections import defaultdict
@@ -304,6 +305,31 @@ def main():
     print("2. 在无约束条件下，2符号组合总是比3符号从句更高效")
     print("3. 从句需要时间压力（max_len约束）才能成为最优策略")
     print("4. 下一步：Phase 16b 时间压力实验")
+
+    # 保存结果
+    def to_serializable(obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, (np.floating, np.integer)):
+            return float(obj)
+        elif isinstance(obj, dict):
+            return {k: to_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [to_serializable(v) for v in obj]
+        elif isinstance(obj, set):
+            return sorted(list(obj))
+        return obj
+
+    results = {
+        'experiment_1_simple_clause': r1,
+        'experiment_2_emergence': r2,
+        'experiment_3_complexity_levels': r3,
+        'experiment_4_multiple_runs': r4,
+        'experiment_5_forced_clause': r5,
+    }
+    with open('compound_clause_results.json', 'w', encoding='utf-8') as f:
+        json.dump(to_serializable(results), f, indent=2, ensure_ascii=False)
+    print(f"\n结果已保存到: compound_clause_results.json")
 
 
 if __name__ == '__main__':

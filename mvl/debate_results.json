@@ -1,0 +1,276 @@
+{
+  "experiment_1": {
+    "final_convergence": 0.882,
+    "final_accuracy": 0.24,
+    "marker_emergence_rounds": {
+      "so": 13,
+      "wrong": 7,
+      "because": 1,
+      "but": 16
+    },
+    "final_marker_distribution": {
+      "so": 0.261,
+      "wrong": 0.175,
+      "because": 0.357,
+      "but": 0.207
+    },
+    "snapshots": [
+      {
+        "round": 50,
+        "convergence": 0.872,
+        "accuracy": 0.36,
+        "markers": {
+          "so": 0.11,
+          "wrong": 0.162,
+          "because": 0.574,
+          "but": 0.154
+        }
+      },
+      {
+        "round": 100,
+        "convergence": 0.884,
+        "accuracy": 0.22,
+        "markers": {
+          "so": 0.166,
+          "wrong": 0.169,
+          "because": 0.501,
+          "but": 0.164
+        }
+      },
+      {
+        "round": 150,
+        "convergence": 0.883,
+        "accuracy": 0.22,
+        "markers": {
+          "so": 0.222,
+          "wrong": 0.146,
+          "because": 0.443,
+          "but": 0.188
+        }
+      },
+      {
+        "round": 200,
+        "convergence": 0.887,
+        "accuracy": 0.44,
+        "markers": {
+          "so": 0.238,
+          "wrong": 0.16,
+          "because": 0.4,
+          "but": 0.202
+        }
+      },
+      {
+        "round": 250,
+        "convergence": 0.896,
+        "accuracy": 0.28,
+        "markers": {
+          "so": 0.25,
+          "wrong": 0.172,
+          "because": 0.372,
+          "but": 0.205
+        }
+      },
+      {
+        "round": 300,
+        "convergence": 0.882,
+        "accuracy": 0.24,
+        "markers": {
+          "so": 0.261,
+          "wrong": 0.175,
+          "because": 0.357,
+          "but": 0.207
+        }
+      }
+    ]
+  },
+  "experiment_2": {
+    "structured_avg_convergence": 0.883,
+    "structured_avg_accuracy": 0.316,
+    "forceful_avg_convergence": 0.858,
+    "forceful_avg_accuracy": 0.347,
+    "convergence_advantage": 0.025,
+    "accuracy_advantage": -0.03,
+    "per_run": {
+      "structured": [
+        {
+          "convergence": 0.8815262621108857,
+          "accuracy": 0.355
+        },
+        {
+          "convergence": 0.8858532011800904,
+          "accuracy": 0.2975
+        },
+        {
+          "convergence": 0.8841904409197393,
+          "accuracy": 0.28
+        },
+        {
+          "convergence": 0.8837005440424237,
+          "accuracy": 0.325
+        },
+        {
+          "convergence": 0.8785053734122863,
+          "accuracy": 0.325
+        }
+      ],
+      "forceful": [
+        {
+          "convergence": 0.8579944989346674,
+          "accuracy": 0.3575
+        },
+        {
+          "convergence": 0.8519418924335244,
+          "accuracy": 0.3375
+        },
+        {
+          "convergence": 0.8549349393001723,
+          "accuracy": 0.3075
+        },
+        {
+          "convergence": 0.8647048463038552,
+          "accuracy": 0.3625
+        },
+        {
+          "convergence": 0.8580670336129824,
+          "accuracy": 0.37
+        }
+      ]
+    }
+  },
+  "experiment_3": {
+    "early_complexity": 2.15,
+    "late_complexity": 3.63,
+    "complexity_growth": 1.48,
+    "final_level_distribution": {
+      "level_2": 0.02,
+      "level_3": 0.73,
+      "level_4": 0.25
+    },
+    "snapshots": [
+      {
+        "round": 100,
+        "avg_complexity": 2.42,
+        "max_complexity": 4.0,
+        "level_distribution": {
+          "level_1": 0.18,
+          "level_2": 0.58,
+          "level_3": 0.23,
+          "level_4": 0.01
+        },
+        "marker_stats": {
+          "so": 0.212,
+          "wrong": 0.139,
+          "because": 0.495,
+          "but": 0.155
+        }
+      },
+      {
+        "round": 200,
+        "avg_complexity": 3.29,
+        "max_complexity": 4.0,
+        "level_distribution": {
+          "level_2": 0.11,
+          "level_3": 0.84,
+          "level_4": 0.05
+        },
+        "marker_stats": {
+          "so": 0.258,
+          "wrong": 0.156,
+          "because": 0.392,
+          "but": 0.193
+        }
+      },
+      {
+        "round": 300,
+        "avg_complexity": 3.49,
+        "max_complexity": 4.0,
+        "level_distribution": {
+          "level_3": 0.87,
+          "level_4": 0.13
+        },
+        "marker_stats": {
+          "so": 0.273,
+          "wrong": 0.163,
+          "because": 0.356,
+          "but": 0.208
+        }
+      },
+      {
+        "round": 400,
+        "avg_complexity": 3.55,
+        "max_complexity": 4.0,
+        "level_distribution": {
+          "level_2": 0.01,
+          "level_3": 0.83,
+          "level_4": 0.16
+        },
+        "marker_stats": {
+          "so": 0.279,
+          "wrong": 0.173,
+          "because": 0.337,
+          "but": 0.211
+        }
+      },
+      {
+        "round": 500,
+        "avg_complexity": 3.59,
+        "max_complexity": 4.0,
+        "level_distribution": {
+          "level_2": 0.02,
+          "level_3": 0.73,
+          "level_4": 0.25
+        },
+        "marker_stats": {
+          "so": 0.283,
+          "wrong": 0.181,
+          "because": 0.327,
+          "but": 0.208
+        }
+      }
+    ]
+  },
+  "experiment_4": {
+    "num_agents": 5,
+    "final_consensus": 0.726,
+    "final_accuracy": 0.288,
+    "consensus_round": 2,
+    "agent_marker_summary": {
+      "because": 0.386,
+      "but": 0.16,
+      "so": 0.261,
+      "wrong": 0.193
+    },
+    "snapshots": [
+      {
+        "round": 50,
+        "consensus": 0.764,
+        "accuracy": 0.312
+      },
+      {
+        "round": 100,
+        "consensus": 0.757,
+        "accuracy": 0.344
+      },
+      {
+        "round": 150,
+        "consensus": 0.751,
+        "accuracy": 0.276
+      },
+      {
+        "round": 200,
+        "consensus": 0.724,
+        "accuracy": 0.296
+      },
+      {
+        "round": 250,
+        "consensus": 0.717,
+        "accuracy": 0.312
+      },
+      {
+        "round": 300,
+        "consensus": 0.726,
+        "accuracy": 0.288
+      }
+    ]
+  }
+}

@@ -1,0 +1,142 @@
+{
+  "exp1": {
+    "influence_rate": 0.45,
+    "vocab_size": 16,
+    "training_sr": 0.915
+  },
+  "exp2": {
+    "early_advantage": -1.1102230246251565e-16,
+    "late_advantage": -0.016666666666666607,
+    "transfer_curve": [
+      {
+        "round": 20,
+        "success_rate": 0.95,
+        "avg_symbols": 1.7
+      },
+      {
+        "round": 40,
+        "success_rate": 0.85,
+        "avg_symbols": 1.75
+      },
+      {
+        "round": 60,
+        "success_rate": 0.8,
+        "avg_symbols": 1.8
+      },
+      {
+        "round": 80,
+        "success_rate": 0.75,
+        "avg_symbols": 1.95
+      },
+      {
+        "round": 100,
+        "success_rate": 1.0,
+        "avg_symbols": 1.9
+      },
+      {
+        "round": 120,
+        "success_rate": 0.95,
+        "avg_symbols": 1.9
+      },
+      {
+        "round": 140,
+        "success_rate": 0.7,
+        "avg_symbols": 1.95
+      },
+      {
+        "round": 160,
+        "success_rate": 0.9,
+        "avg_symbols": 1.75
+      },
+      {
+        "round": 180,
+        "success_rate": 0.95,
+        "avg_symbols": 1.95
+      },
+      {
+        "round": 200,
+        "success_rate": 0.95,
+        "avg_symbols": 1.8
+      }
+    ],
+    "baseline_curve": [
+      {
+        "round": 20,
+        "success_rate": 1.0,
+        "avg_symbols": 1.85
+      },
+      {
+        "round": 40,
+        "success_rate": 0.85,
+        "avg_symbols": 1.9
+      },
+      {
+        "round": 60,
+        "success_rate": 0.75,
+        "avg_symbols": 1.8
+      },
+      {
+        "round": 80,
+        "success_rate": 0.95,
+        "avg_symbols": 1.8
+      },
+      {
+        "round": 100,
+        "success_rate": 0.9,
+        "avg_symbols": 1.95
+      },
+      {
+        "round": 120,
+        "success_rate": 0.8,
+        "avg_symbols": 1.95
+      },
+      {
+        "round": 140,
+        "success_rate": 0.95,
+        "avg_symbols": 1.9
+      },
+      {
+        "round": 160,
+        "success_rate": 0.95,
+        "avg_symbols": 1.8
+      },
+      {
+        "round": 180,
+        "success_rate": 0.95,
+        "avg_symbols": 1.7
+      },
+      {
+        "round": 200,
+        "success_rate": 0.95,
+        "avg_symbols": 2.1
+      }
+    ],
+    "vocab_size": 15
+  },
+  "exp3": {
+    "4": {
+      "success_rate": 0.94,
+      "vocab_size": 15,
+      "coverage": 0.7058823529411765,
+      "avg_desc_length": 1.2
+    },
+    "8": {
+      "success_rate": 0.92,
+      "vocab_size": 15,
+      "coverage": 0.6666666666666666,
+      "avg_desc_length": 1.5
+    },
+    "12": {
+      "success_rate": 0.875,
+      "vocab_size": 15,
+      "coverage": 0.6842105263157895,
+      "avg_desc_length": 1.76
+    },
+    "16": {
+      "success_rate": 0.86,
+      "vocab_size": 15,
+      "coverage": 0.6818181818181818,
+      "avg_desc_length": 2.12
+    }
+  }
+}
