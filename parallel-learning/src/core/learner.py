@@ -518,13 +518,12 @@ class Learner:
 
         # ===== 新增：因果DAG学习 =====
         try:
-            causal_dag = self._registry.get('causal_dag')
-            # 使用预测误差作为因果信号
+            # 使用统一的causal_engine（避免双轨初始化）
             if error > 0.5:  # 高误差表示意外
                 obs_state = f"state_{self._total_steps % 100}"
                 next_state = f"state_{(self._total_steps + 1) % 100}"
-                causal_dag.observe({obs_state: error, next_state: 0.0})
-        except (KeyError, Exception):
+                self.causal_engine.observe({obs_state: error, next_state: 0.0})
+        except Exception:
             pass
 
         # ===== 新增：反思学习（每10步反思一次）=====
@@ -1269,16 +1268,40 @@ class Learner:
                 grounding_strength = 1.0 if verification['passed'] else 0.3
                 self.symbol_grounding.ground_symbol(symbol, env_state, grounding_strength)
 
-        # 22. 认知预测路由：区分低级和高级误差
-        low_error = 0.0 if verification['passed'] else 1.0
-        high_error = 0.0 if verification['passed'] else 0.8
+        # 22. 认知预测路由：使用真实的预测误差值
+        # 低级误差：从预测编码引擎获取连续值
+        if hasattr(self, '_error_history') and self._error_history:
+            recent_errors = list(self._error_history)[-5:]
+            low_error = sum(recent_errors) / len(recent_errors)
+        else:
+            low_error = 0.0 if verification['passed'] else 0.8
+
+        # 高级误差：基于验证分数的连续值
+        high_error = 1.0 - score  # score越高，误差越低
+
         routing = self.cognitive_router.route_error(low_error, high_error)
 
-        # 23. GHL全局调制：计算全局信号
-        reward = 1.0 if verification['passed'] else -0.5
+        # 23. GHL全局调制：计算全局信号并执行Hebbian更新
+        reward = score * 2.0 - 1.0  # 映射到[-1, 1]
         novelty = self.predictive_coding_light.get_novelty_score()
         uncertainty = self._metacognition.get('uncertainty_map', {}).get(text[:30], 0.5)
         global_signal = self.ghl_learning.compute_global_signal(reward, novelty, uncertainty)
+
+        # GHL Hebbian更新：用全局信号调制局部学习
+        if len(entities) >= 2:
+            for i, entity_a in enumerate(entities):
+                for entity_b in entities[i+1:]:
+                    emb_a = self._encode_text(entity_a)
+                    emb_b = self._encode_text(entity_b)
+                    delta = self.ghl_learning.hebbian_update(emb_a, emb_b, global_signal)
+                    # 将delta应用到知识图谱中的嵌入
+                    if entity_a in self.knowledge.entities:
+                        old_emb = self.knowledge.entities[entity_a].embedding
+                        if old_emb is not None:
+                            new_emb = old_emb + delta.mean(dim=0)[:old_emb.shape[0]]
+                            self.knowledge.entities[entity_a].embedding = torch.nn.functional.normalize(
+                                new_emb.unsqueeze(0), p=2, dim=1
+                            ).squeeze(0)
 
         # 24. 学习进展好奇心：更新领域进展
         domain = text[:10]  # 用文本前10字作为领域标识

@@ -116,6 +116,7 @@ class SelfImprovementSystem:
         # 性能稳定但低 → 调整权重
         if score < 0.5 and abs(trend) < 0.05:
             should_adjust_weights = True
+            self.improvement_stats['weight_updates'] += 1
 
         # 性能高 → 强化当前策略
         if score > 0.8 and trend >= 0:
