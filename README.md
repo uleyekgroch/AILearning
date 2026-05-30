@@ -10,6 +10,38 @@
 
 学习的本质是**预测误差最小化**（自由能原理）。语言从交流压力中自发涌现，符号接地不限于视觉——所有感知模态都能接地。
 
+## 并行学习系统（新）
+
+基于5层架构的AI学习系统，从语料中真正学习知识：
+
+```
+parallel-learning/
+├── training/
+│   ├── layers/
+│   │   ├── semantic.py      # 语义理解
+│   │   ├── causal.py        # 因果推理
+│   │   ├── abstraction.py   # 概念抽象
+│   │   ├── numerical.py     # 数值理解
+│   │   ├── analogical.py    # 类比推理
+│   │   ├── world_model.py   # 世界模型
+│   │   └── metacognition.py # 元认知
+│   ├── integrated_ai.py     # 整合系统
+│   └── cuda_fast_learning.py # CUDA加速学习
+└── src/
+    └── core/
+        └── learner.py       # 主学习体（已集成新层）
+```
+
+### 测试结果
+
+| 问题 | 答案 |
+|------|------|
+| 什么是人工智能 | 计算机科学的一个分支 |
+| 牛顿发现了什么 | 万有引力定律 |
+| 为什么地面湿了 | 下雨 → 地面湿了 |
+| 水在多少度沸腾 | 100.0摄氏度 |
+| 水流像什么 | 水流 像 电流 |
+
 ### 涌现的符号系统
 
 | 类别 | 符号 | 涌现条件 |
@@ -68,7 +100,71 @@ mvl/
 ├── 跨语言翻译模块
 │   └── language_translator.py        # 双语 Agent + 跨环境翻译
 │
-└── 实验模块（26 个 experiment_*.py）
+├── 自主学习模块
+│   └── self_directed_learning.py     # 知识评估 + 目标选择 + 自主学习
+│
+├── 课程学习模块
+│   └── curriculum_learning.py        # 歧义度控制 + 渐进课程 + 自主节奏
+│
+├── 神经科学验证模块
+│   └── neuroscience_validation.py    # 文献数据 + 曲线拟合 + 关键期测试
+│
+├── 开放式学习模块
+│   └── open_ended_learning.py        # 内驱力探索 + 结构发现
+│
+├── 累积文化创新模块
+│   └── cultural_innovation.py        # 棘轮效应 + 代际传承 + 创新涌现
+│
+├── 具身隐喻模块
+│   └── embodied_metaphor.py          # 跨域映射涌现 + 隐喻接地测试
+│
+├── 关键期模块
+│   └── critical_period.py            # 可塑性衰减 + 关键期关闭 + 重新打开
+│
+├── 预测编码模块
+│   └── experiment_predictive_coding.py  # Hebbian vs 反向传播对比 + 局部性验证
+│
+├── 类比隐喻模块
+│   └── analogy_metaphor.py             # 结构映射检测 + 情感空间 + 具身隐喻
+│
+├── 认知扩展模块
+│   ├── experiment_counterfactual.py    # 反事实推理（if/then/would）
+│   ├── experiment_cooperative_planning.py # 协作规划（角色 + 顺序标记）
+│   ├── experiment_continuous_concepts.py  # 连续概念空间（模糊类别）
+│   ├── experiment_language_memory.py     # 语言驱动记忆（记忆支架）
+│   ├── experiment_language_attention.py  # 语言引导注意力（感知调制）
+│   ├── experiment_adversarial.py         # 对抗性通信（欺骗 + 信任）
+│   ├── experiment_hierarchical_syntax.py # 层级语法（词序 + 递归嵌入）
+│
+├── 量化与空间模块
+│   ├── experiment_quantitative_language.py  # 量化语言（数字 + 计数 + 多/少）
+│   └── experiment_spatial_language.py       # 空间关系语言（介词涌现）
+│
+├── 好奇心与规范模块
+│   ├── experiment_curiosity_question.py     # 好奇心提问（why/what/how 涌现）
+│   └── experiment_social_norms.py           # 社会规范语言（礼貌 + 禁忌）
+│
+├── 适应与辩论模块
+│   ├── experiment_nonstationary.py          # 非平稳环境适应（词汇淘汰 + 新词涌现）
+│   └── experiment_debate.py                 # 辩论与说服（论证标记涌现）
+│
+├── 道德与游戏模块
+│   ├── experiment_moral_language.py         # 道德语言涌现（公平 + 利他信号）
+│   └── experiment_humor_play.py             # 幽默与游戏（非工具性通信）
+│
+├── 对话与认知模块
+│   ├── experiment_conversational_repair.py  # 对话修复（huh/again/different 澄清标记）
+│   ├── experiment_sleep_consolidation.py    # 睡眠式记忆巩固（离线重播 + 遗忘曲线）
+│   ├── experiment_politeness.py             # 礼貌与面子语言（please/sorry 社交距离）
+│   └── experiment_empathy.py                # 共情与视角采择（happy/sad 情感标记）
+│
+├── 社会与文化模块
+│   ├── experiment_ownership.py              # 所有权与财产（mine/yours/share 涌现）
+│   ├── experiment_negotiation.py            # 谈判与讨价还价（fair/deal/compromise）
+│   ├── experiment_dialect.py                # 方言分化与语言接触（pidgin → creole）
+│   └── experiment_cryptolect.py             # 秘密语言（群体内部密码词汇）
+
+└── 实验模块（46 个 experiment_*.py）
 ```
 
 ## 快速开始
@@ -136,6 +232,33 @@ python experiment_tool_use.py
 | 48 | 流体与软体物理（SPH 粒子 + 弹簧-质点）| ✅ |
 | 49 | 超大规模社会（2000-5000 Agent）| ✅ |
 | 50 | 跨语言迁移（不同环境的语言互译）| ✅ |
+| 51 | 自主目标设定（Agent 自己决定学什么）| ✅ |
+| 52 | 课程涌现（歧义度驱动的难度阶梯）| ✅ |
+| 53 | 神经科学验证（与真实婴儿脑成像数据对比）| ✅ |
+| 54 | 主动推理验证（Expected Free Energy 动作选择）| ✅ |
+| 55 | 同伴互学（对称知识交换）| ✅ |
+| 56 | 开放式学习（纯内驱力探索）| ✅ |
+| 57 | 累积文化创新（踩在巨人肩膀上）| ✅ |
+| 58 | 具身隐喻接地（Lakoff 跨域映射测试）| ✅ |
+| 59 | 关键期关闭机制（突触可塑性衰减）| ✅ |
+| 60 | 理论-代码一致性修正（Hebbian 预测编码替换反向传播）| ✅ |
+| 61 | 类比推理驱动的隐喻涌现（结构映射 + 情感空间）| ✅ |
+| 62 | 多模态身体经验接地（物理感觉→情感→抽象概念）| ✅ |
+| 63 | 反事实推理（if/then/would 标记涌现）| ✅ |
+| 64 | 多 Agent 协作规划（角色标记 + 顺序指令）| ✅ |
+| 65 | 连续概念空间（模糊类别 + online k-means）| ✅ |
+| 66 | 语言驱动记忆（语言作为记忆支架）| ✅ |
+| 67 | 语言引导注意力（自上而下感知调制）| ✅ |
+| 68 | 对抗性通信与欺骗（信任校准 + 声誉系统）| ✅ |
+| 69 | 层级语法（词序承载语义角色 + 递归嵌入）| ✅ |
+| 70 | 量化语言（数字 + 计数 + more/less 涌现）| ✅ |
+| 71 | 空间关系语言（介词 left/right/above/below 涌现）| ✅ |
+| 72 | 好奇心驱动的提问（why/what/how 涌现）| ✅ |
+| 73 | 社会规范语言（礼貌 + 禁忌 + should/please 涌现）| ✅ |
+| 74 | 非平稳环境适应（词汇淘汰 + 新词涌现 + 记忆保留）| ✅ |
+| 75 | 多 Agent 辩论与说服（论证标记 because/but/so 涌现）| ✅ |
+| 76 | 道德语言涌现（公平 + 利他信号 + 声誉系统）| ✅ |
+| 77 | 幽默与游戏语言（非工具性通信 + 社交凝聚）| ✅ |
 
 ## 关键论文
 
