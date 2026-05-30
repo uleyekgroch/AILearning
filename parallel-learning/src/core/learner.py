@@ -1421,6 +1421,33 @@ class Learner:
             prediction_error=temporal_result.get('prediction_error', 0.0),
         )
 
+        # 37. 语言发展阶段：注册概念和关系
+        for entity in entities:
+            self.language_development.register_concept(entity)
+        for item in triples:
+            if len(item) >= 3:
+                self.language_development.register_relation(item[0], item[1], item[2])
+        # 检查阶段晋升
+        self.language_development.check_stage_transition()
+
+        # 38. 具身符号接地：从文本中提取感知特征并绑定实体
+        grounded = self.embodied_grounding.ground_from_text(text, entities)
+
+        # 39. 社会反馈：处理验证反馈
+        if verification['passed']:
+            self.social_feedback.process_feedback(
+                learner_output=text[:50],
+                expected_output=text[:50],
+            )
+
+        # 40. 知识蒸馏：积累三元组到领域
+        for item in triples:
+            if len(item) >= 3:
+                self.knowledge_distillation.accumulate(
+                    domain=source,
+                    triple=(item[0], item[1], item[2]),
+                )
+
         return result
 
     def _verify_learned_knowledge(self, text: str, entities: List[str],
@@ -2107,6 +2134,46 @@ class Learner:
                 device=str(self.device),
             )
         return self._attn_gate
+
+    # ===== 机制24-27: 语言发展+具身接地+社会反馈+知识蒸馏 =====
+
+    @property
+    def language_development(self):
+        """语言发展阶段系统（懒初始化）"""
+        if not hasattr(self, '_lang_dev'):
+            from src.learning.language_development import LanguageDevelopmentSystem
+            self._lang_dev = LanguageDevelopmentSystem(
+                d_model=self.config.obs_dim,
+                device=str(self.device),
+            )
+        return self._lang_dev
+
+    @property
+    def embodied_grounding(self):
+        """具身符号接地系统（懒初始化）"""
+        if not hasattr(self, '_embodied'):
+            from src.learning.embodied_grounding import EmbodiedGroundingSystem
+            self._embodied = EmbodiedGroundingSystem(
+                d_model=self.config.obs_dim,
+                device=str(self.device),
+            )
+        return self._embodied
+
+    @property
+    def social_feedback(self):
+        """社会反馈学习系统（懒初始化）"""
+        if not hasattr(self, '_social_fb'):
+            from src.learning.social_distillation import SocialFeedbackSystem
+            self._social_fb = SocialFeedbackSystem()
+        return self._social_fb
+
+    @property
+    def knowledge_distillation(self):
+        """知识蒸馏系统（懒初始化）"""
+        if not hasattr(self, '_distill'):
+            from src.learning.social_distillation import KnowledgeDistillationSystem
+            self._distill = KnowledgeDistillationSystem()
+        return self._distill
 
     def _subword_tokenize(self, text: str) -> List[str]:
         """子词分词 — 捕获有意义的片段
