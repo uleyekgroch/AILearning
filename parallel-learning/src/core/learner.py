@@ -2369,7 +2369,7 @@ class Learner:
         return triple_str
 
     def _think_legacy(self, question: str) -> str:
-        """原有推理逻辑（回退）"""
+        """原有推理逻辑（回退） — 增强版：双路径检索"""
         import re
 
         # 1. 编码问题为向量
@@ -2377,6 +2377,34 @@ class Learner:
 
         # 2. 用向量相似度检索相关实体
         similar_entities = self._find_similar_entities(question_repr, top_k=10)
+
+        # 2b. 互补学习双路径检索：先查语义(皮层)，再查情节(海马体)
+        cls_results = self.complementary_learning.retrieve(question_repr, top_k=5)
+        for content, score, source in cls_results:
+            if source == 'semantic' and score > 0.3:
+                # 语义记忆提供概念级匹配
+                concept = content
+                if not any(eid == concept for eid, _ in similar_entities):
+                    similar_entities.append((concept, score))
+
+        # 2c. 树突计算消歧义：如果实体有多个上下文，选择最匹配的
+        keywords = self._extract_keywords(question)
+        if len(similar_entities) > 0:
+            disambiguated = []
+            for eid, sim in similar_entities[:5]:
+                if eid in self.knowledge.entities:
+                    entity = self.knowledge.entities[eid]
+                    if hasattr(entity, 'embedding') and entity.embedding is not None:
+                        # 用问题上下文消歧义
+                        best_ctx, ctx_repr = self.dendritic_system.disambiguate(
+                            eid, entity.embedding,
+                            [(question[:20], question_repr)]
+                        )
+                        disambiguated.append((eid, sim))
+                else:
+                    disambiguated.append((eid, sim))
+            if disambiguated:
+                similar_entities[:len(disambiguated)] = disambiguated
 
         # 3. 提取关键词
         keywords = self._extract_keywords(question)
@@ -2391,6 +2419,15 @@ class Learner:
 
         # 5. 从相似实体出发推理
         results = self._reason_from_entities(similar_entities, keywords, question)
+
+        # 5b. 补充互补学习的情节记忆细节
+        for content, score, source in cls_results:
+            if source == 'episodic' and score > 0.2:
+                results.append({
+                    'type': 'episodic_memory',
+                    'content': content,
+                    'confidence': score * 0.8,
+                })
 
         # 6. 按置信度排序
         results.sort(key=lambda x: x.get('confidence', 0), reverse=True)
