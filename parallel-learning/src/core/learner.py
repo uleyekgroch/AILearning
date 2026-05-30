@@ -976,6 +976,11 @@ class Learner:
         entities = self._extract_entities_from_repr(text, text_repr)
         result['entities'] = entities
 
+        # 2b. BTSP：标记实体为可学习（资格痕迹）
+        for entity in entities:
+            entity_repr = self._encode_text(entity)
+            self.btsp_learning.mark_eligible(entity, entity_repr)
+
         # 3. 从表示中提取关系
         triples = self._extract_relations_from_repr(text, entities, text_repr)
         result['triples'] = triples
@@ -1173,8 +1178,22 @@ class Learner:
         self._learning_stats['total_learned'] += 1
         if verification['passed']:
             self._learning_stats['verified'] += 1
+            # BTSP：验证通过时触发平台电位（一次性强化所有带标记的连接）
+            updated_embeddings = self.btsp_learning.trigger_plateau(
+                trigger_strength=1.0,
+                reason=f'verified: {text[:30]}'
+            )
+            # 更新知识图谱中的实体嵌入
+            for entity, new_emb in updated_embeddings.items():
+                if entity in self.knowledge.entities:
+                    self.knowledge.entities[entity].embedding = new_emb
         else:
             self._learning_stats['failed'] += 1
+            # BTSP：验证失败时也触发，但强度较低
+            self.btsp_learning.trigger_plateau(
+                trigger_strength=0.3,
+                reason=f'failed: {text[:30]}'
+            )
 
         # 12. 自改进：评估性能并调整策略（参数通过get_parameter动态获取）
         score = verification.get('score', 0.5)
@@ -1496,6 +1515,14 @@ class Learner:
                 device=str(self.device),
             )
         return self._world_model
+
+    @property
+    def btsp_learning(self):
+        """BTSP启发的单次学习系统（懒初始化）"""
+        if not hasattr(self, '_btsp'):
+            from src.learning.btsp_learning import BTSPLearningSystem
+            self._btsp = BTSPLearningSystem(decay_time=5.0)
+        return self._btsp
 
     def perceive_objects(self, text: str) -> Dict:
         """感知文本中的对象和关系"""
