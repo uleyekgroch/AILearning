@@ -79,6 +79,7 @@ class ObjectDetector(nn.Module):
             检测到的对象列表
         """
         objects = []
+        obs = obs.to(self.object_queries.device)
 
         for i in range(self.max_objects):
             # 计算查询与观测的相似度

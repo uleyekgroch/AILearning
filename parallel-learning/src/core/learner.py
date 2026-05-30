@@ -527,6 +527,42 @@ class Learner:
         except (KeyError, Exception):
             pass
 
+        # ===== 新增：对象中心世界模型学习 =====
+        try:
+            # 感知对象
+            perception = self.world_model.perceive(obs)
+            objects = perception['objects']
+            # 更新对象状态
+            for obj in objects:
+                if obj.id in self.world_model.objects:
+                    # 预测下一状态
+                    predicted_state = self.world_model.state_predictor(obj)
+                    # 与实际观测比较
+                    prediction_error = torch.cosine_similarity(
+                        predicted_state.unsqueeze(0), next_obs.unsqueeze(0)
+                    ).item()
+                    # 如果预测误差高，更新对象属性
+                    if prediction_error < 0.5:
+                        obj.attributes['prediction_error'] = prediction_error
+        except Exception:
+            pass
+
+        # ===== 新增：反思学习（每10步反思一次）=====
+        if self._total_steps % 10 == 0 and self._total_steps > 0:
+            try:
+                insights = self.reflective_learning.reflect()
+                for insight in insights:
+                    if insight.category == 'strategy':
+                        # 应用策略洞见
+                        if '降低难度' in insight.insight:
+                            old = self.self_improvement.tunable_params['negative_threshold']
+                            self.self_improvement.tunable_params['negative_threshold'] = max(0.2, old - 0.05)
+                        elif '增加难度' in insight.insight:
+                            old = self.self_improvement.tunable_params['negative_threshold']
+                            self.self_improvement.tunable_params['negative_threshold'] = min(0.8, old + 0.05)
+            except Exception:
+                pass
+
         self._error_history.append(error)
         self._total_steps += 1
         return error
@@ -536,13 +572,13 @@ class Learner:
     # ------------------------------------------------------------------
 
     def choose_action(self, obs: torch.Tensor) -> int:
-        """好奇心驱动探索 + Empowerment + 世界模拟规划
+        """统一决策框架：反应式 + 预测式 + 探索
 
-        结合：
-        1. Empowerment驱动（控制力最大化）
-        2. 好奇心驱动（探索未知）
-        3. 世界模拟（预测后果）
-        4. 批量预测（选择最佳）
+        不再是互斥分支，而是融合：
+        1. 批量预测：每个动作的预期奖励
+        2. 世界模拟器：长期规划调整
+        3. Empowerment + 好奇心：探索权重
+        4. 统一评分：选择综合得分最高的动作
         """
         curiosity = self.engine.get_curiosity(obs)
         n_actions = self.config.action_dim
@@ -552,32 +588,38 @@ class Learner:
         empowerment = exploration['empowerment']
         exploration_bonus = exploration['bonus']
 
-        # 尝试使用世界模拟器规划
+        # 1. 批量预测：每个动作的预期奖励
+        action_vecs = torch.eye(n_actions, device=obs.device)
+        obs_batch = obs.unsqueeze(0).expand(n_actions, -1)
+        preds = self.engine.predict_batch(obs_batch, action_vecs)
+        base_scores = preds[:, 0]  # 第一维代表奖励信号
+
+        # 2. 世界模拟器调整（如果可用）
+        simulator_bonus = torch.zeros(n_actions, device=obs.device)
         try:
             simulator = self._registry.get('world_simulator')
             if simulator.stats.get('training_steps', 0) > 10:
-                # 使用世界模拟器规划最佳行动
                 best_actions = simulator.plan(obs, horizon=3, num_samples=5)
                 if best_actions:
-                    action = best_actions[0]
-                    self._action_counts[action] += 1
-                    return action
+                    for a in best_actions[:3]:
+                        simulator_bonus[a] += 0.5
         except (KeyError, Exception):
             pass
 
-        # Empowerment + 好奇心加权探索
+        # 3. 探索奖励（基于好奇心和Empowerment）
+        explore_bonus = torch.zeros(n_actions, device=obs.device)
         explore_prob = min(0.5, (curiosity * 0.3 + exploration_bonus * 0.4))
         if torch.rand(1).item() < explore_prob:
-            counts = self._action_counts + 1e-6
-            probs = (1.0 / counts).softmax(0)
-            action = torch.multinomial(probs, 1).item()
-        else:
-            # 批量预测：1 次矩阵运算替代 n 次前向传播
-            action_vecs = torch.eye(n_actions, device=obs.device)
-            obs_batch = obs.unsqueeze(0).expand(n_actions, -1)
-            preds = self.engine.predict_batch(obs_batch, action_vecs)
-            # exploit: 选择预测奖励最高的动作（第一维代表奖励信号）
-            action = int(preds[:, 0].argmax().item())
+            # 探索：优先选择访问次数少的动作
+            counts = self._action_counts.to(obs.device) + 1e-6
+            explore_bonus = (1.0 / counts).softmax(0)
+
+        # 4. 统一评分（确保所有张量在同一设备）
+        device = base_scores.device
+        simulator_bonus = simulator_bonus.to(device)
+        explore_bonus = explore_bonus.to(device)
+        final_scores = base_scores + simulator_bonus + explore_bonus * 0.3
+        action = int(final_scores.argmax().item())
 
         self._action_counts[action] += 1
         return action
