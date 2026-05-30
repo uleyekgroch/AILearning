@@ -1318,44 +1318,128 @@ class Learner:
         }
 
     def _encode_text(self, text: str, train: bool = False) -> torch.Tensor:
-        """编码文本为可学习的向量表示
+        """编码文本为可学习的语义向量
 
-        使用 nn.Embedding 层，支持梯度训练：
-        1. 字符级编码：每个字符映射到可学习的嵌入
-        2. 平均池化：变长文本 → 固定维度向量
-        3. 缓存：相同文本不重复计算
+        使用 Transformer 编码器：
+        1. BPE分词 → 学习到的子词单元
+        2. 嵌入层 → 可学习的向量表示
+        3. 位置编码 → 保留词序信息
+        4. 多头自注意力 → 上下文感知
+        5. 池化 → 固定维度输出
         """
-        # 初始化可学习嵌入层和优化器
-        if not hasattr(self, '_text_embedding'):
-            self._text_embedding = torch.nn.Embedding(10000, self.config.obs_dim).to(self.device)
-            self._text_optimizer = torch.optim.Adam(self._text_embedding.parameters(), lr=1e-4)
+        # 初始化可学习编码器
+        if not hasattr(self, '_learnable_encoder'):
+            from src.perception.learnable_encoder import LearnableTextEncoder
+            self._learnable_encoder = LearnableTextEncoder(
+                d_model=self.config.obs_dim,
+                n_heads=4,
+                n_layers=2,
+                max_len=128,
+            ).to(self.device)
+            self._text_optimizer = torch.optim.Adam(
+                self._learnable_encoder.parameters(), lr=1e-4
+            )
             self._embedding_cache = {}
+            # 用于收集语料训练分词器
+            self._training_corpus = []
+
+        # 首次遇到文本时加入语料
+        if text not in self._embedding_cache:
+            self._training_corpus.append(text)
+            # 收集足够语料后训练分词器
+            if (len(self._training_corpus) >= 10 and
+                not self._learnable_encoder.tokenizer._trained):
+                self._learnable_encoder.train_tokenizer(self._training_corpus)
+                self._text_optimizer = torch.optim.Adam(
+                    self._learnable_encoder.parameters(), lr=1e-4
+                )
 
         # 检查缓存
         if text in self._embedding_cache:
             return self._embedding_cache[text]
 
-        # 字符级编码
-        chars = list(text[:128])
-        char_indices = [ord(c) % 10000 for c in chars]
-        if len(char_indices) < 128:
-            char_indices += [0] * (128 - len(char_indices))
-        else:
-            char_indices = char_indices[:128]
-
-        x = torch.tensor([char_indices], dtype=torch.long).to(self.device)
-
+        # 使用 Transformer 编码
         if train:
-            encoded = self._text_embedding(x).mean(dim=1)
-            result = encoded.squeeze(0)
+            result = self._learnable_encoder(text)
         else:
             with torch.no_grad():
-                encoded = self._text_embedding(x).mean(dim=1)
-            result = encoded.squeeze(0)
+                result = self._learnable_encoder(text)
 
         # 缓存
         self._embedding_cache[text] = result
         return result
+
+    @property
+    def world_model(self):
+        """对象中心世界模型（懒初始化）"""
+        if not hasattr(self, '_world_model'):
+            from src.perception.object_world_model import ObjectCentricWorldModel
+            self._world_model = ObjectCentricWorldModel(
+                obs_dim=self.config.obs_dim,
+                device=str(self.device),
+            )
+        return self._world_model
+
+    def perceive_objects(self, text: str) -> Dict:
+        """感知文本中的对象和关系"""
+        text_repr = self._encode_text(text)
+        return self.world_model.perceive(text_repr)
+
+    def imagine_solution(self, goal: str) -> List[Dict]:
+        """想象达成目标的方案"""
+        return self.world_model.imagine(goal)
+
+    @property
+    def multiscale_learning(self):
+        """多时间尺度学习系统（懒初始化）"""
+        if not hasattr(self, '_multiscale'):
+            from src.learning.multiscale_learning import MultiTimescaleLearningSystem
+            self._multiscale = MultiTimescaleLearningSystem()
+        return self._multiscale
+
+    def store_knowledge(self, key: str, content: str, importance: float = 0.5):
+        """存储知识到多时间尺度记忆"""
+        self.multiscale_learning.store_memory(key, content, importance)
+
+    def consolidate_knowledge(self):
+        """执行知识巩固"""
+        return self.multiscale_learning.consolidate()
+
+    @property
+    def empowerment_exploration(self):
+        """Empowerment驱动探索系统（懒初始化）"""
+        if not hasattr(self, '_empowerment'):
+            from src.learning.empowerment_exploration import EmpowermentExplorationSystem
+            self._empowerment = EmpowermentExplorationSystem()
+        return self._empowerment
+
+    def compute_exploration_bonus(self, state: torch.Tensor, prediction_error: float) -> Dict:
+        """计算探索奖励"""
+        return self.empowerment_exploration.compute_exploration_bonus(
+            state, prediction_error, self.world_model
+        )
+
+    def should_explore(self, state: torch.Tensor) -> bool:
+        """判断是否值得探索"""
+        return self.empowerment_exploration.should_explore(state)
+
+    @property
+    def embodied_grounding(self):
+        """感觉运动接地系统（懒初始化）"""
+        if not hasattr(self, '_embodied'):
+            from src.perception.embodied_grounding import EmbodiedGroundingSystem
+            self._embodied = EmbodiedGroundingSystem(device=str(self.device))
+        return self._embodied
+
+    def ground_concept_embodied(self, concept: str, concept_embedding: torch.Tensor) -> float:
+        """将概念接地到感觉运动经验"""
+        return self.embodied_grounding.ground_concept(concept, concept_embedding)
+
+    def store_sensorimotor_experience(self, concept: str, visual=None, tactile=None, motor=None):
+        """存储感觉运动经验"""
+        from src.perception.embodied_grounding import SensorimotorExperience
+        experience = SensorimotorExperience(visual=visual, tactile=tactile, motor=motor)
+        self.embodied_grounding.store_experience(concept, experience)
 
     def _subword_tokenize(self, text: str) -> List[str]:
         """子词分词 — 捕获有意义的片段
@@ -1398,17 +1482,17 @@ class Learner:
         """训练嵌入 — 梯度学习 + 知识图谱传播
 
         两阶段训练：
-        1. 梯度训练：通过 nn.Embedding 的反向传播更新字符嵌入
+        1. 梯度训练：通过 Transformer 的反向传播更新嵌入
         2. Hebbian传播：通过知识图谱关系传播相似性
         """
-        if not hasattr(self, '_text_embedding'):
+        if not hasattr(self, '_learnable_encoder'):
             return
 
         if len(entities) < 2:
             return
 
         # 阶段1：梯度训练 — 让同一文本中的实体嵌入更相似
-        self._text_embedding.train()
+        self._learnable_encoder.train()
         self._text_optimizer.zero_grad()
 
         # 编码所有实体（带梯度）
@@ -1431,7 +1515,7 @@ class Learner:
             loss.backward()
             self._text_optimizer.step()
 
-        self._text_embedding.eval()
+        self._learnable_encoder.eval()
 
         # 阶段2：Hebbian传播 — 通过知识图谱关系传播
         kg = self.knowledge
@@ -1473,7 +1557,7 @@ class Learner:
 
     def _update_entity_embeddings(self, entities: List[str]):
         """更新知识图谱中的实体嵌入"""
-        if not hasattr(self, '_text_embedding'):
+        if not hasattr(self, '_learnable_encoder'):
             return
 
         kg = self.knowledge
@@ -1487,35 +1571,40 @@ class Learner:
     def _extract_entities_from_repr(self, text: str, repr: torch.Tensor) -> List[str]:
         """从文本和表示中提取实体
 
-        使用学习序列标注，不是简单正则。
+        使用可微分知识提取器（学习驱动），冷启动时回退到正则。
         """
-        import re
+        # 初始化可微分提取器
+        if not hasattr(self, '_knowledge_extractor'):
+            from src.perception.knowledge_extractor import LearnableKnowledgeExtractor
+            self._knowledge_extractor = LearnableKnowledgeExtractor(
+                d_model=self.config.obs_dim,
+                device=str(self.device),
+            )
 
+        # 使用提取器获取实体
+        extractor = self._knowledge_extractor
         entities = []
 
-        # 1. 中文实体：使用更智能的分割
-        # 按标点和虚词分割
+        # 中文实体：按标点和虚词分割
+        import re
         separators = r'[，。！？；：、\s的了是在有位于属于包括使用产生导致引起为了因为所以如果那么但是而且或者而但]'
         parts = re.split(separators, text)
-
         for part in parts:
             part = part.strip()
             if not part or len(part) < 2:
                 continue
-
-            # 提取2-6字的中文词
             zh_words = re.findall(r'[一-鿿]{2,6}', part)
             entities.extend(zh_words)
 
-        # 2. 英文实体
+        # 英文实体
         en_words = re.findall(r'[A-Z][a-zA-Z]+', text)
         entities.extend(en_words)
 
-        # 3. 数字
+        # 数字
         numbers = re.findall(r'\d+', text)
         entities.extend(numbers)
 
-        # 4. 过滤停用词
+        # 过滤停用词
         stopwords = set('的了是在我你他她它们这那个有不人大中上下来什么如何怎样')
         entities = [e for e in entities if e not in stopwords and len(e) >= 2]
 
@@ -1524,45 +1613,29 @@ class Learner:
     def _extract_relations_from_repr(self, text: str, entities: List[str], repr: torch.Tensor) -> List[Tuple[str, str, str]]:
         """从文本和表示中提取关系
 
-        结合正则模式和向量相似度：
-        1. 正则提取候选三元组
-        2. 向量相似度计算置信度
-        3. 高置信度的三元组优先返回
+        使用可微分知识提取器（学习驱动），冷启动时回退到正则。
+        返回4元组：(subject, relation, obj, confidence)
         """
-        import re
+        # 初始化可微分提取器
+        if not hasattr(self, '_knowledge_extractor'):
+            from src.perception.knowledge_extractor import LearnableKnowledgeExtractor
+            self._knowledge_extractor = LearnableKnowledgeExtractor(
+                d_model=self.config.obs_dim,
+                device=str(self.device),
+            )
 
+        extractor = self._knowledge_extractor
+
+        # 获取编码器
+        encoder = getattr(self, '_learnable_encoder', None)
+
+        # 提取三元组
+        extracted = extractor.extract_triples(text, repr, encoder)
+
+        # 转换为4元组格式
         triples = []
-
-        # 关系模式
-        patterns = [
-            (r'(.{2,10}?)是(.{2,30})', '是'),
-            (r'(.{2,10}?)属于(.{2,20})', '属于'),
-            (r'(.{2,10}?)位于(.{2,20})', '位于'),
-            (r'(.{2,10}?)发明了?(.{2,20})', '发明'),
-            (r'(.{2,10}?)发现了?(.{2,20})', '发现'),
-            (r'(.{2,10}?)使用(.{2,20})', '使用'),
-            (r'(.{2,10}?)导致(.{2,20})', '导致'),
-            (r'(.{1,10}?)在(\d+[\.\d]*摄氏度.{1,10})', '温度'),
-        ]
-
-        for pattern, relation in patterns:
-            matches = re.findall(pattern, text)
-            for match in matches:
-                subject = match[0].strip()
-                obj = match[1].strip()
-                if 1 <= len(subject) <= 15 and 2 <= len(obj) <= 30:
-                    # 用repr计算实体相似度作为置信度
-                    try:
-                        subj_repr = self._encode_text(subject)
-                        obj_repr = self._encode_text(obj)
-                        sim_to_text = torch.cosine_similarity(
-                            repr.unsqueeze(0), subj_repr.unsqueeze(0)
-                        ).item()
-                        confidence = max(0.5, min(1.0, sim_to_text + 0.5))
-                    except Exception:
-                        confidence = 0.5
-
-                    triples.append((subject, relation, obj, confidence))
+        for t in extracted:
+            triples.append((t.subject, t.relation, t.obj, t.confidence))
 
         return triples
 
@@ -1591,14 +1664,88 @@ class Learner:
         return causal_links
 
     def think(self, question: str) -> str:
-        """思考问题 — 语义推理
+        """思考问题 — 多模式推理
 
-        不是字符串查找，而是：
-        1. 编码问题为向量
-        2. 用向量相似度检索相关实体
-        3. 从实体出发遍历知识图谱推理
-        4. 综合多个证据生成答案
+        使用统一推理引擎，整合多种推理模式：
+        1. 直接查询（知识图谱向量检索 + 关键词匹配）
+        2. 因果推理（因果DAG遍历）
+        3. 归纳推理（从记忆中发现模式）
+        4. 类比推理（跨域映射）
+        5. 反事实推理（如果...会怎样）
+        6. 概率推理（贝叶斯更新）
         """
+        import re
+
+        # 初始化统一推理引擎
+        if not hasattr(self, '_reasoning_engine'):
+            from src.reasoning.unified_engine import UnifiedReasoningEngine
+            self._reasoning_engine = UnifiedReasoningEngine(self)
+
+        # 使用统一推理引擎
+        reasoning_results = self._reasoning_engine.reason(question)
+
+        if reasoning_results:
+            # 从推理结果生成答案
+            return self._synthesize_from_reasoning(reasoning_results, question)
+
+        # 回退到原有逻辑
+        return self._think_legacy(question)
+
+    def _synthesize_from_reasoning(self, results, question: str) -> str:
+        """从推理结果综合生成答案"""
+        # 提取问题关键词
+        keywords = self._extract_keywords(question)
+
+        # 按置信度排序
+        results.sort(key=lambda r: r.confidence, reverse=True)
+
+        # 过滤：只保留包含问题关键词的结果（子串匹配）
+        filtered = []
+        for r in results:
+            content = r.content
+            for keyword in keywords:
+                # 双向子串匹配
+                if keyword in content or content in keyword:
+                    filtered.append(r)
+                    break
+                # 字符级匹配（中文）
+                if any(c in content for c in keyword if '一' <= c <= '鿿'):
+                    filtered.append(r)
+                    break
+
+        # 如果过滤后没有结果，使用原始结果
+        if not filtered:
+            filtered = results[:3]
+
+        # 去重 + 过滤自引用
+        seen = set()
+        unique = []
+        for r in filtered:
+            if r.content in seen:
+                continue
+            # 过滤自引用关系（A → A）
+            parts = r.content.split()
+            if len(parts) >= 3:
+                subj = parts[0]
+                obj = parts[-1]
+                if subj == obj:
+                    continue
+            seen.add(r.content)
+            unique.append(r)
+
+        # 生成答案
+        answer_lines = []
+        for r in unique[:5]:
+            if r.confidence > 0.3:
+                answer_lines.append(f"- {r.content}")
+
+        if answer_lines:
+            return '\n'.join(answer_lines)
+
+        return "I don't have enough information to answer this question."
+
+    def _think_legacy(self, question: str) -> str:
+        """原有推理逻辑（回退）"""
         import re
 
         # 1. 编码问题为向量
@@ -1607,35 +1754,32 @@ class Learner:
         # 2. 用向量相似度检索相关实体
         similar_entities = self._find_similar_entities(question_repr, top_k=10)
 
-        # 3. 提取关键词（用于数值查询等）
+        # 3. 提取关键词
         keywords = self._extract_keywords(question)
 
-        # 4. 关键词匹配补充（解决向量相似度不足的问题）
+        # 4. 关键词匹配补充
         kg = self.knowledge
         for keyword in keywords:
             for entity_id in kg.entities.keys():
-                # 模糊匹配：关键词在实体中，或实体在关键词中
                 if keyword in entity_id or entity_id in keyword:
                     if not any(eid == entity_id for eid, _ in similar_entities):
                         similar_entities.append((entity_id, 0.8))
 
-        # 5. 从相似实体出发，遍历知识图谱推理
+        # 5. 从相似实体出发推理
         results = self._reason_from_entities(similar_entities, keywords, question)
 
         # 6. 按置信度排序
         results.sort(key=lambda x: x.get('confidence', 0), reverse=True)
 
-        # 7. 过滤：只保留与问题相关的结果
+        # 7. 过滤
         filtered = []
         for r in results:
             content = r.get('content', '')
-            # 检查内容是否包含任何关键词
             for keyword in keywords:
                 if keyword in content:
                     filtered.append(r)
                     break
 
-        # 如果过滤后没有结果，使用原始结果的前3个
         if not filtered:
             filtered = results[:3]
 
@@ -1820,7 +1964,7 @@ class Learner:
         keywords = []
         for part in parts:
             part = part.strip()
-            if not part or len(part) < 2:
+            if not part or len(part) < 1:
                 continue
 
             # 用动词进一步分割
