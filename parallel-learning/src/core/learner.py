@@ -684,11 +684,22 @@ class Learner:
         # 6. 遗忘低保留率记忆
         forgotten = self.multiscale_learning.forget(threshold=0.1)
 
+        # 7. 睡眠回放巩固：SWS+REM+Spindles完整周期
+        sleep_result = self.sleep_replay.sleep_cycle(
+            knowledge_graph=self.knowledge,
+            encoder_fn=self._encode_text,
+        )
+
+        # 8. 互补学习系统巩固：海马体→皮层转移
+        cls_result = self.complementary_learning.replay_consolidate(batch_size=50)
+
         return {
             'consolidated': len(consolidated),
             'multiscale_consolidated': len(multiscale_consolidated),
             'forgotten': len(forgotten),
             'total': len(memories),
+            'sleep_cycle': sleep_result,
+            'cls_consolidated': cls_result.get('consolidated', 0),
         }
 
     def _offline_replay(self, memories: List[Dict]):
@@ -1320,6 +1331,48 @@ class Learner:
                 success=verification['passed'],
             )
 
+        # ===== 机制14-17: 最新人类学习研究集成 =====
+
+        # 27. 树突计算：上下文相关的实体表征
+        for entity in entities:
+            entity_emb = self._encode_text(entity)
+            ctx_emb = text_repr  # 用全文表征作为上下文
+            contextualized, plateau = self.dendritic_system.compute_context_representation(
+                entity, entity_emb, ctx_emb
+            )
+            # 更新知识图谱中的实体嵌入（使用上下文化的表征）
+            if plateau and entity in self.knowledge.entities:
+                # plateau触发时，用上下文表征更新（强学习信号）
+                with torch.no_grad():
+                    old_emb = self.knowledge.entities[entity].embedding
+                    if old_emb is not None and old_emb.shape == contextualized.shape:
+                        self.knowledge.entities[entity].embedding = (
+                            0.7 * old_emb + 0.3 * contextualized
+                        )
+
+        # 28. 睡眠回放：记录情节到海马体
+        importance_score = 0.8 if verification['passed'] else 0.3
+        if len(entities) >= 1:
+            self.sleep_replay.record_episode(
+                text=text,
+                embedding=text_repr.detach(),
+                importance=importance_score,
+            )
+
+        # 29. 主动推理学习：更新信念和不确定性
+        self.active_inference_learning.update_beliefs(
+            entity_id=text[:20],
+            observation=text_repr.detach(),
+        )
+
+        # 30. 互补学习：快速存储到海马体记忆
+        self.complementary_learning.store_episode(
+            content=text,
+            embedding=text_repr.detach(),
+            entities=entities,
+            context=source,
+        )
+
         return result
 
     def _verify_learned_knowledge(self, text: str, entities: List[str],
@@ -1855,6 +1908,70 @@ class Learner:
             self._meta_comp = MetaLearningComposition()
         return self._meta_comp
 
+    # ===== 机制14-17: 最新人类学习研究集成 =====
+
+    @property
+    def dendritic_system(self):
+        """树突计算系统（懒初始化）
+
+        基于Chavlis & Poirazi 2025:
+        不同树突区室有独立可塑性，实现上下文关联表征。
+        """
+        if not hasattr(self, '_dendritic'):
+            from src.learning.dendritic_computation import DendriticComputationSystem
+            self._dendritic = DendriticComputationSystem(
+                d_model=self.config.obs_dim,
+                device=str(self.device),
+            )
+        return self._dendritic
+
+    @property
+    def sleep_replay(self):
+        """睡眠回放巩固系统（懒初始化）
+
+        基于Nature Comms 2022 + NeuroDream 2025:
+        生成式回放防止灾难性遗忘，REM阶段创造性发现。
+        """
+        if not hasattr(self, '_sleep_replay'):
+            from src.learning.sleep_replay import SleepReplaySystem
+            self._sleep_replay = SleepReplaySystem(
+                d_model=self.config.obs_dim,
+                device=str(self.device),
+            )
+        return self._sleep_replay
+
+    @property
+    def active_inference_learning(self):
+        """主动推理学习系统（懒初始化）
+
+        基于Friston 2022 + Parr et al. 2024:
+        自由能最小化驱动的自主学习决策。
+        注意：区别于registry中的reasoning/active_inference（推理模块），
+        这个是learning版本，专注于学习目标选择和课程安排。
+        """
+        if not hasattr(self, '_active_inf_learning'):
+            from src.learning.active_inference import ActiveInferenceSystem
+            self._active_inf_learning = ActiveInferenceSystem(
+                d_model=self.config.obs_dim,
+                device=str(self.device),
+            )
+        return self._active_inf_learning
+
+    @property
+    def complementary_learning(self):
+        """互补学习系统（懒初始化）
+
+        基于McClelland 1995 + Nature Neuroscience 2023:
+        海马体快速记忆 + 皮层慢速抽象 = 互补学习。
+        """
+        if not hasattr(self, '_cls'):
+            from src.learning.complementary_learning import ComplementaryLearningSystem
+            self._cls = ComplementaryLearningSystem(
+                d_model=self.config.obs_dim,
+                device=str(self.device),
+            )
+        return self._cls
+
     def _subword_tokenize(self, text: str) -> List[str]:
         """子词分词 — 捕获有意义的片段
 
@@ -2114,7 +2231,10 @@ class Learner:
         # 测试时训练：根据查询上下文微调编码器
         # 先确保编码器已初始化
         question_repr = self._encode_text(question)
-        if hasattr(self, '_learnable_encoder'):
+
+        # 批量学习时跳过TTT以提高性能
+        skip_ttt = getattr(self, '_skip_ttt', False)
+        if not skip_ttt and hasattr(self, '_learnable_encoder'):
             # 获取相关实体
             similar_entities = self._find_similar_entities(question_repr, top_k=3)
             relevant_entities = [eid for eid, sim in similar_entities if sim > 0.3]
