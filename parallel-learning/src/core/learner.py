@@ -576,7 +576,8 @@ class Learner:
             action_vecs = torch.eye(n_actions, device=obs.device)
             obs_batch = obs.unsqueeze(0).expand(n_actions, -1)
             preds = self.engine.predict_batch(obs_batch, action_vecs)
-            action = int(preds.var(dim=1).argmax().item())
+            # exploit: 选择预测奖励最高的动作（均值最大化）
+            action = int(preds.mean(dim=1).argmax().item())
 
         self._action_counts[action] += 1
         return action
@@ -1103,13 +1104,12 @@ class Learner:
             importance=importance,
         )
 
-        # 10c. 存入感觉运动接地系统（文本作为伪感觉运动数据）
-        for entity in entities:
-            entity_repr = self._encode_text(entity)
-            self.store_sensorimotor_experience(
-                entity,
-                visual=entity_repr,  # 用文本嵌入作为伪视觉
-            )
+        # 10c. 存入感觉运动接地系统
+        # 注意：当前没有真实视觉/触觉数据，跳过接地
+        # 当接入真实传感器时再启用
+        # for entity in entities:
+        #     entity_repr = self._encode_text(entity)
+        #     self.store_sensorimotor_experience(entity, visual=entity_repr)
 
         # 11. 更新学习统计
         self._learning_stats['total_learned'] += 1
@@ -1382,8 +1382,8 @@ class Learner:
         # 首次遇到文本时加入语料
         if text not in self._embedding_cache:
             self._training_corpus.append(text)
-            # 收集足够语料后训练分词器
-            if (len(self._training_corpus) >= 10 and
+            # 收集足够语料后训练分词器（降低门槛到3条）
+            if (len(self._training_corpus) >= 3 and
                 not self._learnable_encoder.tokenizer._trained):
                 self._learnable_encoder.train_tokenizer(self._training_corpus)
                 self._text_optimizer = torch.optim.Adam(
@@ -1531,25 +1531,36 @@ class Learner:
         if len(entities) < 2:
             return
 
-        # 阶段1：梯度训练 — 让同一文本中的实体嵌入更相似
+        # 阶段1：梯度训练 — 实体嵌入应接近文本嵌入但保持区分度
         self._learnable_encoder.train()
         self._text_optimizer.zero_grad()
 
-        # 编码所有实体（带梯度）
+        # 编码文本和实体（带梯度）
+        text_emb = self._encode_text(text, train=True)
         entity_embs = []
         for entity in entities:
             emb = self._encode_text(entity, train=True)
             entity_embs.append(emb)
 
-        # 损失：同文本实体的嵌入应该相似（余弦相似度接近1）
+        # 损失设计：
+        # 1. 实体应与文本嵌入相关（正锚点）
+        # 2. 实体之间应保持区分度（负样本）
         loss = torch.tensor(0.0, device=self.device, requires_grad=True)
+        for emb in entity_embs:
+            # 正锚点：实体应与文本相关
+            sim_to_text = torch.cosine_similarity(emb.unsqueeze(0), text_emb.unsqueeze(0))
+            loss = loss + (1.0 - sim_to_text) * 0.5
+
+        # 负样本：实体之间保持区分（相似度不应过高）
         for i in range(len(entity_embs)):
             for j in range(i + 1, len(entity_embs)):
                 sim = torch.cosine_similarity(
                     entity_embs[i].unsqueeze(0),
                     entity_embs[j].unsqueeze(0)
                 )
-                loss = loss + (1.0 - sim)
+                # 如果相似度过高，增加损失
+                if sim > 0.8:
+                    loss = loss + (sim - 0.8) * 2.0
 
         if loss.requires_grad:
             loss.backward()
@@ -1621,11 +1632,10 @@ class Learner:
                 device=str(self.device),
             )
 
-        # 使用提取器获取实体
         extractor = self._knowledge_extractor
         entities = []
 
-        # 中文实体：按标点和虚词分割
+        # 方法1：正则提取（冷启动回退）
         import re
         separators = r'[，。！？；：、\s的了是在有位于属于包括使用产生导致引起为了因为所以如果那么但是而且或者而但]'
         parts = re.split(separators, text)
@@ -1636,17 +1646,26 @@ class Learner:
             zh_words = re.findall(r'[一-鿿]{2,6}', part)
             entities.extend(zh_words)
 
-        # 英文实体
         en_words = re.findall(r'[A-Z][a-zA-Z]+', text)
         entities.extend(en_words)
 
-        # 数字
         numbers = re.findall(r'\d+', text)
         entities.extend(numbers)
 
-        # 过滤停用词
         stopwords = set('的了是在我你他她它们这那个有不人大中上下来什么如何怎样')
         entities = [e for e in entities if e not in stopwords and len(e) >= 2]
+
+        # 方法2：可学习提取器（10次后启用）
+        encoder = getattr(self, '_learnable_encoder', None)
+        if extractor._extraction_count >= 10 and encoder is not None:
+            learned_triples = extractor._extract_by_model(text, repr, encoder)
+            for t in learned_triples:
+                if t.subject not in entities:
+                    entities.append(t.subject)
+                if t.obj not in entities:
+                    entities.append(t.obj)
+
+        extractor._extraction_count += 1
 
         return list(set(entities))
 
@@ -1773,16 +1792,68 @@ class Learner:
             seen.add(r.content)
             unique.append(r)
 
-        # 生成答案
+        # 生成答案（三元组→自然语言）
         answer_lines = []
         for r in unique[:5]:
             if r.confidence > 0.3:
-                answer_lines.append(f"- {r.content}")
+                # 尝试将三元组转换为自然语言
+                sentence = self._triple_to_sentence(r.content)
+                answer_lines.append(f"- {sentence}")
 
         if answer_lines:
             return '\n'.join(answer_lines)
 
         return "I don't have enough information to answer this question."
+
+    def _triple_to_sentence(self, triple_str: str) -> str:
+        """将三元组字符串转换为自然语言句子
+
+        "牛顿 发现 万有引力定律" → "牛顿发现了万有引力定律。"
+        "下雨 导致 地面湿了" → "下雨导致地面湿了。"
+        "水 温度 100摄氏度沸腾" → "水的温度是100摄氏度沸腾。"
+        """
+        parts = triple_str.split()
+        if len(parts) >= 3:
+            subj = parts[0]
+            rel = parts[1]
+            obj = ' '.join(parts[2:])
+
+            # 关系到自然语言映义
+            rel_map = {
+                '是': '是',
+                '属于': '属于',
+                '位于': '位于',
+                '发明': '发明了',
+                '发现': '发现了',
+                '使用': '使用',
+                '导致': '导致',
+                '温度': '的温度是',
+                '长度': '的长度是',
+                '重量': '的重量是',
+                '时间': '的时间是',
+                '颜色': '的颜色是',
+                '形状': '的形状是',
+                '大小': '的大小是',
+                '部分': '是',
+                '整体': '包含',
+                '因果': '导致',
+                '相似': '类似于',
+                '对比': '与',
+                '包含': '包含',
+                '拥有': '拥有',
+                '制造': '制造了',
+                '运动': '在运动',
+                '状态': '处于',
+                '属性': '具有',
+            }
+
+            natural_rel = rel_map.get(rel, rel)
+            # 避免重复句号
+            if obj.endswith('。'):
+                return f"{subj}{natural_rel}{obj}"
+            return f"{subj}{natural_rel}{obj}。"
+
+        return triple_str
 
     def _think_legacy(self, question: str) -> str:
         """原有推理逻辑（回退）"""
@@ -2013,8 +2084,16 @@ class Learner:
 
             for sub_part in sub_parts:
                 sub_part = sub_part.strip()
-                if sub_part and len(sub_part) >= 2 and sub_part not in verbs:
-                    keywords.append(sub_part)
+                if not sub_part or sub_part in verbs:
+                    continue
+                # 保留有意义的子串（包括单个中文字符）
+                if len(sub_part) >= 1:
+                    # 单字符只保留中文实词
+                    if len(sub_part) == 1:
+                        if '一' <= sub_part <= '鿿' and sub_part not in '的了是在有不人大中上下来什么如何怎样':
+                            keywords.append(sub_part)
+                    else:
+                        keywords.append(sub_part)
 
         # 过滤停用词
         stopwords = set('什么怎么如何的是有在位于属于包括使用产生导致引起为了因为所以如果那么但是而且或者而但了')
