@@ -1269,6 +1269,34 @@ class Learner:
                 grounding_strength = 1.0 if verification['passed'] else 0.3
                 self.symbol_grounding.ground_symbol(symbol, env_state, grounding_strength)
 
+        # 22. 认知预测路由：区分低级和高级误差
+        low_error = 0.0 if verification['passed'] else 1.0
+        high_error = 0.0 if verification['passed'] else 0.8
+        routing = self.cognitive_router.route_error(low_error, high_error)
+
+        # 23. GHL全局调制：计算全局信号
+        reward = 1.0 if verification['passed'] else -0.5
+        novelty = self.predictive_coding_light.get_novelty_score()
+        uncertainty = self._metacognition.get('uncertainty_map', {}).get(text[:30], 0.5)
+        global_signal = self.ghl_learning.compute_global_signal(reward, novelty, uncertainty)
+
+        # 24. 学习进展好奇心：更新领域进展
+        domain = text[:10]  # 用文本前10字作为领域标识
+        self.learning_progress.update_progress(domain, score)
+
+        # 25. 感知类别：发现或创建类别
+        for entity in entities:
+            entity_repr = self._encode_text(entity)
+            category = self.perceptual_categories.discover_category(entity, entity_repr)
+
+        # 26. 元学习组合：学习组合规则
+        if len(entities) >= 2:
+            self.meta_composition.learn_rule(
+                components=entities,
+                result=text[:30],
+                success=verification['passed'],
+            )
+
         return result
 
     def _verify_learned_knowledge(self, text: str, entities: List[str],
@@ -1763,6 +1791,46 @@ class Learner:
             from src.learning.predictive_coding_light import SymbolGrounding
             self._grounding = SymbolGrounding()
         return self._grounding
+
+    @property
+    def cognitive_router(self):
+        """认知预测路由（懒初始化）"""
+        if not hasattr(self, '_cognitive_router'):
+            from src.learning.cognitive_mechanisms import CognitivePredictiveRouter
+            self._cognitive_router = CognitivePredictiveRouter(d_model=self.config.obs_dim)
+        return self._cognitive_router
+
+    @property
+    def ghl_learning(self):
+        """GHL全局调制Hebbian学习（懒初始化）"""
+        if not hasattr(self, '_ghl'):
+            from src.learning.cognitive_mechanisms import GlobalModulatedHebbian
+            self._ghl = GlobalModulatedHebbian(learning_rate=0.01)
+        return self._ghl
+
+    @property
+    def learning_progress(self):
+        """学习进展好奇心（懒初始化）"""
+        if not hasattr(self, '_learning_progress'):
+            from src.learning.cognitive_mechanisms import LearningProgressCuriosity
+            self._learning_progress = LearningProgressCuriosity()
+        return self._learning_progress
+
+    @property
+    def perceptual_categories(self):
+        """感知类别系统（懒初始化）"""
+        if not hasattr(self, '_perceptual_cats'):
+            from src.learning.cognitive_mechanisms import PerceptualCategorySystem
+            self._perceptual_cats = PerceptualCategorySystem()
+        return self._perceptual_cats
+
+    @property
+    def meta_composition(self):
+        """元学习组合规则（懒初始化）"""
+        if not hasattr(self, '_meta_comp'):
+            from src.learning.cognitive_mechanisms import MetaLearningComposition
+            self._meta_comp = MetaLearningComposition()
+        return self._meta_comp
 
     def _subword_tokenize(self, text: str) -> List[str]:
         """子词分词 — 捕获有意义的片段
