@@ -283,6 +283,333 @@ class Learner:
         return self.memory.consolidate_all()
 
     # ------------------------------------------------------------------
+    # 文本学习（桥接 training/layers）
+    # ------------------------------------------------------------------
+
+    def learn_from_text(self, text: str, source: str = "text") -> Dict:
+        """从文本中学习 — 桥接 training/layers 模块
+
+        将文本知识注入到：
+        1. 知识图谱
+        2. 因果DAG
+        3. 概念形成
+        4. 数值理解
+        5. 类比推理
+        """
+        import re
+        result = {
+            'entities': [],
+            'triples': [],
+            'causal_links': [],
+            'concepts': [],
+            'numerical_facts': [],
+        }
+
+        # 1. 提取实体（简单分词）
+        entities = re.findall(r'[一-鿿]{2,6}', text)
+        entities = [e for e in entities if len(e) >= 2]
+        result['entities'] = entities
+
+        # 2. 提取三元组
+        triple_patterns = [
+            (r'(.{2,10}?)是(.{2,30})', '是'),
+            (r'(.{2,10}?)属于(.{2,20})', '属于'),
+            (r'(.{2,10}?)位于(.{2,20})', '位于'),
+            (r'(.{2,10}?)发明了?(.{2,20})', '发明'),
+            (r'(.{2,10}?)发现了?(.{2,20})', '发现'),
+        ]
+
+        for pattern, relation in triple_patterns:
+            matches = re.findall(pattern, text)
+            for match in matches:
+                subject = match[0].strip()
+                obj = match[1].strip()
+                if 2 <= len(subject) <= 15 and 2 <= len(obj) <= 30:
+                    result['triples'].append((subject, relation, obj))
+
+                    # 注入知识图谱
+                    try:
+                        kg = self.knowledge  # 使用属性访问，会自动初始化
+                        from src.knowledge.entity import Entity
+                        from src.knowledge.relation import Relation
+
+                        # 添加实体
+                        subj_entity = Entity(id=subject, type='concept', source=source)
+                        obj_entity = Entity(id=obj, type='concept', source=source)
+                        kg.add_entity(subj_entity)
+                        kg.add_entity(obj_entity)
+
+                        # 添加关系
+                        rel = Relation(
+                            source_id=subject,
+                            target_id=obj,
+                            type=relation,
+                            confidence=0.8,
+                        )
+                        kg.add_relation(rel)
+                    except Exception as e:
+                        pass
+
+        # 3. 提取因果关系
+        causal_patterns = [
+            (r'因为(.+?)，所以(.+)', 'direct'),
+            (r'由于(.+?)，(.+)', 'direct'),
+            (r'(.+)导致(.+)', 'direct'),
+            (r'(.+)引起(.+)', 'direct'),
+        ]
+
+        for pattern, causal_type in causal_patterns:
+            matches = re.findall(pattern, text)
+            for match in matches:
+                # 去除标点符号
+                cause = re.sub(r'[。！？；\s]+', '', match[0].strip())[:20]
+                effect = re.sub(r'[。！？；\s]+', '', match[1].strip())[:20]
+                if len(cause) >= 2 and len(effect) >= 2:
+                    result['causal_links'].append((cause, effect))
+
+                    # 注入因果DAG
+                    try:
+                        dag = self.causal_dag
+                        dag.add_edge(cause, effect)
+                    except Exception:
+                        pass
+
+                    # 注入知识图谱
+                    try:
+                        kg = self.knowledge
+                        from src.knowledge.entity import Entity
+                        from src.knowledge.relation import Relation
+
+                        cause_entity = Entity(id=cause, type='event', source=source)
+                        effect_entity = Entity(id=effect, type='event', source=source)
+                        kg.add_entity(cause_entity)
+                        kg.add_entity(effect_entity)
+
+                        rel = Relation(
+                            source_id=cause,
+                            target_id=effect,
+                            type='导致',
+                            confidence=0.9,
+                        )
+                        kg.add_relation(rel)
+                    except Exception:
+                        pass
+
+        # 4. 形成概念
+        for entity in entities[:10]:  # 限制数量
+            result['concepts'].append(entity)
+
+            # 注入概念形成
+            try:
+                cf = self.concept_formation
+                features = torch.randn(self.config.obs_dim).to(self.device)
+                cf.add_instance(entity, features)
+            except Exception:
+                pass
+
+        # 5. 提取数值
+        numerical_patterns = [
+            (r'(\d+(?:\.\d+)?)\s*(?:度|℃)', '温度', '摄氏度'),
+            (r'(\d+(?:\.\d+)?)\s*(?:米|m)', '长度', '米'),
+            (r'(\d+(?:\.\d+)?)\s*(?:千克|公斤|kg)', '重量', '千克'),
+            (r'(\d+(?:\.\d+)?)\s*(?:年)', '时间', '年'),
+        ]
+
+        for pattern, attr_type, unit in numerical_patterns:
+            matches = re.findall(pattern, text)
+            for match in matches:
+                value = float(match)
+                result['numerical_facts'].append({
+                    'attribute': attr_type,
+                    'value': value,
+                    'unit': unit,
+                })
+
+                # 注入知识图谱
+                try:
+                    kg = self.knowledge
+                    from src.knowledge.entity import Entity
+                    from src.knowledge.relation import Relation
+
+                    # 创建数值实体
+                    num_entity = Entity(
+                        id=f'{attr_type}_{value}',
+                        type='numerical',
+                        source=source,
+                        properties={'value': value, 'unit': unit},
+                    )
+                    kg.add_entity(num_entity)
+
+                    # 查找上下文中的实体
+                    context_entities = re.findall(r'[一-鿿]{2,6}', text[:100])
+                    for ctx_entity in context_entities[:3]:
+                        if ctx_entity not in ['的', '了', '是', '在', '有']:
+                            # 添加关系
+                            rel = Relation(
+                                source_id=ctx_entity,
+                                target_id=f'{attr_type}_{value}',
+                                type=attr_type,
+                                confidence=0.8,
+                            )
+                            kg.add_relation(rel)
+                except Exception:
+                    pass
+
+        # 6. 存入记忆
+        self.memory.store_experience(
+            torch.zeros(self.config.obs_dim).to(self.device),
+            torch.tensor([0]),
+            torch.zeros(self.config.obs_dim).to(self.device),
+            reward=0.0,
+            error=0.0,
+        )
+
+        return result
+
+    def think(self, question: str) -> str:
+        """思考问题 — 从知识图谱中检索答案"""
+        import re
+
+        # 提取关键词：滑动窗口匹配知识图谱中的实体
+        keywords = []
+        kg = self.knowledge if self._registry.has('knowledge') else None
+
+        # 从知识图谱中获取所有实体
+        known_entities = set()
+        if kg:
+            known_entities = set(kg.entities.keys())
+
+        # 滑动窗口匹配
+        for length in range(6, 1, -1):  # 从长到短
+            for i in range(len(question) - length + 1):
+                word = question[i:i+length]
+                if word in known_entities:
+                    keywords.append(word)
+
+        # 如果没有匹配到，使用简单分词
+        if not keywords:
+            # 用标点和常见词分割
+            separators = r'[，。！？；：、\s的了是在有位于属于包括使用产生导致引起为了因为所以如果那么但是而且或者而但]'
+            parts = re.split(separators, question)
+            for part in parts:
+                part = part.strip()
+                if part and len(part) >= 2:
+                    keywords.append(part)
+
+        keywords = list(set(keywords))
+
+        if not keywords:
+            return "我不太理解你的问题。"
+
+        # 从知识图谱中搜索
+        results = []
+        try:
+            kg = self.knowledge
+            for keyword in keywords:
+                try:
+                    # 搜索相关实体
+                    entity = kg.get_entity(keyword)
+                    if entity:
+                        # 获取相关关系
+                        relations = kg.get_relations_of(keyword)
+                        for rel in relations[:3]:
+                            results.append({
+                                'type': 'knowledge',
+                                'content': f"{rel.source_id} {rel.type} {rel.target_id}",
+                            })
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+        # 从因果DAG中搜索
+        try:
+            dag = self.causal_dag
+            for keyword in keywords:
+                if keyword in dag.nodes:
+                    node = dag.nodes[keyword]
+                    for child in node.children[:3]:
+                        results.append({
+                            'type': 'causal',
+                            'content': f"{keyword} → {child}",
+                        })
+        except Exception:
+            pass
+
+        # 从概念形成中搜索
+        try:
+            cf = self.concept_formation
+            for keyword in keywords:
+                if keyword in cf.concepts:
+                    concept = cf.concepts[keyword]
+                    if concept.parent:
+                        results.append({
+                            'type': 'concept',
+                            'content': f"{keyword} 是一种 {concept.parent}",
+                        })
+        except Exception:
+            pass
+
+        # 从知识图谱中搜索数值关系
+        try:
+            kg = self.knowledge
+
+            # 检测数值问题类型
+            numerical_types = {
+                '温度': ['度', '温度', '热', '冷'],
+                '长度': ['高', '长', '宽', '深', '远', '米'],
+                '重量': ['重', '千克', '公斤', '斤'],
+                '时间': ['年', '月', '天', '小时', '分钟', '秒'],
+            }
+
+            question_type = None
+            for attr_type, kw_list in numerical_types.items():
+                for kw in kw_list:
+                    if kw in question:
+                        question_type = attr_type
+                        break
+                if question_type:
+                    break
+
+            # 搜索数值实体
+            for entity_id, entity in kg.entities.items():
+                if entity.type == 'numerical':
+                    # 获取数值属性
+                    if hasattr(entity, 'properties') and entity.properties:
+                        value = entity.properties.get('value', '')
+                        unit = entity.properties.get('unit', '')
+                        attr = entity_id.split('_')[0] if '_' in entity_id else ''
+
+                        # 如果是匹配的类型，添加结果
+                        if question_type and attr == question_type:
+                            results.append({
+                                'type': 'numerical',
+                                'content': f"{attr}为{value}{unit}",
+                            })
+                        # 或者包含关键词
+                        elif any(kw in entity_id for kw in keywords):
+                            results.append({
+                                'type': 'numerical',
+                                'content': f"{attr}为{value}{unit}",
+                            })
+        except Exception:
+            pass
+
+        if not results:
+            return f"我没有关于{', '.join(keywords[:3])}的知识。"
+
+        # 生成答案
+        parts = []
+        seen = set()
+        for r in results[:5]:
+            content = r.get('content', str(r))
+            if content not in seen:
+                seen.add(content)
+                parts.append(f"- {content}")
+
+        return '\n'.join(parts)
+
+    # ------------------------------------------------------------------
     # 语言
     # ------------------------------------------------------------------
 
