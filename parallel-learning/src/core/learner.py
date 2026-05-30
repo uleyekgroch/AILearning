@@ -1402,6 +1402,25 @@ class Learner:
                     confidence=item[3] if len(item) > 3 else 0.5,
                 )
 
+        # 34. 层次概念：将实体加入概念层次结构
+        for entity in entities:
+            entity_emb = self._encode_text(entity)
+            # 自动分类到层次结构
+            self.hierarchical_concepts.auto_classify(entity, entity_emb)
+
+        # 35. 时序预测：将此文本作为序列中的一个观察
+        temporal_result = self.temporal_sequence.observe(
+            item=text[:30],
+            embedding=text_repr.detach(),
+        )
+
+        # 36. 注意力门控：评估此输入的注意力权重
+        should_learn, attn_weight = self.attention_gate.gate_learning(
+            content=text,
+            embedding=text_repr,
+            prediction_error=temporal_result.get('prediction_error', 0.0),
+        )
+
         return result
 
     def _verify_learned_knowledge(self, text: str, entities: List[str],
@@ -2044,6 +2063,50 @@ class Learner:
                 device=str(self.device),
             )
         return self._xfer
+
+    # ===== 机制21-23: 层次概念+时序预测+注意力门控 =====
+
+    @property
+    def hierarchical_concepts(self):
+        """层次概念体系（懒初始化）
+
+        基于PMC 2023: mPFC+海马体的层次概念表征。
+        """
+        if not hasattr(self, '_hier_concepts'):
+            from src.learning.hierarchical_concepts import HierarchicalConceptSystem
+            self._hier_concepts = HierarchicalConceptSystem(
+                d_model=self.config.obs_dim,
+                device=str(self.device),
+            )
+        return self._hier_concepts
+
+    @property
+    def temporal_sequence(self):
+        """时序预测学习系统（懒初始化）
+
+        基于Neuron 2024: CA3预测+CA1误差的海马体序列学习。
+        """
+        if not hasattr(self, '_temporal'):
+            from src.learning.temporal_sequence import TemporalSequenceSystem
+            self._temporal = TemporalSequenceSystem(
+                d_model=self.config.obs_dim,
+                device=str(self.device),
+            )
+        return self._temporal
+
+    @property
+    def attention_gate(self):
+        """注意力门控系统（懒初始化）
+
+        基于Trends Cog Sci 2025: 新奇+目标+竞争的选择性注意力。
+        """
+        if not hasattr(self, '_attn_gate'):
+            from src.learning.attention_gating import AttentionGate
+            self._attn_gate = AttentionGate(
+                d_model=self.config.obs_dim,
+                device=str(self.device),
+            )
+        return self._attn_gate
 
     def _subword_tokenize(self, text: str) -> List[str]:
         """子词分词 — 捕获有意义的片段
