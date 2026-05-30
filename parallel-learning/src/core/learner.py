@@ -1118,6 +1118,23 @@ class Learner:
         else:
             self._learning_stats['failed'] += 1
 
+        # 12. 自改进：评估性能并调整策略
+        score = verification.get('score', 0.5)
+        improvement = self.self_improvement.evaluate_performance(text[:30], score)
+
+        # 应用脚手架调整
+        for adj in improvement.get('adjustments', []):
+            param = adj['parameter']
+            if param == 'hebbian_lr':
+                # 更新Hebbian学习率
+                pass  # 在_train_embedding中使用get_parameter
+            elif param == 'negative_threshold':
+                # 更新负样本阈值
+                pass  # 在_train_embedding中使用get_parameter
+            elif param == 'confidence_threshold':
+                # 更新置信度阈值
+                pass  # 在_synthesize_from_reasoning中使用get_parameter
+
         return result
 
     def _verify_learned_knowledge(self, text: str, entities: List[str],
@@ -1428,6 +1445,14 @@ class Learner:
         return self.world_model.imagine(goal)
 
     @property
+    def self_improvement(self):
+        """自改进系统（懒初始化）"""
+        if not hasattr(self, '_self_improvement'):
+            from src.learning.self_improvement import SelfImprovementSystem
+            self._self_improvement = SelfImprovementSystem()
+        return self._self_improvement
+
+    @property
     def multiscale_learning(self):
         """多时间尺度学习系统（懒初始化）"""
         if not hasattr(self, '_multiscale'):
@@ -1549,18 +1574,19 @@ class Learner:
             sim_to_text = torch.cosine_similarity(emb.unsqueeze(0), text_emb.unsqueeze(0))
             loss = loss + (1.0 - sim_to_text) * 0.5
 
-        # 负样本：实体之间保持区分（阈值从0.5开始，更积极地防止坍缩）
+        # 负样本：实体之间保持区分（阈值由自改进系统动态调整）
+        neg_threshold = self.self_improvement.get_parameter('negative_threshold')
         for i in range(len(entity_embs)):
             for j in range(i + 1, len(entity_embs)):
                 sim = torch.cosine_similarity(
                     entity_embs[i].unsqueeze(0),
                     entity_embs[j].unsqueeze(0)
                 )
-                # 如果相似度过高，增加损失（阈值0.5更积极）
-                if sim > 0.5:
-                    loss = loss + (sim - 0.5) * 2.0
+                # 如果相似度过高，增加损失
+                if sim > neg_threshold:
+                    loss = loss + (sim - neg_threshold) * 2.0
 
-        if loss.requires_grad:
+        if isinstance(loss, torch.Tensor) and loss.requires_grad:
             loss.backward()
             self._text_optimizer.step()
 
@@ -1790,10 +1816,11 @@ class Learner:
             seen.add(r.content)
             unique.append(r)
 
-        # 生成答案（三元组→自然语言）
+        # 生成答案（三元组→自然语言，置信度阈值由自改进系统动态调整）
+        conf_threshold = self.self_improvement.get_parameter('confidence_threshold')
         answer_lines = []
         for r in unique[:5]:
-            if r.confidence > 0.3:
+            if r.confidence > conf_threshold:
                 # 尝试将三元组转换为自然语言
                 sentence = self._triple_to_sentence(r.content)
                 answer_lines.append(f"- {sentence}")

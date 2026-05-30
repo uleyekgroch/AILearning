@@ -83,7 +83,7 @@ class UnifiedReasoningEngine:
         return results
 
     def _direct_query(self, question: str) -> List[ReasoningResult]:
-        """直接查询知识图谱"""
+        """直接查询知识图谱（只返回与问题相关的结果）"""
         results = []
         learner = self.learner
 
@@ -113,6 +113,9 @@ class UnifiedReasoningEngine:
                     try:
                         relations = kg.get_relations_of(entity_id)
                         for rel in relations:
+                            # 过滤自引用关系
+                            if entity_id == rel.target_id:
+                                continue
                             content = f"{entity_id} {rel.type} {rel.target_id}"
                             results.append(ReasoningResult(
                                 content=content,
@@ -123,14 +126,30 @@ class UnifiedReasoningEngine:
                     except Exception:
                         pass
 
-        # 关键词匹配补充
+        # 关键词匹配补充（实体名或关系目标包含关键词）
         if kg and hasattr(kg, 'entities'):
             for keyword in keywords:
                 for entity_id in kg.entities:
-                    if keyword in entity_id:
+                    # 检查实体名是否包含关键词
+                    entity_matches = keyword in entity_id
+                    # 检查关系目标是否包含关键词
+                    target_matches = False
+                    try:
+                        relations = kg.get_relations_of(entity_id)
+                        for rel in relations:
+                            if keyword in rel.target_id:
+                                target_matches = True
+                                break
+                    except Exception:
+                        pass
+
+                    if entity_matches or target_matches:
                         try:
                             relations = kg.get_relations_of(entity_id)
                             for rel in relations:
+                                # 过滤自引用关系
+                                if entity_id == rel.target_id:
+                                    continue
                                 content = f"{entity_id} {rel.type} {rel.target_id}"
                                 if content not in [r.content for r in results]:
                                     results.append(ReasoningResult(
