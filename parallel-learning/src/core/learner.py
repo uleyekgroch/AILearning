@@ -536,15 +536,21 @@ class Learner:
     # ------------------------------------------------------------------
 
     def choose_action(self, obs: torch.Tensor) -> int:
-        """好奇心驱动探索 + 世界模拟规划
+        """好奇心驱动探索 + Empowerment + 世界模拟规划
 
         结合：
-        1. 好奇心驱动（探索未知）
-        2. 世界模拟（预测后果）
-        3. 批量预测（选择最佳）
+        1. Empowerment驱动（控制力最大化）
+        2. 好奇心驱动（探索未知）
+        3. 世界模拟（预测后果）
+        4. 批量预测（选择最佳）
         """
         curiosity = self.engine.get_curiosity(obs)
         n_actions = self.config.action_dim
+
+        # Empowerment探索奖励
+        exploration = self.compute_exploration_bonus(obs, curiosity)
+        empowerment = exploration['empowerment']
+        exploration_bonus = exploration['bonus']
 
         # 尝试使用世界模拟器规划
         try:
@@ -559,8 +565,8 @@ class Learner:
         except (KeyError, Exception):
             pass
 
-        # 回退到好奇心驱动探索
-        explore_prob = min(0.3, curiosity * 0.5)
+        # Empowerment + 好奇心加权探索
+        explore_prob = min(0.5, (curiosity * 0.3 + exploration_bonus * 0.4))
         if torch.rand(1).item() < explore_prob:
             counts = self._action_counts + 1e-6
             probs = (1.0 / counts).softmax(0)
@@ -640,7 +646,18 @@ class Learner:
         # 4. 整合新旧知识
         self._integrate_knowledge()
 
-        return {'consolidated': len(consolidated), 'total': len(memories)}
+        # 5. 多时间尺度巩固 — 选择性巩固高不确定性记忆
+        multiscale_consolidated = self.multiscale_learning.consolidate()
+
+        # 6. 遗忘低保留率记忆
+        forgotten = self.multiscale_learning.forget(threshold=0.1)
+
+        return {
+            'consolidated': len(consolidated),
+            'multiscale_consolidated': len(multiscale_consolidated),
+            'forgotten': len(forgotten),
+            'total': len(memories),
+        }
 
     def _offline_replay(self, memories: List[Dict]):
         """离线重放 — 重组记忆
@@ -1078,6 +1095,22 @@ class Learner:
             error=0.0 if verification['passed'] else 1.0,
         )
 
+        # 10b. 存入多时间尺度记忆系统
+        importance = 0.8 if verification['passed'] else 0.3
+        self.multiscale_learning.store_memory(
+            key=text[:50],
+            content=text,
+            importance=importance,
+        )
+
+        # 10c. 存入感觉运动接地系统（文本作为伪感觉运动数据）
+        for entity in entities:
+            entity_repr = self._encode_text(entity)
+            self.store_sensorimotor_experience(
+                entity,
+                visual=entity_repr,  # 用文本嵌入作为伪视觉
+            )
+
         # 11. 更新学习统计
         self._learning_stats['total_learned'] += 1
         if verification['passed']:
@@ -1339,7 +1372,10 @@ class Learner:
             self._text_optimizer = torch.optim.Adam(
                 self._learnable_encoder.parameters(), lr=1e-4
             )
-            self._embedding_cache = {}
+            # LRU缓存（限制大小防止内存膨胀）
+            from collections import OrderedDict
+            self._embedding_cache = OrderedDict()
+            self._embedding_cache_max = 10000
             # 用于收集语料训练分词器
             self._training_corpus = []
 
@@ -1354,8 +1390,9 @@ class Learner:
                     self._learnable_encoder.parameters(), lr=1e-4
                 )
 
-        # 检查缓存
+        # 检查缓存（LRU：命中时移到末尾）
         if text in self._embedding_cache:
+            self._embedding_cache.move_to_end(text)
             return self._embedding_cache[text]
 
         # 使用 Transformer 编码
@@ -1365,8 +1402,11 @@ class Learner:
             with torch.no_grad():
                 result = self._learnable_encoder(text)
 
-        # 缓存
+        # LRU缓存：超过限制时淘汰最旧的
         self._embedding_cache[text] = result
+        if len(self._embedding_cache) > self._embedding_cache_max:
+            self._embedding_cache.popitem(last=False)
+
         return result
 
     @property

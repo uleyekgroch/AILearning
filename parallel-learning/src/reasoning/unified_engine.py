@@ -282,23 +282,76 @@ class UnifiedReasoningEngine:
         return results
 
     def _probabilistic_reasoning(self, question: str) -> List[ReasoningResult]:
-        """概率推理"""
+        """概率推理 — 基于自由能原理的贝叶斯推理
+
+        使用 FEP 预测器估计不确定性，用精度加权推理。
+        """
         results = []
         learner = self.learner
 
         # 使用FEP预测器
-        if hasattr(learner, 'predictor') and learner.predictor is not None:
-            try:
-                q_repr = learner._encode_text(question)
-                # 简化：使用预测器的不确定性作为置信度
+        try:
+            # 获取FEP预测器
+            fep_predictor = None
+            if hasattr(learner, '_registry'):
+                try:
+                    fep_predictor = learner._registry.get('fep_predictor')
+                except Exception:
+                    pass
+
+            if fep_predictor is None:
+                return results
+
+            q_repr = learner._encode_text(question)
+
+            # 使用FEP预测器的不确定性
+            if hasattr(fep_predictor, 'error_history') and len(fep_predictor.error_history) > 0:
+                # 计算平均预测误差
+                avg_error = sum(fep_predictor.error_history) / len(fep_predictor.error_history)
+                # 精度 = 1/误差
+                precision = 1.0 / (avg_error + 1e-6)
+
+                # 根据精度评估推理置信度
+                confidence = min(0.9, precision * 0.1)
+
+                # 查找相关实体的不确定性
+                keywords = learner._extract_keywords(question)
+                uncertainty_info = []
+                for keyword in keywords:
+                    if keyword in learner._metacognition.get('uncertainty_map', {}):
+                        uncertainty = learner._metacognition['uncertainty_map'][keyword]
+                        uncertainty_info.append(f"{keyword}: 不确定性={uncertainty:.2f}")
+
+                reasoning = ["基于自由能原理的概率估计"]
+                if uncertainty_info:
+                    reasoning.append(f"知识不确定性: {', '.join(uncertainty_info)}")
+
                 results.append(ReasoningResult(
-                    content="[概率推理]",
-                    confidence=0.3,
+                    content=f"[概率推理] 精度={precision:.2f}",
+                    confidence=confidence,
                     method='probabilistic',
-                    reasoning_chain=["基于自由能原理的概率估计"],
+                    reasoning_chain=reasoning,
                 ))
+
+            # 使用FEP信念更新
+            try:
+                fep_belief = learner._registry.get('fep_belief')
+                if fep_belief and hasattr(fep_belief, 'belief_mean'):
+                    belief = fep_belief.belief_mean
+                    belief_uncertainty = fep_belief.belief_var if hasattr(fep_belief, 'belief_var') else None
+
+                    if belief is not None:
+                        results.append(ReasoningResult(
+                            content=f"[信念状态] 均值={belief.mean().item():.4f}",
+                            confidence=0.6,
+                            method='probabilistic',
+                            reasoning_chain=["基于变分自由能的信念状态估计"],
+                        ))
             except Exception:
                 pass
+
+        except Exception:
+            pass
 
         return results
 

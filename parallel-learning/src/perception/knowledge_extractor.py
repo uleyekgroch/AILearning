@@ -72,8 +72,8 @@ class EntityExtractor(nn.Module):
             nn.Linear(d_model // 2, len(BIO_TAGS)),
         )
 
-        # 字符嵌入
-        self.char_embedding = nn.Embedding(10000, d_model)
+        # 字符嵌入（支持更大词表）
+        self.char_embedding = nn.Embedding(50000, d_model, padding_idx=0)
 
     def forward(self, token_ids: torch.Tensor) -> torch.Tensor:
         """预测 BIO 标签
@@ -326,10 +326,25 @@ class LearnableKnowledgeExtractor:
 
         return entities
 
-    def _get_span_repr(self, text_repr: torch.Tensor, start: int, end: int) -> torch.Tensor:
-        """获取文本区间的表示（简单平均池化）"""
-        # 简化：使用整个文本表示
-        return text_repr
+    def _get_span_repr(self, text_repr: torch.Tensor, start: int, end: int,
+                      token_reprs: Optional[torch.Tensor] = None) -> torch.Tensor:
+        """获取文本区间的表示
+
+        如果有token级表示，做真正的区间池化；
+        否则用全文表示的加权近似。
+        """
+        if token_reprs is not None and token_reprs.dim() >= 2:
+            # 真正的区间池化
+            seq_len = token_reprs.size(0)
+            start = max(0, min(start, seq_len - 1))
+            end = max(start, min(end, seq_len))
+            span = token_reprs[start:end]
+            if span.size(0) > 0:
+                return span.mean(dim=0)
+
+        # 回退：用位置加权的全文表示
+        weight = (end - start) / max(text_repr.size(0), 1)
+        return text_repr * weight
 
     def train_on_feedback(self, text: str, correct_triples: List[Tuple[str, str, str]],
                          encoder=None):
@@ -369,7 +384,24 @@ class LearnableKnowledgeExtractor:
             correct_tags[:entity_probs.size(1)]
         )
 
-        entity_loss.backward()
+        # 关系分类损失
+        text_repr = encoder.forward(text)
+        relation_loss = torch.tensor(0.0, device=self.device)
+        for subj, rel, obj in correct_triples:
+            subj_repr = encoder.forward(subj)
+            obj_repr = encoder.forward(obj)
+            rel_probs = self.relation_classifier(subj_repr, obj_repr, text_repr)
+
+            # 找到正确关系的ID
+            if rel in REL_TO_ID:
+                target = torch.tensor([REL_TO_ID[rel]], device=self.device)
+                relation_loss = relation_loss + F.cross_entropy(
+                    rel_probs.unsqueeze(0), target
+                )
+
+        # 总损失
+        total_loss = entity_loss + relation_loss
+        total_loss.backward()
         self.optimizer.step()
 
         self.entity_extractor.eval()

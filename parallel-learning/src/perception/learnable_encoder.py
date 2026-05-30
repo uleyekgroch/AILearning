@@ -362,13 +362,36 @@ class LearnableTextEncoder(nn.Module):
         return pooled.squeeze(0)
 
     def encode_batch(self, texts: List[str]) -> torch.Tensor:
-        """批量编码文本
+        """批量编码文本（真正的批处理）
 
         Returns:
             (batch, d_model) 批量向量
         """
-        vectors = [self.forward(text) for text in texts]
-        return torch.stack(vectors)
+        if len(texts) == 0:
+            return torch.zeros(0, self.d_model)
+
+        # 批量分词
+        batch_token_ids = [self.tokenizer.encode(text, self.max_len) for text in texts]
+        x = torch.tensor(batch_token_ids, dtype=torch.long, device=self.embedding.weight.device)
+
+        # 嵌入 + 位置编码
+        x = self.embedding(x) * math.sqrt(self.d_model)
+        x = self.pos_encoding(x)
+
+        # 创建padding mask
+        mask = (x.sum(dim=-1) != 0).unsqueeze(1).unsqueeze(2)
+
+        # Transformer编码（批处理）
+        for layer in self.layers:
+            x = layer(x, mask)
+
+        x = self.norm(x)
+
+        # 池化
+        mask_float = (x.sum(dim=-1) != 0).float().unsqueeze(-1)
+        pooled = (x * mask_float).sum(dim=1) / mask_float.sum(dim=1).clamp(min=1)
+
+        return pooled
 
     def similarity(self, text1: str, text2: str) -> float:
         """计算两个文本的语义相似度"""
