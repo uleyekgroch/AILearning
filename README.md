@@ -13,243 +13,134 @@
 ## 系统架构
 
 ```
-src/core/learner.py — 主学习体（2000+行）
-├── 感知层 — 多模态编码
-├── 预测编码引擎 — Hebbian学习
+src/core/learner.py — 主学习体（3282行）
+├── 感知层 — BPE分词 + Transformer编码器
+├── 预测编码引擎 — Hebbian学习 + 预测编码Light
 ├── 知识图谱 — 实体-关系存储
-├── 记忆系统 — 工作/情景/语义记忆
-├── 推理引擎 — 演绎/归纳/类比
+├── 记忆系统 — 工作/情景/语义记忆 + 多时间尺度
+├── 推理引擎 — 6种推理模式（直接/因果/归纳/类比/反事实/概率）
 ├── 元认知 — 自我评估/知识空白
 ├── 语言接地 — 符号↔世界模型
-└── 发展阶段 — Piaget式课程
+├── 发展阶段 — Piaget式课程
+├── 自改进 — 脚手架+权重更新
+├── 反思学习 — 经验反思+策略合成
+├── 测试时训练 — In-Place TTT (ICLR 2026)
+├── BTSP学习 — 单次学习（资格痕迹+平台电位）
+└── 认知机制 — 认知路由+GHL+学习进展+类别先于语言+元学习组合
 ```
+
+## 项目规模
+
+- **源文件**: 135个Python文件
+- **代码量**: 36,741行
+- **主系统**: 3,282行 (learner.py)
+- **学习模块**: 21个
+- **推理模块**: 20个
+- **感知模块**: 10个
+- **Git提交**: 20次迭代
 
 ## 核心能力
 
-### 1. Hebbian学习 + 预测编码
+### 1. BPE分词 + Transformer编码器
 
 ```python
-# Hebbian规则: ΔW = η × pre × post
-weight[idx] += hebbian_lr * entity_activation
-
-# 预测编码
-epsilon = actual - predicted  # 预测误差
-W += lr * np.outer(pre_synaptic, post_synaptic_error)
+# 从字符级升级到子词级
+encoder = LearnableTextEncoder(d_model=128, n_heads=4, n_layers=2)
+encoder.train_tokenizer(corpus)  # 从语料学习BPE合并规则
+embedding = encoder(text)  # Transformer编码
 ```
 
-### 2. 离线整合（睡眠）
+### 2. 测试时训练 (In-Place TTT)
 
 ```python
-def consolidate(self):
-    self._offline_replay(memories)  # 重组记忆
-    self._extract_abstractions(memories)  # 提取抽象
-    self._integrate_knowledge()  # 整合知识
+# 推理时原地更新快权重
+ttt = TestTimeTrainer(encoder, lr=1e-5)
+ttt.adapt_to_query(query, query_repr, relevant_entities)
+# 自适应学习率：相似度高→小更新，相似度低→大更新
 ```
 
-### 3. 组合泛化
+### 3. BTSP单次学习
 
 ```python
-# 组合概念
-compose_concepts('红', '球') → '红球'
-decompose_concept('红球') → ['红', '球']
-
-# 类比迁移
-analogical_transfer('水流', '电流', {'水': '电', '管道': '导线'})
+# 行为时间尺度突触可塑性
+btsp = BTSPLearningSystem()
+btsp.mark_eligible(entity, embedding)  # 资格痕迹
+btsp.trigger_plateau(trigger_strength=1.0)  # 平台电位
+# 差异化增强：远离其他实体中心
 ```
 
-### 4. 矛盾检测与修正
+### 4. 认知预测路由
 
 ```python
-# 检测矛盾
-conflict = _check_contradiction(subject, relation, obj)
-
-# 解决矛盾
-_resolve_contradiction(subject, relation, obj, conflict, source)
+# 区分低级感觉误差和高级认知误差
+router = CognitivePredictiveRouter()
+routing = router.route_error(low_error, high_error)
+# 动态调整路由权重：低级0.3, 高级0.7
 ```
 
-### 5. 间隔重复
+### 5. GHL全局调制Hebbian学习
 
 ```python
-# 难以回忆的项目 → 加强巩固
-# 容易回忆的项目 → 延长间隔
-update_uncertainty(key, success)
+# 神经调质信号调制局部学习
+ghl = GlobalModulatedHebbian()
+global_signal = ghl.compute_global_signal(reward, novelty, uncertainty)
+delta = ghl.hebbian_update(pre, post, global_signal)
+# Δw = η × sign(global_signal) × pre × post
+```
+
+### 6. 学习进展好奇心
+
+```python
+# 探索甜蜜区（不太简单也不太难）
+progress = LearningProgressCuriosity()
+progress.update_progress(domain, performance)
+sweet_spot = progress.get_sweet_spot_domain()
+```
+
+### 7. 先类别后语言
+
+```python
+# 感知分类先于语言涌现
+categories = PerceptualCategorySystem()
+category = categories.discover_category(entity, representation)
+# 自动聚类：12个实体→1个类别
+```
+
+### 8. 元学习组合规则
+
+```python
+# 学习如何组合，而非记住什么组合
+composition = MetaLearningComposition()
+composition.learn_rule(components, result, success)
+predicted = composition.apply_rule(new_components)
 ```
 
 ## 测试结果
 
 | 问题 | 答案 |
 |------|------|
-| 什么是人工智能 | 计算机科学的一个分支 |
-| 牛顿发现了什么 | 万有引力定律 |
-| 为什么地面湿了 | 下雨 → 地面湿了 |
-| 水在多少度沸腾 | 100.0摄氏度 |
-| 水流像什么 | 水流 像 电流 |
+| 什么是人工智能 | 人工智能是计算机科学的一个分支。 |
+| 牛顿发现了什么 | 牛顿发现了万有引力定律。 |
+| 为什么地面湿了 | 下雨导致地面湿了。 |
+| 水在多少度沸腾 | 水的温度是100摄氏度沸腾。 |
 
-## 性能
+## 人类学习研究集成
 
-- 学习速度: 1935条/秒 (CUDA加速)
-- 基准分数: 0.94 (A级)
-- GPU: RTX 4060, 8GB显存
-
-## 与传统系统的区别
-
-| 维度 | 传统LLM | 本系统 |
-|------|---------|--------|
-| 学习方式 | 预训练+微调 | 持续学习 |
-| 推理方式 | 统计关联 | 因果推理 |
-| 记忆方式 | 静态参数 | 动态重构 |
-| 进化能力 | 无 | 自我改进 |
-| 可解释性 | 低 | 高 |
-
-### 涌现的符号系统
-
-| 类别 | 符号 | 涌现条件 |
-|------|------|----------|
-| 组合性 | 颜色+形状+大小+材质 | 单符号不足以区分场景 |
-| 否定 | "not" | 子集关系（多值特征） |
-| 时态 | "past"/"present"/"future" | 时间维度成为独立特征 |
-| 因果 | "because" | 混杂场景（虚假相关+真正因果） |
-| 类比 | "like" | 跨领域特征隔离+关系共享 |
-| 工具 | "use"/"for" | 外观歧义时的功能描述需求 |
-| 视角 | "know"/"think"/"believe" | 置信度差异 |
-| 跨模态 | "loud"/"rough" 等 20 个 | 视觉模糊时的听觉/触觉区分 |
-
-## 项目结构
-
-```
-mvl/
-├── 核心系统
-│   ├── agent.py / agent_fep.py          # 学习体
-│   ├── environment.py / environment_3d.py # 环境
-│   ├── language_emergence.py             # 语言涌现核心
-│   └── main.py                           # 入口
-│
-├── 符号接地模块（13 个 grounding_*.py）
-│   ├── grounding_actions.py              # 动作
-│   ├── grounding_emotions.py             # 情感
-│   ├── grounding_causal_reasoning.py     # 因果推理
-│   ├── grounding_theory_of_mind.py       # 心智理论
-│   ├── grounding_abstraction.py          # 抽象推理
-│   ├── grounding_tool_use.py             # 工具使用
-│   └── grounding_crossmodal.py           # 跨模态
-│
-├── 高级语言模块
-│   ├── narrative.py                      # 叙事与篇章
-│   ├── metacognition.py                  # 元认知
-│   ├── language_society.py               # 多 Agent 社会
-│   └── generational_transfer.py          # 跨代知识传递
-│
-├── 感官编码模块
-│   ├── encoder_sensory.py              # 可学习感官编码器
-│   ├── environment_sensory.py          # 感官网格世界
-│   └── agent_sensory.py               # 端到端感官Agent
-│
-├── 大规模社会模块
-│   ├── language_society_large.py       # 100+ Agent 语言社会（GPU 加速相似度）
-│   └── multi_agent_env.py             # 自适应网格环境 + 空间索引
-
-├── CUDA 加速模块
-│   └── cuda_utils.py                  # 设备管理、NumPy↔PyTorch、批量操作
-│
-├── 3D 多 Agent 模块
-│   ├── multi_agent_3d_env.py          # 多 Agent 共享 3D 环境
-│   ├── agent_social.py               # 社会学习 Agent
-│   └── instruction_grounding.py      # 指令 Grounding（动词+物体描述）
-│
-├── 跨语言翻译模块
-│   └── language_translator.py        # 双语 Agent + 跨环境翻译
-│
-├── 自主学习模块
-│   └── self_directed_learning.py     # 知识评估 + 目标选择 + 自主学习
-│
-├── 课程学习模块
-│   └── curriculum_learning.py        # 歧义度控制 + 渐进课程 + 自主节奏
-│
-├── 神经科学验证模块
-│   └── neuroscience_validation.py    # 文献数据 + 曲线拟合 + 关键期测试
-│
-├── 开放式学习模块
-│   └── open_ended_learning.py        # 内驱力探索 + 结构发现
-│
-├── 累积文化创新模块
-│   └── cultural_innovation.py        # 棘轮效应 + 代际传承 + 创新涌现
-│
-├── 具身隐喻模块
-│   └── embodied_metaphor.py          # 跨域映射涌现 + 隐喻接地测试
-│
-├── 关键期模块
-│   └── critical_period.py            # 可塑性衰减 + 关键期关闭 + 重新打开
-│
-├── 预测编码模块
-│   └── experiment_predictive_coding.py  # Hebbian vs 反向传播对比 + 局部性验证
-│
-├── 类比隐喻模块
-│   └── analogy_metaphor.py             # 结构映射检测 + 情感空间 + 具身隐喻
-│
-├── 认知扩展模块
-│   ├── experiment_counterfactual.py    # 反事实推理（if/then/would）
-│   ├── experiment_cooperative_planning.py # 协作规划（角色 + 顺序标记）
-│   ├── experiment_continuous_concepts.py  # 连续概念空间（模糊类别）
-│   ├── experiment_language_memory.py     # 语言驱动记忆（记忆支架）
-│   ├── experiment_language_attention.py  # 语言引导注意力（感知调制）
-│   ├── experiment_adversarial.py         # 对抗性通信（欺骗 + 信任）
-│   ├── experiment_hierarchical_syntax.py # 层级语法（词序 + 递归嵌入）
-│
-├── 量化与空间模块
-│   ├── experiment_quantitative_language.py  # 量化语言（数字 + 计数 + 多/少）
-│   └── experiment_spatial_language.py       # 空间关系语言（介词涌现）
-│
-├── 好奇心与规范模块
-│   ├── experiment_curiosity_question.py     # 好奇心提问（why/what/how 涌现）
-│   └── experiment_social_norms.py           # 社会规范语言（礼貌 + 禁忌）
-│
-├── 适应与辩论模块
-│   ├── experiment_nonstationary.py          # 非平稳环境适应（词汇淘汰 + 新词涌现）
-│   └── experiment_debate.py                 # 辩论与说服（论证标记涌现）
-│
-├── 道德与游戏模块
-│   ├── experiment_moral_language.py         # 道德语言涌现（公平 + 利他信号）
-│   └── experiment_humor_play.py             # 幽默与游戏（非工具性通信）
-│
-├── 对话与认知模块
-│   ├── experiment_conversational_repair.py  # 对话修复（huh/again/different 澄清标记）
-│   ├── experiment_sleep_consolidation.py    # 睡眠式记忆巩固（离线重播 + 遗忘曲线）
-│   ├── experiment_politeness.py             # 礼貌与面子语言（please/sorry 社交距离）
-│   └── experiment_empathy.py                # 共情与视角采择（happy/sad 情感标记）
-│
-├── 社会与文化模块
-│   ├── experiment_ownership.py              # 所有权与财产（mine/yours/share 涌现）
-│   ├── experiment_negotiation.py            # 谈判与讨价还价（fair/deal/compromise）
-│   ├── experiment_dialect.py                # 方言分化与语言接触（pidgin → creole）
-│   └── experiment_cryptolect.py             # 秘密语言（群体内部密码词汇）
-
-└── 实验模块（46 个 experiment_*.py）
-```
-
-## 快速开始
-
-```bash
-cd mvl
-
-# 运行语言涌现实验
-python experiment_language.py
-
-# 运行否定涌现实验
-python experiment_compound_negation.py
-
-# 运行因果推理实验
-python experiment_causal_reasoning.py
-
-# 运行跨模态语言实验
-python experiment_crossmodal.py
-
-# 运行全部实验
-python experiment_tool_use.py
-```
-
-## 理论框架
-
-详见 [theory_framework.md](theory_framework.md)，包含 5.1-5.31 节的完整理论分析。
+| 研究发现 | 核心思想 | 论文来源 |
+|---------|---------|---------|
+| BTSP单次学习 | 资格痕迹+差异化增强 | Quanta Magazine 2026 |
+| 学习进度监控 | 选择"够得着的挑战" | Nature Communications |
+| 选择性重放 | 高不确定性记忆优先 | 海马体研究 |
+| 预测编码Light | 抑制可预测信号 | Nature Communications 2025 |
+| 奖励表征后移 | 信用分配时间迁移 | Nature 2026 哈佛 |
+| 组合泛化 | 分离what/how+共享子空间 | Nature 2023 MLC |
+| 社会偶联学习 | 即时反馈循环 | Royal Society 2026 |
+| 符号接地 | 交互式环境因果学习 | arXiv 2026 USC |
+| 认知预测路由 | 区分低级/高级误差 | Annual Review 2026 |
+| GHL全局调制 | 神经调质信号 | arXiv 2026 |
+| 学习进展好奇心 | 探索甜蜜区 | Oudeyer 2026 |
+| 先类别后语言 | 感知分类先于语言 | Nature Neuroscience 2026 |
+| 元学习组合规则 | 学习如何组合 | Nature 2023 MLC |
 
 ## 研究阶段
 
@@ -318,6 +209,15 @@ python experiment_tool_use.py
 | 75 | 多 Agent 辩论与说服（论证标记 because/but/so 涌现）| ✅ |
 | 76 | 道德语言涌现（公平 + 利他信号 + 声誉系统）| ✅ |
 | 77 | 幽默与游戏语言（非工具性通信 + 社交凝聚）| ✅ |
+| 78 | 通用学习AI — 7个Phase完整实现 | ✅ |
+| 79 | 连接孤岛模块 + 打通端到端梯度流 | ✅ |
+| 80 | 自改进系统 + 经验反思学习 | ✅ |
+| 81 | 统一决策框架 + 世界模型接入 | ✅ |
+| 82 | 测试时训练 (In-Place TTT, ICLR 2026) | ✅ |
+| 83 | BTSP单次学习 (Quanta Magazine 2026) | ✅ |
+| 84 | 修正8个愿景差距 — 7个新引擎 | ✅ |
+| 85 | 集成5个人类学习机制 | ✅ |
+| 86 | 实现5个最新研究机制 | ✅ |
 
 ## 关键论文
 
@@ -328,3 +228,16 @@ python experiment_tool_use.py
 5. Tomasello, M. (2014). *A Natural History of Human Thinking*.
 6. Pepperberg, I. M. (2009). *Alex & Me*.
 7. Kuhl, P. K. (2007). Is speech learning 'gated' by the social brain? *Developmental Science*.
+8. LeCun, Y. (2022). A Path Towards Autonomous Machine Intelligence.
+9. Hafner, D. et al. (2025). Mastering Diverse Control Tasks through World Models. *Nature*.
+10. Heins et al. (2025). AXIOM: Learning to Play Games in Minutes. *arXiv:2505.24784*.
+11. Behrouz et al. (2025). Nested Learning. *NeurIPS 2025*.
+12. Scholkopf et al. (2021). Toward Causal Representation Learning. *Proceedings of IEEE*.
+13. Mantiuk et al. (2025). From Curiosity to Competence. *arXiv:2507.08210*.
+14. Xu et al. (2025). Symbol Grounding. *Nature Human Behaviour*.
+15. Lake & Baroni (2023). Human-like systematic generalization through MLC. *Nature*.
+16. Oudeyer, P. (2026). Curiosity. *HAL-Inria*.
+17. Furutachi & Hofer (2026). Rethinking Predictive Processing. *Annual Review of Neuroscience*.
+18. arXiv:2601.21367 (2026). Hebbian Learning with Global Direction.
+19. Quanta Magazine (2026). A New Type of Neuroplasticity Rewires the Brain After a Single Experience.
+20. Nature Neuroscience (2026). Two-month-old babies are already making sense of the world.
