@@ -94,8 +94,11 @@ class TestTimeTrainer:
 
     def _update_fast_weights(self, query: str, query_repr: torch.Tensor,
                            entity_reprs: List[torch.Tensor], adaptive_lr: float = None):
-        """更新快权重（嵌入层的最后一层）"""
-        # 获取嵌入层
+        """更新快权重（嵌入层的最后一层）
+
+        使用BPE token级别更新，而非字符级别。
+        """
+        # 获取嵌入层和分词器
         if not hasattr(self.encoder, 'embedding'):
             return
 
@@ -115,14 +118,19 @@ class TestTimeTrainer:
             # 计算梯度方向
             grad_direction = target - query_repr
 
+            # 使用BPE分词器获取token IDs
+            if hasattr(self.encoder, 'tokenizer') and self.encoder.tokenizer._trained:
+                token_ids = self.encoder.tokenizer.encode(query, self.encoder.max_len)
+            else:
+                # 回退：使用字符级编码
+                token_ids = [ord(c) % 10000 for c in query[:128]]
+                token_ids += [0] * (128 - len(token_ids))
+
             # 原地更新（不使用优化器，直接更新权重）
             with torch.no_grad():
-                # 更新与查询字符相关的嵌入
-                chars = list(query[:128])
-                for char in chars:
-                    char_idx = ord(char) % 10000
-                    if char_idx < embedding_layer.weight.size(0):
-                        embedding_layer.weight[char_idx] += lr * grad_direction
+                for token_id in token_ids:
+                    if 0 < token_id < embedding_layer.weight.size(0):
+                        embedding_layer.weight[token_id] += lr * grad_direction
 
         self.total_updates += 1
         self.update_history.append({

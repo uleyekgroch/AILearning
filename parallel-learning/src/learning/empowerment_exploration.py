@@ -122,11 +122,12 @@ class CuriosityCompetenceBalance:
 
 
 class MultiScaleCuriosity:
-    """多尺度好奇心
+    """多尺度好奇心（基于人类学习研究）
 
     - 短期好奇心：下一个状态的新颖性
     - 中期好奇心：区域的新颖性
     - 长期好奇心：世界规则的变化
+    - 学习进度好奇心：选择"够得着的挑战"（PMC 2021）
     """
 
     def __init__(self, short_window: int = 10, medium_window: int = 100):
@@ -137,10 +138,21 @@ class MultiScaleCuriosity:
         self.state_history = deque(maxlen=medium_window)
         self.error_history = deque(maxlen=medium_window)
 
+        # 学习进度监控（人类好奇心研究的核心发现）
+        self.learning_progress_history = deque(maxlen=medium_window)
+        self.domain_progress = {}  # 每个领域的学习进度
+
     def update(self, state: torch.Tensor, prediction_error: float):
         """更新历史"""
         self.state_history.append(state.detach())
         self.error_history.append(prediction_error)
+
+        # 计算学习进度（误差变化率）
+        if len(self.error_history) >= 2:
+            recent_errors = list(self.error_history)[-5:]
+            if len(recent_errors) >= 2:
+                progress = recent_errors[0] - recent_errors[-1]  # 正值=进步
+                self.learning_progress_history.append(progress)
 
     def short_term_curiosity(self) -> float:
         """短期好奇心：最近状态的新颖性"""
@@ -194,13 +206,38 @@ class MultiScaleCuriosity:
         # 如果误差在增加，说明有新东西要学
         return max(0.0, late_avg - early_avg)
 
+    def learning_progress_curiosity(self) -> float:
+        """学习进度好奇心（基于PMC 2021研究）
+
+        人类在好奇心驱动的探索中监控自己的学习进度，
+        选择那些能带来最大学习进展的探索方向。
+        """
+        if len(self.learning_progress_history) < 3:
+            return 0.5
+
+        # 计算平均学习进度
+        recent_progress = list(self.learning_progress_history)[-10:]
+        avg_progress = sum(recent_progress) / len(recent_progress)
+
+        # 正进度 = 学习中，应继续探索
+        # 负进度 = 退步，应改变策略
+        # 零进度 = 饱和，应探索新领域
+        if avg_progress > 0.01:
+            return 0.7  # 有进步，继续
+        elif avg_progress < -0.01:
+            return 0.3  # 退步，需要改变
+        else:
+            return 0.9  # 饱和，探索新领域
+
     def combined_curiosity(self) -> float:
         """组合好奇心"""
         short = self.short_term_curiosity()
         medium = self.medium_term_curiosity()
         long = self.long_term_curiosity()
 
-        return 0.5 * short + 0.3 * medium + 0.2 * long
+        # 加入学习进度好奇心（人类研究的核心发现）
+        progress = self.learning_progress_curiosity()
+        return 0.4 * short + 0.25 * medium + 0.15 * long + 0.2 * progress
 
 
 class EmpowermentExplorationSystem:

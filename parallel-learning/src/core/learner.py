@@ -693,22 +693,37 @@ class Learner:
         }
 
     def _offline_replay(self, memories: List[Dict]):
-        """离线重放 — 重组记忆
+        """离线重放 — 选择性重组记忆
 
-        模拟海马体重放：
-        1. 随机选择记忆对
+        模拟海马体重放（基于人类学习研究）：
+        1. 优先选择高不确定性/高预测误差的记忆
         2. 通过预测编码引擎重放
         3. 建立新的联系
         """
         if len(memories) < 2:
             return
 
-        # 随机选择记忆对
+        # 选择性重放：优先选择高不确定性的记忆
         import random
-        for _ in range(min(10, len(memories) // 2)):
-            i, j = random.sample(range(len(memories)), 2)
-            mem_i = memories[i]
-            mem_j = memories[j]
+
+        # 按不确定性排序（如果有的话）
+        def get_uncertainty(mem):
+            key = mem.get('key', '')
+            if key in self._metacognition.get('uncertainty_map', {}):
+                return self._metacognition['uncertainty_map'][key]
+            return 0.5  # 默认不确定性
+
+        # 排序：高不确定性优先
+        sorted_memories = sorted(memories, key=get_uncertainty, reverse=True)
+
+        # 选择前10个高不确定性记忆进行重放
+        replay_candidates = sorted_memories[:min(10, len(sorted_memories))]
+
+        for _ in range(min(10, len(replay_candidates) // 2)):
+            # 从高不确定性记忆中随机选择对
+            i, j = random.sample(range(len(replay_candidates)), 2)
+            mem_i = replay_candidates[i]
+            mem_j = replay_candidates[j]
 
             # 通过预测编码引擎重放
             try:
