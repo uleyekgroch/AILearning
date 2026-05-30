@@ -1487,6 +1487,14 @@ class Learner:
         return self._reflective
 
     @property
+    def _test_time_trainer(self):
+        """测试时训练器（懒初始化）"""
+        if not hasattr(self, '_ttt'):
+            from src.learning.test_time_training import TestTimeTrainer
+            self._ttt = TestTimeTrainer(self._learnable_encoder, lr=1e-5)
+        return self._ttt
+
+    @property
     def multiscale_learning(self):
         """多时间尺度学习系统（懒初始化）"""
         if not hasattr(self, '_multiscale'):
@@ -1781,17 +1789,32 @@ class Learner:
         return causal_links
 
     def think(self, question: str) -> str:
-        """思考问题 — 多模式推理
+        """思考问题 — 多模式推理 + 测试时训练
 
         使用统一推理引擎，整合多种推理模式：
-        1. 直接查询（知识图谱向量检索 + 关键词匹配）
-        2. 因果推理（因果DAG遍历）
-        3. 归纳推理（从记忆中发现模式）
-        4. 类比推理（跨域映射）
-        5. 反事实推理（如果...会怎样）
-        6. 概率推理（贝叶斯更新）
+        1. 测试时训练（根据查询上下文微调编码器）
+        2. 直接查询（知识图谱向量检索 + 关键词匹配）
+        3. 因果推理（因果DAG遍历）
+        4. 归纳推理（从记忆中发现模式）
+        5. 类比推理（跨域映射）
+        6. 反事实推理（如果...会怎样）
+        7. 概率推理（贝叶斯更新）
         """
         import re
+
+        # 测试时训练：根据查询上下文微调编码器
+        # 先确保编码器已初始化
+        question_repr = self._encode_text(question)
+        if hasattr(self, '_learnable_encoder') and hasattr(self, '_knowledge_extractor'):
+            # 获取相关实体
+            similar_entities = self._find_similar_entities(question_repr, top_k=3)
+            relevant_entities = [eid for eid, sim in similar_entities if sim > 0.3]
+
+            # 微调编码器
+            if relevant_entities:
+                self._test_time_trainer.adapt_to_query(
+                    question, question_repr, relevant_entities
+                )
 
         # 初始化统一推理引擎
         if not hasattr(self, '_reasoning_engine'):
