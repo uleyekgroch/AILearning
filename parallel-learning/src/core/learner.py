@@ -576,8 +576,8 @@ class Learner:
             action_vecs = torch.eye(n_actions, device=obs.device)
             obs_batch = obs.unsqueeze(0).expand(n_actions, -1)
             preds = self.engine.predict_batch(obs_batch, action_vecs)
-            # exploit: 选择预测奖励最高的动作（均值最大化）
-            action = int(preds.mean(dim=1).argmax().item())
+            # exploit: 选择预测奖励最高的动作（第一维代表奖励信号）
+            action = int(preds[:, 0].argmax().item())
 
         self._action_counts[action] += 1
         return action
@@ -910,8 +910,8 @@ class Learner:
             'representation': None,
         }
 
-        # 1. 学习文本表示（使用学习编码器）
-        text_repr = self._encode_text(text)
+        # 1. 学习文本表示（使用学习编码器，启用梯度训练）
+        text_repr = self._encode_text(text, train=True)
         result['representation'] = text_repr
 
         # 2. 从表示中提取实体
@@ -1386,9 +1386,7 @@ class Learner:
             if (len(self._training_corpus) >= 3 and
                 not self._learnable_encoder.tokenizer._trained):
                 self._learnable_encoder.train_tokenizer(self._training_corpus)
-                self._text_optimizer = torch.optim.Adam(
-                    self._learnable_encoder.parameters(), lr=1e-4
-                )
+                # 保留优化器状态，不重建（避免丢失动量）
 
         # 检查缓存（LRU：命中时移到末尾）
         if text in self._embedding_cache:
@@ -1545,22 +1543,22 @@ class Learner:
         # 损失设计：
         # 1. 实体应与文本嵌入相关（正锚点）
         # 2. 实体之间应保持区分度（负样本）
-        loss = torch.tensor(0.0, device=self.device, requires_grad=True)
+        loss = 0.0
         for emb in entity_embs:
             # 正锚点：实体应与文本相关
             sim_to_text = torch.cosine_similarity(emb.unsqueeze(0), text_emb.unsqueeze(0))
             loss = loss + (1.0 - sim_to_text) * 0.5
 
-        # 负样本：实体之间保持区分（相似度不应过高）
+        # 负样本：实体之间保持区分（阈值从0.5开始，更积极地防止坍缩）
         for i in range(len(entity_embs)):
             for j in range(i + 1, len(entity_embs)):
                 sim = torch.cosine_similarity(
                     entity_embs[i].unsqueeze(0),
                     entity_embs[j].unsqueeze(0)
                 )
-                # 如果相似度过高，增加损失
-                if sim > 0.8:
-                    loss = loss + (sim - 0.8) * 2.0
+                # 如果相似度过高，增加损失（阈值0.5更积极）
+                if sim > 0.5:
+                    loss = loss + (sim - 0.5) * 2.0
 
         if loss.requires_grad:
             loss.backward()
@@ -1655,10 +1653,10 @@ class Learner:
         stopwords = set('的了是在我你他她它们这那个有不人大中上下来什么如何怎样')
         entities = [e for e in entities if e not in stopwords and len(e) >= 2]
 
-        # 方法2：可学习提取器（10次后启用）
+        # 方法2：可学习提取器（3次后启用，带梯度训练）
         encoder = getattr(self, '_learnable_encoder', None)
-        if extractor._extraction_count >= 10 and encoder is not None:
-            learned_triples = extractor._extract_by_model(text, repr, encoder)
+        if extractor._extraction_count >= 3 and encoder is not None:
+            learned_triples = extractor.extract_triples(text, repr, encoder)
             for t in learned_triples:
                 if t.subject not in entities:
                     entities.append(t.subject)
@@ -1803,7 +1801,7 @@ class Learner:
         if answer_lines:
             return '\n'.join(answer_lines)
 
-        return "I don't have enough information to answer this question."
+        return "我没有足够的信息来回答这个问题。"
 
     def _triple_to_sentence(self, triple_str: str) -> str:
         """将三元组字符串转换为自然语言句子
@@ -1812,7 +1810,9 @@ class Learner:
         "下雨 导致 地面湿了" → "下雨导致地面湿了。"
         "水 温度 100摄氏度沸腾" → "水的温度是100摄氏度沸腾。"
         """
-        parts = triple_str.split()
+        # 标准化格式：将箭头替换为空格
+        normalized = triple_str.replace('→', ' ').replace('->', ' ')
+        parts = normalized.split()
         if len(parts) >= 3:
             subj = parts[0]
             rel = parts[1]
