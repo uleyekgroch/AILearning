@@ -1607,6 +1607,65 @@ class Learner:
         """存储感觉运动经验"""
         from src.perception.embodied_grounding import SensorimotorExperience
         experience = SensorimotorExperience(visual=visual, tactile=tactile, motor=motor)
+
+    @property
+    def causal_engine(self):
+        """因果推理引擎（懒初始化）"""
+        if not hasattr(self, '_causal_engine'):
+            from src.reasoning.causal_engine import CausalEngine
+            self._causal_engine = CausalEngine()
+        return self._causal_engine
+
+    @property
+    def tool_engine(self):
+        """工具调用引擎（懒初始化）"""
+        if not hasattr(self, '_tool_engine'):
+            from src.reasoning.tool_engine import ToolEngine
+            self._tool_engine = ToolEngine()
+        return self._tool_engine
+
+    @property
+    def code_generator(self):
+        """代码生成引擎（懒初始化）"""
+        if not hasattr(self, '_code_generator'):
+            from src.reasoning.code_generator import CodeGenerator
+            self._code_generator = CodeGenerator()
+        return self._code_generator
+
+    @property
+    def self_evolution(self):
+        """自主进化引擎（懒初始化）"""
+        if not hasattr(self, '_self_evolution'):
+            from src.learning.self_evolution import SelfEvolutionEngine
+            self._self_evolution = SelfEvolutionEngine()
+        return self._self_evolution
+
+    @property
+    def multimodal_engine(self):
+        """多模态引擎（懒初始化）"""
+        if not hasattr(self, '_multimodal'):
+            from src.perception.multimodal_engine import MultimodalEngine
+            self._multimodal = MultimodalEngine(
+                d_model=self.config.obs_dim,
+                device=str(self.device),
+            )
+        return self._multimodal
+
+    @property
+    def creativity_engine(self):
+        """创造性引擎（懒初始化）"""
+        if not hasattr(self, '_creativity'):
+            from src.reasoning.creativity_engine import CreativityEngine
+            self._creativity = CreativityEngine()
+        return self._creativity
+
+    @property
+    def emotional_drive(self):
+        """情感驱动引擎（懒初始化）"""
+        if not hasattr(self, '_emotional'):
+            from src.learning.emotional_drive import EmotionalDriveEngine
+            self._emotional = EmotionalDriveEngine()
+        return self._emotional
         self.embodied_grounding.store_experience(concept, experience)
 
     def _subword_tokenize(self, text: str) -> List[str]:
