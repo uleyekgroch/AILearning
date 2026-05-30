@@ -1373,6 +1373,35 @@ class Learner:
             context=source,
         )
 
+        # 31. 图式学习：将实体归入知识图式
+        for entity in entities:
+            entity_emb = self._encode_text(entity)
+            schema_id, is_new = self.schema_learning.find_or_create_schema(
+                entity, entity_emb
+            )
+            # 记录关系到图式
+            for item in triples:
+                if len(item) >= 3 and item[0] == entity:
+                    self.schema_learning.schemas[schema_id].relations.append(
+                        (item[1], item[2])
+                    )
+
+        # 32. 元认知调控：监控本次学习效果
+        meta_state = self.metacognitive_regulator.monitor(
+            success=verification['passed'],
+            confidence=verification.get('score', 0.5),
+            domain=text[:10],
+        )
+
+        # 33. 跨域迁移：记录关系模式供未来迁移
+        for item in triples:
+            if len(item) >= 3:
+                self.cross_domain_transfer.learn_relation(
+                    relation_type=item[1],
+                    domain=source,
+                    confidence=item[3] if len(item) > 3 else 0.5,
+                )
+
         return result
 
     def _verify_learned_knowledge(self, text: str, entities: List[str],
@@ -1971,6 +2000,50 @@ class Learner:
                 device=str(self.device),
             )
         return self._cls
+
+    # ===== 机制18-20: 图式+元认知+跨域迁移 =====
+
+    @property
+    def schema_learning(self):
+        """图式学习系统（懒初始化）
+
+        基于Nature Comms 2022: 图式作为脚手架加速新知识整合。
+        """
+        if not hasattr(self, '_schema'):
+            from src.learning.schema_learning import SchemaLearningSystem
+            self._schema = SchemaLearningSystem(
+                d_model=self.config.obs_dim,
+                device=str(self.device),
+            )
+        return self._schema
+
+    @property
+    def metacognitive_regulator(self):
+        """元认知自我调控器（懒初始化）
+
+        基于NeurIPS 2025: 监控学习效果，动态调整策略。
+        """
+        if not hasattr(self, '_metacog'):
+            from src.learning.metacognitive_regulation import MetacognitiveRegulator
+            self._metacog = MetacognitiveRegulator(
+                d_model=self.config.obs_dim,
+                device=str(self.device),
+            )
+        return self._metacog
+
+    @property
+    def cross_domain_transfer(self):
+        """跨域迁移学习系统（懒初始化）
+
+        基于Science China 2025: 关系抽象+结构映射+投射迁移。
+        """
+        if not hasattr(self, '_xfer'):
+            from src.learning.cross_domain_transfer import CrossDomainTransfer
+            self._xfer = CrossDomainTransfer(
+                d_model=self.config.obs_dim,
+                device=str(self.device),
+            )
+        return self._xfer
 
     def _subword_tokenize(self, text: str) -> List[str]:
         """子词分词 — 捕获有意义的片段
