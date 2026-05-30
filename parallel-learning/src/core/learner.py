@@ -598,7 +598,11 @@ class Learner:
         device = base_scores.device
         simulator_bonus = simulator_bonus.to(device)
         explore_bonus = explore_bonus.to(device)
-        final_scores = base_scores + simulator_bonus + explore_bonus * 0.3
+        # empowerment：控制力高的动作获得奖励
+        empowerment_bonus = torch.zeros(n_actions, device=device)
+        if empowerment > 0.3:
+            empowerment_bonus += empowerment * 0.2
+        final_scores = base_scores + simulator_bonus + explore_bonus * 0.3 + empowerment_bonus
         action = int(final_scores.argmax().item())
 
         self._action_counts[action] += 1
@@ -935,6 +939,17 @@ class Learner:
         # 1. 学习文本表示（使用学习编码器，启用梯度训练）
         text_repr = self._encode_text(text, train=True)
         result['representation'] = text_repr
+
+        # 1b. 测试时训练：根据文本上下文微调编码器
+        if hasattr(self, '_learnable_encoder'):
+            # 获取已知实体作为上下文
+            kg = self.knowledge
+            if kg and hasattr(kg, 'entities'):
+                existing_entities = list(kg.entities.keys())[:3]
+                if existing_entities:
+                    self._test_time_trainer.adapt_to_query(
+                        text, text_repr, existing_entities
+                    )
 
         # 2. 从表示中提取实体
         entities = self._extract_entities_from_repr(text, text_repr)
