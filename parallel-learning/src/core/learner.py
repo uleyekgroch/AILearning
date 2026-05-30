@@ -1135,6 +1135,23 @@ class Learner:
                 # 更新置信度阈值
                 pass  # 在_synthesize_from_reasoning中使用get_parameter
 
+        # 13. 经验反思学习：记录经验并定期反思
+        self.reflective_learning.record_experience(
+            text=text,
+            entities=entities,
+            triples=triples,
+            verification_passed=verification['passed'],
+            score=score,
+        )
+        if self.reflective_learning.should_reflect():
+            insights = self.reflective_learning.reflect()
+            # 将洞见应用到系统
+            for insight in insights:
+                if insight.category == 'strategy' and '降低难度' in insight.insight:
+                    # 降低负样本阈值
+                    old = self.self_improvement.tunable_params['negative_threshold']
+                    self.self_improvement.tunable_params['negative_threshold'] = max(0.2, old - 0.05)
+
         return result
 
     def _verify_learned_knowledge(self, text: str, entities: List[str],
@@ -1451,6 +1468,14 @@ class Learner:
             from src.learning.self_improvement import SelfImprovementSystem
             self._self_improvement = SelfImprovementSystem()
         return self._self_improvement
+
+    @property
+    def reflective_learning(self):
+        """经验反思学习系统（懒初始化）"""
+        if not hasattr(self, '_reflective'):
+            from src.learning.reflective_learning import ReflectiveLearningSystem
+            self._reflective = ReflectiveLearningSystem()
+        return self._reflective
 
     @property
     def multiscale_learning(self):
