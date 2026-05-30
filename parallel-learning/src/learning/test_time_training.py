@@ -96,7 +96,7 @@ class TestTimeTrainer:
                            entity_reprs: List[torch.Tensor], adaptive_lr: float = None):
         """更新快权重（嵌入层的最后一层）
 
-        使用BPE token级别更新，而非字符级别。
+        使用BPE token级别更新 + 真正的autograd梯度。
         """
         # 获取嵌入层和分词器
         if not hasattr(self.encoder, 'embedding'):
@@ -108,29 +108,36 @@ class TestTimeTrainer:
         # 计算目标：查询表示应该与实体表示相关
         target = torch.stack(entity_reprs).mean(dim=0)
 
+        # 使用BPE分词器获取token IDs
+        if hasattr(self.encoder, 'tokenizer') and self.encoder.tokenizer._trained:
+            token_ids = self.encoder.tokenizer.encode(query, self.encoder.max_len)
+        else:
+            # 回退：使用字符级编码
+            token_ids = [ord(c) % 10000 for c in query[:128]]
+            token_ids += [0] * (128 - len(token_ids))
+
+        # 使用autograd计算真正的梯度
+        self.encoder.train()
+        self.encoder.zero_grad()
+
+        # 前向传播（带梯度）- 使用文本字符串
+        encoded = self.encoder(query)
+
         # 计算损失
         loss = 1.0 - torch.cosine_similarity(
-            query_repr.unsqueeze(0), target.unsqueeze(0)
+            encoded.unsqueeze(0), target.detach().unsqueeze(0)
         )
 
-        # 只更新嵌入层的权重（快权重）
-        if hasattr(embedding_layer, 'weight'):
-            # 计算梯度方向
-            grad_direction = target - query_repr
+        # 反向传播
+        loss.backward()
 
-            # 使用BPE分词器获取token IDs
-            if hasattr(self.encoder, 'tokenizer') and self.encoder.tokenizer._trained:
-                token_ids = self.encoder.tokenizer.encode(query, self.encoder.max_len)
-            else:
-                # 回退：使用字符级编码
-                token_ids = [ord(c) % 10000 for c in query[:128]]
-                token_ids += [0] * (128 - len(token_ids))
+        # 使用计算出的梯度更新嵌入层
+        with torch.no_grad():
+            if embedding_layer.weight.grad is not None:
+                embedding_layer.weight -= lr * embedding_layer.weight.grad
+                embedding_layer.weight.grad.zero_()
 
-            # 原地更新（不使用优化器，直接更新权重）
-            with torch.no_grad():
-                for token_id in token_ids:
-                    if 0 < token_id < embedding_layer.weight.size(0):
-                        embedding_layer.weight[token_id] += lr * grad_direction
+        self.encoder.eval()
 
         self.total_updates += 1
         self.update_history.append({

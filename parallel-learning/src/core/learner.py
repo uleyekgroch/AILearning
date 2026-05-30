@@ -1216,6 +1216,24 @@ class Learner:
                     old = self.self_improvement.tunable_params['negative_threshold']
                     self.self_improvement.tunable_params['negative_threshold'] = max(0.2, old - 0.05)
 
+        # 14. 因果引擎：记录因果关系
+        for item in triples:
+            if len(item) >= 3:
+                subj, rel, obj = item[0], item[1], item[2]
+                self.causal_engine.add_node(subj)
+                self.causal_engine.add_node(obj)
+                self.causal_engine.add_edge(subj, obj, strength=0.5)
+
+        # 15. 情感驱动：更新情感状态
+        if verification['passed']:
+            self.emotional_drive.on_learning_success(text[:30])
+        else:
+            self.emotional_drive.on_learning_failure(text[:30])
+
+        # 16. 创造性引擎：添加新概念
+        for entity in entities:
+            self.creativity_engine.add_concept(entity, {'source': text[:30]})
+
         return result
 
     def _verify_learned_knowledge(self, text: str, entities: List[str],
@@ -1607,6 +1625,7 @@ class Learner:
         """存储感觉运动经验"""
         from src.perception.embodied_grounding import SensorimotorExperience
         experience = SensorimotorExperience(visual=visual, tactile=tactile, motor=motor)
+        self.embodied_grounding.store_experience(concept, experience)
 
     @property
     def causal_engine(self):

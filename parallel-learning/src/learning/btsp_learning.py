@@ -104,15 +104,21 @@ class BTSPLearningSystem:
                 torch.tensor(-age / self.decay_time)
             ).item()
 
-            # 平台电位强化：增强嵌入
+            # 平台电位强化：差异化增强（BTSP核心机制）
             if decayed_strength > 0.1:
-                # 计算强化方向（向原始嵌入的中心靠拢）
-                center = torch.stack([
-                    t.embedding for t in self.traces.values()
-                ]).mean(dim=0)
+                # 计算与其他实体的平均距离（差异化方向）
+                other_embeddings = [
+                    t.embedding for e, t in self.traces.items() if e != entity
+                ]
+                if other_embeddings:
+                    others_mean = torch.stack(other_embeddings).mean(dim=0)
+                    # 强化方向：远离其他实体的中心（差异化增强）
+                    differentiation = trace.embedding - others_mean
+                    reinforcement = differentiation * 0.1 * trigger_strength * decayed_strength
+                else:
+                    # 只有一个实体时，增强其独特性
+                    reinforcement = trace.embedding * 0.05 * trigger_strength * decayed_strength
 
-                # 强化：向中心靠拢 + 保持独特性
-                reinforcement = (center - trace.embedding) * 0.1 * trigger_strength * decayed_strength
                 new_embedding = trace.embedding + reinforcement
 
                 # 归一化
