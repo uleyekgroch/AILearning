@@ -1234,6 +1234,41 @@ class Learner:
         for entity in entities:
             self.creativity_engine.add_concept(entity, {'source': text[:30]})
 
+        # 17. 预测编码Light：学习新信息（抑制可预测部分）
+        if entities:
+            entity_repr = self._encode_text(entities[0])
+            context = self._encode_text(text[:20]) if len(text) > 20 else text_repr
+            pcl_state = self.predictive_coding_light.suppress_predictable(entity_repr, context)
+            self.predictive_coding_light.learn_from_prediction(pcl_state)
+
+        # 18. 奖励表征后移：将奖励信号迁移到先行线索
+        if triples:
+            for item in triples:
+                if len(item) >= 3:
+                    cue = item[0]  # 先行线索（如"下雨"）
+                    reward = 1.0 if verification['passed'] else 0.0
+                    self.reward_shift.update_reward_representation(cue, reward)
+
+        # 19. 组合泛化：学习内容和计算方式
+        for entity in entities:
+            entity_repr = self._encode_text(entity)
+            self.compositional_generalization.learn_what(entity, entity_repr)
+
+        # 20. 社会偶联学习：给予即时反馈
+        self.social_contingency.give_feedback(
+            action=text[:30],
+            outcome=score,
+            context=source,
+        )
+
+        # 21. 符号接地：建立符号与环境的因果关系
+        for item in triples:
+            if len(item) >= 3:
+                symbol = item[0]
+                env_state = {'relation': item[1], 'target': item[2]}
+                grounding_strength = 1.0 if verification['passed'] else 0.3
+                self.symbol_grounding.ground_symbol(symbol, env_state, grounding_strength)
+
         return result
 
     def _verify_learned_knowledge(self, text: str, entities: List[str],
@@ -1685,7 +1720,49 @@ class Learner:
             from src.learning.emotional_drive import EmotionalDriveEngine
             self._emotional = EmotionalDriveEngine()
         return self._emotional
-        self.embodied_grounding.store_experience(concept, experience)
+
+    @property
+    def predictive_coding_light(self):
+        """预测编码Light系统（懒初始化）"""
+        if not hasattr(self, '_pcl'):
+            from src.learning.predictive_coding_light import PredictiveCodingLight
+            self._pcl = PredictiveCodingLight(
+                d_model=self.config.obs_dim,
+                device=str(self.device),
+            )
+        return self._pcl
+
+    @property
+    def reward_shift(self):
+        """奖励表征后移系统（懒初始化）"""
+        if not hasattr(self, '_reward_shift'):
+            from src.learning.predictive_coding_light import RewardRepresentationShift
+            self._reward_shift = RewardRepresentationShift(d_model=self.config.obs_dim)
+        return self._reward_shift
+
+    @property
+    def compositional_generalization(self):
+        """组合泛化系统（懒初始化）"""
+        if not hasattr(self, '_compositional'):
+            from src.learning.predictive_coding_light import CompositionalGeneralization
+            self._compositional = CompositionalGeneralization()
+        return self._compositional
+
+    @property
+    def social_contingency(self):
+        """社会偶联学习系统（懒初始化）"""
+        if not hasattr(self, '_social'):
+            from src.learning.predictive_coding_light import SocialContingencyLearning
+            self._social = SocialContingencyLearning()
+        return self._social
+
+    @property
+    def symbol_grounding(self):
+        """符号接地系统（懒初始化）"""
+        if not hasattr(self, '_grounding'):
+            from src.learning.predictive_coding_light import SymbolGrounding
+            self._grounding = SymbolGrounding()
+        return self._grounding
 
     def _subword_tokenize(self, text: str) -> List[str]:
         """子词分词 — 捕获有意义的片段
