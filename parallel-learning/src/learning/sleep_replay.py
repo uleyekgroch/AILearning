@@ -245,7 +245,9 @@ class SleepReplaySystem:
             episode.embedding = reconstructed
 
             # 检查是否可以转移到语义记忆
-            if episode.replay_count >= 3:
+            # 阈值基于重要性：高重要性的记忆更快转移
+            transfer_threshold = 3 if episode.importance < 0.7 else 1
+            if episode.replay_count >= transfer_threshold:
                 episode.strengthened = True
                 # 转移到皮层（语义记忆）
                 self.semantic_memory.append(episode)

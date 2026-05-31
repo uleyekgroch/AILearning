@@ -340,24 +340,27 @@ class LearnableTextEncoder(nn.Module):
         """
         # 分词
         token_ids = self.tokenizer.encode(text, self.max_len)
-        x = torch.tensor([token_ids], dtype=torch.long, device=self.embedding.weight.device)
+        ids_tensor = torch.tensor([token_ids], dtype=torch.long, device=self.embedding.weight.device)
+
+        # 用PAD的真实ID构建mask
+        # PAD ID不一定是0！BPE tokenizer中 PAD='<PAD>' 的ID由sorted vocab决定
+        pad_id = self.tokenizer.token_to_id.get(self.tokenizer.PAD, 0)
+        non_pad_mask = (ids_tensor != pad_id)  # True for non-PAD positions
+        pad_mask = non_pad_mask.unsqueeze(1).unsqueeze(2)  # (1, 1, 1, max_len) for attention
 
         # 嵌入 + 位置编码
-        x = self.embedding(x) * math.sqrt(self.d_model)
+        x = self.embedding(ids_tensor) * math.sqrt(self.d_model)
         x = self.pos_encoding(x)
 
-        # 创建padding mask
-        mask = (x.sum(dim=-1) != 0).unsqueeze(1).unsqueeze(2)
-
-        # Transformer编码
+        # Transformer编码（使用正确的padding mask）
         for layer in self.layers:
-            x = layer(x, mask)
+            x = layer(x, pad_mask)
 
         x = self.norm(x)
 
-        # 池化：非padding位置的平均
-        mask_float = (x.sum(dim=-1) != 0).float().unsqueeze(-1)
-        pooled = (x * mask_float).sum(dim=1) / mask_float.sum(dim=1).clamp(min=1)
+        # 池化：只用非PAD位置的平均（用PAD的真实ID判断）
+        pool_mask = non_pad_mask.float().unsqueeze(-1)  # (1, max_len, 1)
+        pooled = (x * pool_mask).sum(dim=1) / pool_mask.sum(dim=1).clamp(min=1)
 
         return pooled.squeeze(0)
 
@@ -372,24 +375,26 @@ class LearnableTextEncoder(nn.Module):
 
         # 批量分词
         batch_token_ids = [self.tokenizer.encode(text, self.max_len) for text in texts]
-        x = torch.tensor(batch_token_ids, dtype=torch.long, device=self.embedding.weight.device)
+        ids_tensor = torch.tensor(batch_token_ids, dtype=torch.long, device=self.embedding.weight.device)
+
+        # 用PAD的真实ID构建mask
+        pad_id = self.tokenizer.token_to_id.get(self.tokenizer.PAD, 0)
+        non_pad_mask = (ids_tensor != pad_id)
+        pad_mask = non_pad_mask.unsqueeze(1).unsqueeze(2)  # (batch, 1, 1, max_len)
 
         # 嵌入 + 位置编码
-        x = self.embedding(x) * math.sqrt(self.d_model)
+        x = self.embedding(ids_tensor) * math.sqrt(self.d_model)
         x = self.pos_encoding(x)
 
-        # 创建padding mask
-        mask = (x.sum(dim=-1) != 0).unsqueeze(1).unsqueeze(2)
-
-        # Transformer编码（批处理）
+        # Transformer编码（使用正确的padding mask）
         for layer in self.layers:
-            x = layer(x, mask)
+            x = layer(x, pad_mask)
 
         x = self.norm(x)
 
-        # 池化
-        mask_float = (x.sum(dim=-1) != 0).float().unsqueeze(-1)
-        pooled = (x * mask_float).sum(dim=1) / mask_float.sum(dim=1).clamp(min=1)
+        # 池化：只用非PAD位置
+        pool_mask = non_pad_mask.float().unsqueeze(-1)  # (batch, max_len, 1)
+        pooled = (x * pool_mask).sum(dim=1) / pool_mask.sum(dim=1).clamp(min=1)
 
         return pooled
 

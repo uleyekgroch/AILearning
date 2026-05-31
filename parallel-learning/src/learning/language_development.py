@@ -59,13 +59,15 @@ class StageProgress:
 
 
 # 各阶段的晋升阈值
+# 阈值反映了学习的深度：不只是数量，还需要足够的关联和验证
+# 儿童发展参考：前语言期→单词期约10-18个月，需要数百次重复接触
 STAGE_THRESHOLDS = {
     LanguageStage.PRELINGUISTIC: {'concepts': 0, 'relations': 0},
-    LanguageStage.HOLOPHRASE: {'concepts': 10, 'relations': 5},
-    LanguageStage.TWO_WORD: {'concepts': 30, 'relations': 20},
-    LanguageStage.TELEGRAPHIC: {'concepts': 100, 'relations': 60},
-    LanguageStage.COMPLEX: {'concepts': 300, 'relations': 200},
-    LanguageStage.LITERACY: {'concepts': 1000, 'relations': 500},
+    LanguageStage.HOLOPHRASE: {'concepts': 50, 'relations': 30},
+    LanguageStage.TWO_WORD: {'concepts': 150, 'relations': 100},
+    LanguageStage.TELEGRAPHIC: {'concepts': 500, 'relations': 300},
+    LanguageStage.COMPLEX: {'concepts': 1500, 'relations': 800},
+    LanguageStage.LITERACY: {'concepts': 5000, 'relations': 3000},
 }
 
 
@@ -79,12 +81,21 @@ class LanguageDevelopmentSystem:
     4. 模拟儿童的语言习得过程
     """
 
-    def __init__(self, d_model: int = 128, device: str = 'cpu'):
+    def __init__(self, d_model: int = 128, device: str = 'cpu',
+                 initial_stage: str = 'holophrase'):
         self.d_model = d_model
         self.device = torch.device(device)
 
-        # 当前阶段
-        self.current_stage = LanguageStage.PRELINGUISTIC
+        # 当前阶段（可配置 — 文本学习从单词期开始）
+        stage_map = {
+            'prelinguistic': LanguageStage.PRELINGUISTIC,
+            'holophrase': LanguageStage.HOLOPHRASE,
+            'two_word': LanguageStage.TWO_WORD,
+            'telegraphic': LanguageStage.TELEGRAPHIC,
+            'complex': LanguageStage.COMPLEX,
+            'literacy': LanguageStage.LITERACY,
+        }
+        self.current_stage = stage_map.get(initial_stage, LanguageStage.HOLOPHRASE)
 
         # 各阶段的知识积累
         self.knowledge_by_stage: Dict[LanguageStage, Dict] = {

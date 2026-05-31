@@ -35,6 +35,8 @@ from src.language.grounding import GroundingModule
 from src.language.communication import CommunicationProtocol
 from src.knowledge.graph import KnowledgeGraph
 from src.knowledge.bridge import LanguageGraphBridge
+from src.learning.core_knowledge import CoreKnowledgeSystem
+from src.learning.perception_learning_loop import PerceptionLearningLoop
 
 
 # Piaget 发展阶段序列
@@ -102,6 +104,12 @@ class Learner:
         self.perception = MultiModalEncoder(config)
         self.memory = MemorySystem(config)
         self.engine = PredictiveCodingEngine(config)
+
+        # ===== Phase 0: 核心知识先验（Spelke核心知识系统）=====
+        self.core_knowledge = CoreKnowledgeSystem(device=config.device)
+
+        # ===== Phase 1: 感知-预测学习循环 =====
+        self.perception_loop = PerceptionLearningLoop(self)
 
         # 语言子系统
         self.grounding = GroundingModule(obs_dim=config.obs_dim, device=config.device)
@@ -526,6 +534,20 @@ class Learner:
         except Exception:
             pass
 
+        # ===== Phase 0: 核心知识先验 — 额外意外信号 =====
+        # 用核心知识先验计算感知层面的意外（物体消失、因果违反等）
+        try:
+            core_surprise = self._compute_core_surprise(obs, next_obs, error)
+            if core_surprise > 0.3:
+                # 核心先验被违反 → 增强学习信号
+                surprise_boost = min(core_surprise * 0.5, 1.0)
+                # 额外的梯度增强（让系统对违反先验的观察更关注）
+                if grad.abs().sum() > 0:
+                    boosted_grad = grad * (1.0 + surprise_boost)
+                    self.perception.backward(boosted_grad)
+        except Exception:
+            pass
+
         # ===== 新增：反思学习（每10步反思一次）=====
         if self._total_steps % 10 == 0 and self._total_steps > 0:
             try:
@@ -545,6 +567,217 @@ class Learner:
         self._error_history.append(error)
         self._total_steps += 1
         return error
+
+    # ------------------------------------------------------------------
+    # Phase 0: 核心知识先验辅助方法
+    # ------------------------------------------------------------------
+
+    def _compute_core_surprise(self, obs: torch.Tensor,
+                                next_obs: torch.Tensor,
+                                prediction_error: float) -> float:
+        """基于核心知识先验计算意外信号
+
+        核心知识系统检测违反先验的事件（物体凭空消失、因果违反等），
+        生成额外的意外信号来增强学习。
+
+        Args:
+            obs: 当前观察
+            next_obs: 下一步观察
+            prediction_error: 预测误差
+
+        Returns:
+            核心意外信号 [0, 2]
+        """
+        try:
+            # 将张量观察转化为核心知识系统的特征格式
+            obs_features = self._extract_obs_features(obs)
+            next_features = self._extract_obs_features(next_obs)
+
+            # 检测物体变化
+            visible_before = set(obs_features.get('visible_objects', {}).keys())
+            visible_after = set(next_features.get('visible_objects', {}).keys())
+            disappeared = visible_before - visible_after
+
+            surprise = 0.0
+
+            # 物体凭空消失 → 违反持久性
+            for obj_id in disappeared:
+                memory = self.core_knowledge.objects.object_memory.get(obj_id)
+                if memory and memory.get('confidence', 0) > 0.5:
+                    surprise += memory['confidence']
+
+            # 高预测误差 + 无明显原因 → 意外
+            if prediction_error > 1.0 and surprise < 0.1:
+                surprise += 0.2
+
+            return surprise
+        except Exception:
+            return 0.0
+
+    def _extract_obs_features(self, obs: torch.Tensor) -> Dict:
+        """将张量观察提取为核心知识系统的特征字典
+
+        感知编码器的输出是128维向量，需要解码为结构化特征。
+        简化实现：从向量中提取基本统计特征。
+        """
+        if isinstance(obs, dict):
+            return obs
+
+        if not isinstance(obs, torch.Tensor):
+            return {}
+
+        obs_flat = obs.detach().cpu().flatten()
+        features = {}
+
+        # 如果有足够的维度，提取物体信息
+        if obs_flat.shape[0] >= 16:
+            # 简化：将128维向量分成若干"物体槽"
+            n_objects = min(8, obs_flat.shape[0] // 16)
+            visible_objects = {}
+            for i in range(n_objects):
+                offset = i * 16
+                if offset + 16 <= obs_flat.shape[0]:
+                    chunk = obs_flat[offset:offset + 16]
+                    activation = chunk.abs().mean().item()
+                    if activation > 0.1:  # 有意义的物体
+                        obj_id = f'obj_{i}'
+                        visible_objects[obj_id] = {
+                            'position': [chunk[0].item(), chunk[1].item()],
+                            'velocity': [chunk[2].item(), chunk[3].item()],
+                            'activation': activation,
+                        }
+            features['visible_objects'] = visible_objects
+            features['entities'] = [{'id': k, **v} for k, v in visible_objects.items()]
+        else:
+            features['visible_objects'] = {}
+            features['entities'] = []
+
+        return features
+
+    def _apply_core_priors(self, concept_data: Dict) -> float:
+        """在概念形成阶段注入先验偏差
+
+        用核心知识先验评估候选概念的质量，
+        高质量的概念（符合先验）获得更高分数。
+
+        Args:
+            concept_data: 候选概念数据 {'label': str, 'features': Dict, ...}
+
+        Returns:
+            先验加权分数 [0, 1]
+        """
+        return self.core_knowledge.score_concept_candidate(concept_data)
+
+    # ------------------------------------------------------------------
+    # Phase 1: 感知循环辅助方法
+    # ------------------------------------------------------------------
+
+    def _text_to_virtual_observation(self, text: str) -> Dict:
+        """将文本转化为"虚拟感知"输入
+
+        文本也是一种感知模态——就像视觉和听觉一样。
+        这个方法将文本编码为与感知编码器输出格式对齐的"虚拟观察"，
+        使文本学习也能走感知-预测闭环。
+
+        Args:
+            text: 输入文本
+
+        Returns:
+            字典格式的"虚拟观察"，包含：
+            - encoded: 128维编码向量
+            - raw: 原始文本
+            - type: 'text_virtual'
+        """
+        # 使用可学习编码器编码文本
+        with torch.no_grad():
+            text_vec = self._encode_text(text, train=False)
+
+        return {
+            'encoded': text_vec.flatten()[:self.config.obs_dim],
+            'raw': text,
+            'type': 'text_virtual',
+        }
+
+    def _register_perceptual_concept(self, concept_data: Dict) -> bool:
+        """将感知循环中发现的概念注册到概念空间
+
+        概念从预测误差中涌现，带有感知特征和可供性。
+        这绕过了正则提取的严格过滤（文本学习要求3次以上频率），
+        因为感知概念通过感知验证而非统计频率。
+
+        Args:
+            concept_data: {
+                'label': str,                    # 概念标签
+                'perceptual_features': Dict,      # 感知特征
+                'error_dimensions': List[int],    # 关联的误差维度
+                'error_magnitude': float,         # 误差大小
+                'occurrence_count': int,          # 出现次数
+                'source': str,                    # 来源标识
+            }
+
+        Returns:
+            是否成功注册
+        """
+        label = concept_data.get('label', '')
+        if not label or len(label) < 2:
+            return False
+
+        # 获取概念空间
+        cs = self._registry.get('concept_space') if self._registry.has('concept_space') else None
+        if not cs:
+            return False
+
+        # 编码概念向量
+        try:
+            vec = self._encode_text(label, train=False)
+        except Exception:
+            vec = torch.randn(self.config.obs_dim)
+
+        # 感知特征
+        perceptual_features = concept_data.get('perceptual_features', {})
+        error_dims = concept_data.get('error_dimensions', [])
+
+        # 可供性推断（基于感知特征类型）
+        affordances = []
+        feat_type = perceptual_features.get('type', '')
+        if feat_type == 'color':
+            affordances.extend(['描述颜色', '区分物体', '识别属性'])
+        elif feat_type == 'shape':
+            affordances.extend(['描述形状', '分类物体', '识别几何'])
+        elif feat_type == 'material':
+            affordances.extend(['描述材质', '判断属性'])
+        elif feat_type == 'size':
+            affordances.extend(['描述大小', '比较物体'])
+
+        # 注册到概念空间
+        try:
+            anchor = f'perception_loop:{label}'
+            node = cs.register(
+                label,
+                vector=vec,
+                source='perception',
+                sensory_anchors=[anchor],
+            )
+
+            # 填充功能性字段
+            if node.frequency <= 2:  # 新注册的节点
+                node.perceptual_features = perceptual_features
+                node.affordances = affordances
+                node.usage_contexts.append({
+                    'source': 'perception_loop',
+                    'error_dims': error_dims[:5],
+                    'step': self._total_steps,
+                })
+            else:
+                # 已存在 → 增强感知特征
+                node.perceptual_features.update(perceptual_features)
+                for aff in affordances:
+                    if aff not in node.affordances:
+                        node.affordances.append(aff)
+
+            return True
+        except Exception:
+            return False
 
     # ------------------------------------------------------------------
     # 行动选择
@@ -982,8 +1215,31 @@ class Learner:
                         text, text_repr, existing_entities
                     )
 
-        # 2. 从表示中提取实体
-        entities = self._extract_entities_from_repr(text, text_repr)
+        # 1c. 统计学习通道 — 让概念从反复观察中涌现
+        stat_result = {}
+        stat_emergent_set = set()
+        if self.config.statistical_learning_enabled:
+            stat_learner = self._registry.get('statistical_learner')
+            stat_result = stat_learner.observe(text)
+            # 缓存过滤后的涌现概念集（只在有新概念时重算）
+            if stat_result.get('new_concepts'):
+                self._stat_emergent_cache = set(
+                    c for c, conf in stat_learner.get_emergent_concepts(filter_boundary=True)
+                )
+            stat_emergent_set = getattr(self, '_stat_emergent_cache', set())
+
+        # 2. 提取实体 — 正则提取为主，统计学习验证提权 + 补充高频概念
+        regex_entities = self._extract_entities_from_repr(text, text_repr)
+
+        if self.config.statistical_use_as_primary and stat_emergent_set:
+            # 策略A：正则提取的实体被统计学习确认 → 提权（暂存信息，后续使用）
+            # 策略B：统计涌现的高频概念（freq>=5）如果不在正则结果中 → 补充
+            for c in stat_emergent_set:
+                if c not in regex_entities and len(c) >= 2:
+                    info = stat_learner.get_concept_info(c)
+                    if info and info.frequency >= 5:  # 只补充高频涌现概念
+                        regex_entities.append(c)
+        entities = regex_entities
         result['entities'] = entities
 
         # 2b. BTSP：标记实体为可学习（资格痕迹）
@@ -991,8 +1247,33 @@ class Learner:
             entity_repr = self._encode_text(entity)
             self.btsp_learning.mark_eligible(entity, entity_repr)
 
-        # 3. 从表示中提取关系
+        # 2c. 发展阶段过滤 — 根据认知发展阶段约束学习内容
+        # 类似Piaget认知发展理论：前语言期不能学复杂关系，双词期限制句法复杂度
+        try:
+            ld = self.language_development
+            entities, _ = ld.filter_content(entities, [])
+            # 注册概念到发展阶段系统
+            for entity in entities:
+                ld.register_concept(entity)
+            ld.check_stage_transition()
+        except Exception:
+            pass
+
+        # 3. 从表示中提取关系（正则模式匹配 — 保持关系类型语义）
         triples = self._extract_relations_from_repr(text, entities, text_repr)
+
+        # 3b. 发展阶段过滤 — 根据阶段限制可学习的关系复杂度
+        try:
+            ld = self.language_development
+            _, filtered_triples = ld.filter_content(entities, triples)
+            triples = filtered_triples
+            # 注册关系到发展阶段系统
+            for item in triples:
+                if len(item) >= 3:
+                    ld.register_relation(item[0], item[1], item[2])
+        except Exception:
+            pass
+
         result['triples'] = triples
 
         # 4. 注入知识图谱（带矛盾检测）
@@ -1078,6 +1359,78 @@ class Learner:
                 cf.add_instance(entity, entity_repr)
             except Exception:
                 pass
+
+        # 4b. 同步到概念空间（Phase 2 核心路径）
+        try:
+            cs = self._registry.get('concept_space')
+
+            # 获取统计学习验证的概念集合（高频+多上下文 = 真正的词汇）
+            stat_verified = set()
+            try:
+                stat_learner = self._registry.get('statistical_learner')
+                if stat_learner:
+                    emergent = stat_learner.get_emergent_concepts(min_freq=2)
+                    stat_verified = {c for c, conf in emergent}
+            except Exception:
+                pass
+
+            # KG 实体也视为已验证
+            kg_entities = set(self.knowledge.entities.keys()) if self.knowledge else set()
+
+            # 碎片过滤：多层级验证
+            function_chars = set('是的有在了和与被把让给从到以也而')
+            # 额外的高频切分点（这些字通常出现在词汇边界）
+            boundary_chars = set('的了着过在让把被从到以与及其')
+            clean_entities = []
+            for entity in entities[:15]:
+                # 层1: 虚词开头/结尾 → 碎片
+                if entity[0] in function_chars or entity[-1] in function_chars:
+                    continue
+                # 层2: 全是虚词 → 碎片
+                if all(c in function_chars for c in entity):
+                    continue
+                # 层3: 中间含虚词 + 长度>3 → 跨词碎片
+                if len(entity) >= 4:
+                    has_mid_func = any(entity[i] in function_chars for i in range(1, len(entity)-1))
+                    if has_mid_func:
+                        continue
+                # 层4（Phase 5新增）: 统计学习验证
+                # 如果概念在统计学习中已涌现 → 直接通过
+                if entity in stat_verified or entity in kg_entities:
+                    clean_entities.append(entity)
+                    continue
+                # 层5: 未被统计学习验证的2字概念 → 只在KG中存在时才通过
+                if len(entity) == 2:
+                    if entity in kg_entities:
+                        clean_entities.append(entity)
+                    # 否则跳过（2字碎片如"理学"、"学分"太多）
+                    continue
+                # 层6: 3字以上未验证 → 允许（可能是新概念）
+                clean_entities.append(entity)
+
+            # 注册过滤后的实体到概念空间
+            for entity in clean_entities:
+                entity_repr = self._encode_text(entity)
+                cs.register(entity, vector=entity_repr, source='text')
+            # 学习关系 — 策略1: 三元组中主体/客体都在概念空间中的
+            for item in triples:
+                if len(item) >= 3:
+                    subj, rel_type, obj = item[0], item[1], item[2]
+                    strength_map = {'是': 0.3, '导致': 0.4, '包括': 0.3, '包含': 0.3}
+                    s = strength_map.get(rel_type, 0.15)
+                    cs.learn_relation(subj, obj, strength=s)
+            # 学习关系 — 策略2: 同一文本中出现的实体对（共现Hebbian）
+            # 这是最重要的关系来源 — 同一上下文中出现的概念自然关联
+            registered_entities = [e for e in entities[:15] if e in cs.concepts]
+            for i in range(len(registered_entities)):
+                for j in range(i + 1, len(registered_entities)):
+                    # 同一文本中的实体对建立弱关联
+                    cs.learn_relation(
+                        registered_entities[i], registered_entities[j],
+                        strength=0.05, bidirectional=True
+                    )
+        except Exception:
+            pass
 
         # 5. 提取数值
         numerical_patterns = [
@@ -1177,12 +1530,18 @@ class Learner:
             importance=importance,
         )
 
-        # 10c. 存入感觉运动接地系统
-        # 注意：当前没有真实视觉/触觉数据，跳过接地
-        # 当接入真实传感器时再启用
-        # for entity in entities:
-        #     entity_repr = self._encode_text(entity)
-        #     self.store_sensorimotor_experience(entity, visual=entity_repr)
+        # 10c. 概念接地标记 — 在概念空间中标记已学到的概念
+        # 虽然当前没有真实视觉/触觉数据，但记录概念的"学习来源"
+        # 当将来接入模拟环境时，同名概念会自动关联到感知体验
+        try:
+            cs = self._registry.get('concept_space')
+            for entity in entities[:5]:
+                if entity in cs.concepts:
+                    # 标记概念为"文本学习"来源，增强其强度
+                    cs.concepts[entity].source = 'text'
+                    cs.concepts[entity].boost(0.05)
+        except Exception:
+            pass
 
         # 11. 更新学习统计
         self._learning_stats['total_learned'] += 1
@@ -1433,11 +1792,34 @@ class Learner:
         # 38. 具身符号接地：从文本中提取感知特征并绑定实体
         grounded = self.embodied_grounding.ground_from_text(text, entities)
 
-        # 39. 社会反馈：处理验证反馈
-        if verification['passed']:
+        # 39. 社会反馈：基于知识图谱已有知识评估学习质量
+        # 不用自指比较(text vs text)，而是检查新学知识是否与已有知识一致
+        if entities:
+            # 构造"学习输出"：列出学到的实体和关系
+            learned_summary = '、'.join(entities[:5])
+            if triples:
+                learned_summary += '。关系：' + '、'.join(
+                    f"{t[0]}-{t[1]}-{t[2]}" for t in triples[:3] if len(t) >= 3
+                )
+
+            # 构造"期望输出"：从知识图谱查询相关已有知识
+            expected_parts = []
+            for entity in entities[:3]:
+                if entity in self.knowledge.entities:
+                    rels = self.knowledge.get_relations_of(entity)
+                    for r in rels[:2]:
+                        expected_parts.append(f"{r.target_id}")
+            expected_summary = '、'.join(expected_parts[:5]) if expected_parts else ''
+
             self.social_feedback.process_feedback(
-                learner_output=text[:50],
-                expected_output=text[:50],
+                learner_output=learned_summary,
+                expected_output=expected_summary,
+            )
+        else:
+            # 没学到任何实体 → 差评
+            self.social_feedback.process_feedback(
+                learner_output='(未学到任何知识)',
+                expected_output=text[:100],
             )
 
         # 40. 知识蒸馏：积累三元组到领域
@@ -1447,6 +1829,11 @@ class Learner:
                     domain=source,
                     triple=(item[0], item[1], item[2]),
                 )
+
+        # 41. 统计学习摘要：将统计学习器的状态附加到结果
+        if self.config.statistical_learning_enabled:
+            stat_learner = self._registry.get('statistical_learner')
+            result['statistical_learning'] = stat_learner.get_stats()
 
         return result
 
@@ -1695,9 +2082,9 @@ class Learner:
             from src.perception.learnable_encoder import LearnableTextEncoder
             self._learnable_encoder = LearnableTextEncoder(
                 d_model=self.config.obs_dim,
-                n_heads=4,
-                n_layers=2,
-                max_len=128,
+                n_heads=self.config.encoder_n_heads,
+                n_layers=self.config.encoder_n_layers,
+                max_len=self.config.encoder_max_len,
             ).to(self.device)
             self._text_optimizer = torch.optim.Adam(
                 self._learnable_encoder.parameters(), lr=1e-4
@@ -1708,6 +2095,45 @@ class Learner:
             self._embedding_cache_max = 10000
             # 用于收集语料训练分词器
             self._training_corpus = []
+
+            # 关键：用常见中文字符预训练BPE，避免前3条文本编码完全相同
+            # 未训练时所有字符映射为UNK，导致不同文本产生相同向量
+            default_chars = (
+                "的一是不了在人有我他这中大来上个国到说们为子和你地出会也时要就"
+                "可以对本去学能那得于着下自之年过发后作里用道行所然家种事成方多"
+                "经么去法如都同现当没动面起看定天分还进好小部其些主样理心她本前"
+                "开但因只从想实日者意无力它与长把机十民第公此已工使情明性知全三"
+                "又关点正业外将两高间由问很最重并物手应战向头文体政美相见被利什"
+                "二等产新己制身果加西斯月话合回特代内信表化老给世位次度门任常先"
+                "海通教儿原东声提立及比员解水名真论处走义各入几口认条平系气题活"
+                "尔更别打女变四神总何电数安少报才结反受目太量再感建务做接必场件"
+                "计管期市直德资命山金指克干排满西增则完格思传望族群底达约维素效"
+                "收速林际拉七规型步验越即视散器图际单场现书住且引运市究联针角落"
+                "米坚约半革越装断适影规往候府存列类区域阶需规越装断适影往候府存"
+                "根据科技术经济政治社会文化教育历史发展研究生产建设管理国际关系"
+                "数学物理化学生物地理天文计算机科学信息网络系统程序数据算法模型"
+                "语言文字阅读写作思考分析综合推理判断记忆学习认知意识感知体验"
+            )
+            self._learnable_encoder.train_tokenizer([default_chars])
+
+            # 预训练后重建优化器（因为嵌入层可能已扩展）
+            self._text_optimizer = torch.optim.Adam(
+                self._learnable_encoder.parameters(), lr=1e-4
+            )
+
+            # 绑定编码器到概念空间
+            try:
+                cs = self._registry.get('concept_space')
+                if cs and cs.encoder is None:
+                    cs.encoder = self._learnable_encoder
+            except Exception:
+                pass
+
+            # 同时初始化对比学习训练器
+            try:
+                self._ensure_contrastive_trainer()
+            except Exception:
+                pass
 
         # 首次遇到文本时加入语料
         if text not in self._embedding_cache:
@@ -1736,6 +2162,33 @@ class Learner:
             self._embedding_cache.popitem(last=False)
 
         return result
+
+    def _ensure_contrastive_trainer(self):
+        """懒初始化对比学习训练器
+
+        必须在 _learnable_encoder 初始化后调用。
+        """
+        if not hasattr(self, '_learnable_encoder'):
+            return
+
+        # 检查是否已初始化（用 has 而非 get，避免缓存 None）
+        if self._registry.has('contrastive_trainer'):
+            return
+
+        if not self.config.contrastive_enabled:
+            return
+
+        from src.learning.contrastive_trainer import ContrastiveTrainer
+        ct = ContrastiveTrainer(
+            encoder=self._learnable_encoder,
+            dim=self.config.obs_dim,
+            temperature=self.config.contrastive_temperature,
+            memory_bank_size=self.config.contrastive_memory_bank_size,
+            negatives_per_positive=self.config.contrastive_negatives_per_pos,
+            learning_rate=self.config.contrastive_learning_rate,
+            device=str(self.device),
+        )
+        self._registry.set('contrastive_trainer', ct)
 
     @property
     def world_model(self):
@@ -2145,6 +2598,7 @@ class Learner:
             self._lang_dev = LanguageDevelopmentSystem(
                 d_model=self.config.obs_dim,
                 device=str(self.device),
+                initial_stage=getattr(self.config, 'initial_language_stage', 'holophrase'),
             )
         return self._lang_dev
 
@@ -2213,11 +2667,12 @@ class Learner:
         return self._token_to_idx[token]
 
     def _train_embedding(self, text: str, entities: List[str]):
-        """训练嵌入 — 梯度学习 + 知识图谱传播
+        """训练嵌入 — 对比学习 + Hebbian传播
 
-        两阶段训练：
-        1. 梯度训练：通过 Transformer 的反向传播更新嵌入
-        2. Hebbian传播：通过知识图谱关系传播相似性
+        三阶段训练：
+        1. InfoNCE对比学习：让相关概念靠近、不相关概念远离（核心！）
+        2. 保留弱对比损失作为辅助（兼容性）
+        3. Hebbian传播：通过知识图谱关系传播相似性
         """
         if not hasattr(self, '_learnable_encoder'):
             return
@@ -2225,27 +2680,98 @@ class Learner:
         if len(entities) < 2:
             return
 
-        # 阶段1：梯度训练 — 实体嵌入应接近文本嵌入但保持区分度
+        # 关键：训练前清空缓存，避免旧的计算图引用导致inplace崩溃
+        self._embedding_cache.clear()
+
+        # 构建高质量对比学习概念
+        # 优先使用统计学习涌现的高置信概念（比正则实体更干净）
+        cl_entities = entities  # 默认使用原始实体
+        cl_cooccurrence = []
+
+        try:
+            stat_learner = self._registry.get('statistical_learner')
+            cs = self._registry.get('concept_space')
+
+            # 从统计学习获取高质量涌现概念
+            if stat_learner:
+                emergent = stat_learner.get_emergent_concepts(min_freq=2)
+                # 用涌现概念替代正则实体（如果数量足够）
+                emergent_ids = [c for c, conf in emergent if conf > 0.3]
+                if len(emergent_ids) >= 3:
+                    # 取当前文本中出现的涌现概念 + 原始实体的交集/并集
+                    text_specific = [e for e in emergent_ids if e in text]
+                    if len(text_specific) >= 2:
+                        cl_entities = text_specific
+
+                # 统计学习的共现关系作为高质量正样本
+                for entity in cl_entities:
+                    related = stat_learner.get_related(entity, top_k=3)
+                    for rel_concept, strength in related:
+                        if strength > 0:
+                            cl_cooccurrence.append((entity, rel_concept))
+
+            # 概念空间的关系作为额外正样本
+            if cs:
+                for entity in cl_entities:
+                    if entity in cs.concepts:
+                        related = cs.get_related(entity, top_k=3)
+                        for rel_id, score in related:
+                            if score > 0.1:
+                                cl_cooccurrence.append((entity, rel_id))
+        except Exception:
+            pass
+
+        # ===== 阶段1：InfoNCE对比学习（核心训练信号）=====
+        ct = self._registry.get('contrastive_trainer')
+        if ct is not None and self.config.contrastive_enabled:
+            # 检查 warmup 条件
+            if len(self._training_corpus) >= self.config.contrastive_warmup_texts:
+                if len(self._training_corpus) % self.config.contrastive_update_freq == 0:
+                    try:
+                        cl_loss = ct.train_step(
+                            concepts=cl_entities,
+                            cooccurrence_pairs=cl_cooccurrence,
+                            optimizer=self._text_optimizer,
+                        )
+                    except Exception as _cl_err:
+                        import os as _os
+                        if _os.environ.get('DEBUG_CONTRASTIVE'):
+                            import traceback
+                            traceback.print_exc()
+                        cl_loss = None
+
+                    # 更新概念空间中的向量（对比学习后重新编码）
+                    try:
+                        cs = self._registry.get('concept_space')
+                        if cs:
+                            for entity in entities:
+                                if entity in cs.concepts:
+                                    with torch.no_grad():
+                                        new_vec = self._learnable_encoder(entity).detach()
+                                        cs.concepts[entity].vector = torch.nn.functional.normalize(
+                                            new_vec, p=2, dim=0
+                                        )
+                    except Exception:
+                        pass
+
+        # ===== 阶段2：弱对比辅助损失（保留，提供额外梯度信号）=====
         self._learnable_encoder.train()
         self._text_optimizer.zero_grad()
 
-        # 编码文本和实体（带梯度）
-        text_emb = self._encode_text(text, train=True)
-        entity_embs = []
-        for entity in entities:
-            emb = self._encode_text(entity, train=True)
-            entity_embs.append(emb)
+        text_emb = self._learnable_encoder(text)
 
-        # 损失设计：
-        # 1. 实体应与文本嵌入相关（正锚点）
-        # 2. 实体之间应保持区分度（负样本）
-        loss = 0.0
+        with torch.no_grad():
+            entity_embs = [self._learnable_encoder(e).detach().clone() for e in entities]
+
+        # 正样本损失：实体应与文本相关
+        loss = torch.tensor(0.0, device=self.device)
         for emb in entity_embs:
-            # 正锚点：实体应与文本相关
-            sim_to_text = torch.cosine_similarity(emb.unsqueeze(0), text_emb.unsqueeze(0))
-            loss = loss + (1.0 - sim_to_text) * 0.5
+            sim_to_text = torch.cosine_similarity(
+                emb.unsqueeze(0), text_emb.unsqueeze(0)
+            )
+            loss = loss + (1.0 - sim_to_text) * 0.3  # 降低权重，对比学习是主力
 
-        # 负样本：实体之间保持区分（阈值由自改进系统动态调整）
+        # 负样本损失：不同实体保持区分
         neg_threshold = self.self_improvement.get_parameter('negative_threshold')
         for i in range(len(entity_embs)):
             for j in range(i + 1, len(entity_embs)):
@@ -2253,17 +2779,17 @@ class Learner:
                     entity_embs[i].unsqueeze(0),
                     entity_embs[j].unsqueeze(0)
                 )
-                # 如果相似度过高，增加损失
                 if sim > neg_threshold:
-                    loss = loss + (sim - neg_threshold) * 2.0
+                    loss = loss + (sim - neg_threshold) * 1.0  # 降低权重
 
-        if isinstance(loss, torch.Tensor) and loss.requires_grad:
+        if loss.requires_grad and loss.item() > 1e-8:
             loss.backward()
+            torch.nn.utils.clip_grad_norm_(self._learnable_encoder.parameters(), 1.0)
             self._text_optimizer.step()
 
         self._learnable_encoder.eval()
 
-        # 阶段2：Hebbian传播 — 通过知识图谱关系传播
+        # ===== 阶段3：Hebbian传播 =====
         kg = self.knowledge
         related_pairs = []
         for entity in entities:
@@ -2274,29 +2800,23 @@ class Learner:
             except Exception:
                 pass
 
-        hebbian_lr = 0.1
-        for entity1, entity2 in related_pairs:
-            if entity1 in self._embedding_cache and entity2 in self._embedding_cache:
-                emb1 = self._embedding_cache[entity1]
-                emb2 = self._embedding_cache[entity2]
+        if related_pairs:
+            hebbian_lr = 0.1
+            with torch.no_grad():
+                for entity1, entity2 in related_pairs:
+                    emb1 = self._learnable_encoder(entity1).detach()
+                    emb2 = self._learnable_encoder(entity2).detach()
 
-                # Hebbian更新：让相关实体的嵌入更相似
-                delta = hebbian_lr * (emb2 - emb1)
-                self._embedding_cache[entity1] = emb1 + delta
-                self._embedding_cache[entity2] = emb2 - delta
+                    delta = hebbian_lr * (emb2 - emb1)
+                    new_emb1 = torch.nn.functional.normalize(
+                        (emb1 + delta).unsqueeze(0), p=2, dim=1
+                    ).squeeze(0)
+                    new_emb2 = torch.nn.functional.normalize(
+                        (emb2 - delta).unsqueeze(0), p=2, dim=1
+                    ).squeeze(0)
 
-                # 归一化
-                self._embedding_cache[entity1] = torch.nn.functional.normalize(
-                    self._embedding_cache[entity1].unsqueeze(0), p=2, dim=1
-                ).squeeze(0)
-                self._embedding_cache[entity2] = torch.nn.functional.normalize(
-                    self._embedding_cache[entity2].unsqueeze(0), p=2, dim=1
-                ).squeeze(0)
-
-        # 清除缓存，让重新编码使用更新后的嵌入层
-        for entity in entities:
-            if entity in self._embedding_cache:
-                del self._embedding_cache[entity]
+                    self._embedding_cache[entity1] = new_emb1
+                    self._embedding_cache[entity2] = new_emb2
 
         # 更新知识图谱中的实体嵌入
         self._update_entity_embeddings(entities)
@@ -2317,81 +2837,161 @@ class Learner:
     def _extract_entities_from_repr(self, text: str, repr: torch.Tensor) -> List[str]:
         """从文本和表示中提取实体
 
-        使用可微分知识提取器（学习驱动），冷启动时回退到正则。
+        改进策略：
+        1. 基于标点和语法分词提取候选实体
+        2. 用TF-IDF思想过滤：太常见的碎片不是实体
+        3. 用repr向量语义相关性过滤低质量实体
         """
-        # 初始化可微分提取器
-        if not hasattr(self, '_knowledge_extractor'):
-            from src.perception.knowledge_extractor import LearnableKnowledgeExtractor
-            self._knowledge_extractor = LearnableKnowledgeExtractor(
-                d_model=self.config.obs_dim,
-                device=str(self.device),
-            )
+        import re
 
-        extractor = self._knowledge_extractor
+        # 停用词表（扩展版：常见虚词、连接词、代词）
+        stopwords = set(
+            '的了是在我你他她它们这那个有不人大中上下来什么如何怎样'
+            '而且还或者而但由于所以因为如果那么但是以为之一一个一些'
+            '也能就要会可以被与及其对于到从向把给让比跟最更很已也并'
+            '种样方面性化里后前内外国年月日时第个些每各该此本另某'
+            '成得着过将使关于通过之间以及等等可能需要'
+        )
+
+        # 方法1：基于标点和关键标记的分块提取
         entities = []
 
-        # 方法1：正则提取（冷启动回退）
-        import re
-        separators = r'[，。！？；：、\s的了是在有位于属于包括使用产生导致引起为了因为所以如果那么但是而且或者而但]'
-        parts = re.split(separators, text)
+        # 1a. 按"是"提取定义式实体: "X是Y"中的X通常是实体
+        is_patterns = re.findall(r'([一-鿿A-Za-z0-9]{2,10})是', text)
+        entities.extend(is_patterns)
+
+        # 1b. 按"的"提取名词短语: "XX的YY"中YY是实体
+        de_patterns = re.findall(r'的([一-鿿A-Za-z0-9]{2,8})[，。、\s]', text)
+        entities.extend(de_patterns)
+
+        # 1c. 按标点分割后提取（改进：只取2-4字的短片段作为候选）
+        parts = re.split(r'[，。！？；：、\s]', text)
         for part in parts:
             part = part.strip()
             if not part or len(part) < 2:
                 continue
-            zh_words = re.findall(r'[一-鿿]{2,6}', part)
-            entities.extend(zh_words)
+            # 只取2-4字的中文词组作为候选实体（长片段大概率是句子）
+            short_words = re.findall(r'[一-鿿]{2,4}', part)
+            entities.extend(short_words)
 
-        en_words = re.findall(r'[A-Z][a-zA-Z]+', text)
+        # 1d. 英文实体
+        en_words = re.findall(r'[A-Z][a-zA-Z]{2,}', text)
         entities.extend(en_words)
 
+        # 1e. 数字
         numbers = re.findall(r'\d+', text)
         entities.extend(numbers)
 
-        stopwords = set('的了是在我你他她它们这那个有不人大中上下来什么如何怎样')
-        entities = [e for e in entities if e not in stopwords and len(e) >= 2]
+        # 去重 + 停用词过滤
+        seen = set()
+        filtered = []
+        for e in entities:
+            e = e.strip()
+            if e in seen:
+                continue
+            seen.add(e)
+            # 跳过停用词和单字
+            if e in stopwords or len(e) < 2:
+                continue
+            # 跳过纯虚词组合（如"而且"、"所以"）
+            if all(c in stopwords for c in e):
+                continue
+            filtered.append(e)
 
-        # 方法2：可学习提取器（3次后启用，带梯度训练）
-        encoder = getattr(self, '_learnable_encoder', None)
-        if extractor._extraction_count >= 3 and encoder is not None:
-            learned_triples = extractor.extract_triples(text, repr, encoder)
-            for t in learned_triples:
-                if t.subject not in entities:
-                    entities.append(t.subject)
-                if t.obj not in entities:
-                    entities.append(t.obj)
+        # 方法2：用repr向量过滤 — 编码每个候选实体，只保留与文本语义相关的
+        if hasattr(self, '_learnable_encoder') and len(filtered) > 15:
+            with torch.no_grad():
+                # 限制候选数量，避免太多编码操作
+                candidates = filtered[:50]
+                ent_sims = []
+                for ent in candidates:
+                    ent_repr = self._encode_text(ent)
+                    sim = torch.cosine_similarity(repr.unsqueeze(0), ent_repr.unsqueeze(0)).item()
+                    ent_sims.append((ent, sim))
 
-        extractor._extraction_count += 1
+                # 按相似度排序，取top N
+                ent_sims.sort(key=lambda x: x[1], reverse=True)
+                # 保留前15个最相关的实体
+                filtered = [e for e, s in ent_sims[:15]]
 
-        return list(set(entities))
+                # 也保留任何sim > 0的实体（至少有点相关性）
+                extra = [e for e, s in ent_sims[15:] if s > -0.5]
+                filtered.extend(extra[:5])
+
+        return filtered
 
     def _extract_relations_from_repr(self, text: str, entities: List[str], repr: torch.Tensor) -> List[Tuple[str, str, str]]:
         """从文本和表示中提取关系
 
-        使用可微分知识提取器（学习驱动），冷启动时回退到正则。
+        改进策略：
+        1. 关系模式匹配（正则）
+        2. 主语和宾语必须来自已抽取的entities列表
+        3. 用repr计算语义相关性作为置信度
         返回4元组：(subject, relation, obj, confidence)
         """
-        # 初始化可微分提取器
-        if not hasattr(self, '_knowledge_extractor'):
-            from src.perception.knowledge_extractor import LearnableKnowledgeExtractor
-            self._knowledge_extractor = LearnableKnowledgeExtractor(
-                d_model=self.config.obs_dim,
-                device=str(self.device),
-            )
+        import re
 
-        extractor = self._knowledge_extractor
-
-        # 获取编码器
-        encoder = getattr(self, '_learnable_encoder', None)
-
-        # 提取三元组
-        extracted = extractor.extract_triples(text, repr, encoder)
-
-        # 转换为4元组格式
         triples = []
-        for t in extracted:
-            triples.append((t.subject, t.relation, t.obj, t.confidence))
+        entity_set = set(entities)
 
-        return triples
+        # 关系模式：在文本中查找已知实体之间的关系
+        relation_patterns = [
+            # 定义关系
+            (r'([一-鿿]{2,10})是([一-鿿]{2,20})的([一-鿿]{2,10})', '是'),
+            (r'([一-鿿]{2,10})是([一-鿿]{2,20})', '是'),
+            # 包含关系
+            (r'([一-鿿]{2,10})包括([一-鿿]{2,20})', '包括'),
+            (r'([一-鿿]{2,10})包含([一-鿿]{2,20})', '包含'),
+            # 属性关系
+            (r'([一-鿿]{2,10})的([一-鿿]{2,10})', '的'),
+            # 因果关系
+            (r'([一-鿿]{2,10})导致([一-鿿]{2,20})', '导致'),
+            (r'([一-鿿]{2,10})引起([一-鿿]{2,20})', '引起'),
+            # 动作关系
+            (r'([一-鿿]{2,10})使用([一-鿿]{2,20})', '使用'),
+            (r'([一-鿿]{2,10})利用([一-鿿]{2,20})', '利用'),
+            (r'([一-鿿]{2,10})通过([一-鿿]{2,20})', '通过'),
+            (r'([一-鿿]{2,10})研究([一-鿿]{2,20})', '研究'),
+        ]
+
+        for pattern, relation in relation_patterns:
+            matches = re.findall(pattern, text)
+            for match in matches:
+                if len(match) == 2:
+                    subj, obj = match[0].strip(), match[1].strip()
+                elif len(match) == 3:
+                    # "X是Y的Z" → X是Z的Y
+                    subj, obj = match[0].strip(), (match[1] + '的' + match[2]).strip()
+                else:
+                    continue
+
+                # 过滤：主语或宾语必须是已知实体
+                subj_match = subj in entity_set or any(subj in e for e in entities)
+                obj_match = obj in entity_set or any(e in obj for e in entities)
+
+                if subj_match or obj_match:
+                    # 置信度：基于是否两个都在entities中
+                    if subj in entity_set and obj in entity_set:
+                        confidence = 0.9
+                    elif subj_match and obj_match:
+                        confidence = 0.7
+                    else:
+                        confidence = 0.5
+
+                    # 长度合理性检查
+                    if 2 <= len(subj) <= 10 and 2 <= len(obj) <= 20:
+                        triples.append((subj, relation, obj, confidence))
+
+        # 去重
+        seen = set()
+        unique_triples = []
+        for t in triples:
+            key = (t[0], t[1], t[2])
+            if key not in seen:
+                seen.add(key)
+                unique_triples.append(t)
+
+        return unique_triples
 
     def _extract_causal_from_repr(self, text: str, repr: torch.Tensor) -> List[Tuple[str, str]]:
         """从文本和表示中提取因果关系"""
@@ -2418,42 +3018,56 @@ class Learner:
         return causal_links
 
     def think(self, question: str) -> str:
-        """思考问题 — 多模式推理 + 测试时训练
+        """思考问题 — 概念空间激活扩散 + 统一推理引擎双路径
 
-        使用统一推理引擎，整合多种推理模式：
-        1. 测试时训练（根据查询上下文微调编码器）
-        2. 直接查询（知识图谱向量检索 + 关键词匹配）
-        3. 因果推理（因果DAG遍历）
-        4. 归纳推理（从记忆中发现模式）
-        5. 类比推理（跨域映射）
-        6. 反事实推理（如果...会怎样）
-        7. 概率推理（贝叶斯更新）
+        推理路径（优先级）：
+        1. 概念空间激活扩散（Phase 2 新路径）
+           问题 → 向量 → 最近邻概念 → 扩散激活 → 组织答案
+        2. 统一推理引擎（原有路径，作为fallback）
+           直接查询 → 因果 → 归纳 → 类比 → 反事实 → 概率
         """
         import re
 
         # 测试时训练：根据查询上下文微调编码器
-        # 先确保编码器已初始化
         question_repr = self._encode_text(question)
 
-        # 批量学习时跳过TTT以提高性能
         skip_ttt = getattr(self, '_skip_ttt', False)
         if not skip_ttt and hasattr(self, '_learnable_encoder'):
-            # 获取相关实体
             similar_entities = self._find_similar_entities(question_repr, top_k=3)
             relevant_entities = [eid for eid, sim in similar_entities if sim > 0.3]
-
-            # 微调编码器
             if relevant_entities:
                 self._test_time_trainer.adapt_to_query(
                     question, question_repr, relevant_entities
                 )
 
-        # 初始化统一推理引擎
+        # 路径1: 概念空间激活扩散推理（优先）
+        activated = None
+        try:
+            cs = self._registry.get('concept_space')
+            if cs and len(cs.concepts) >= 3:
+                activated = cs.activate(question, top_k=5, spread_depth=2)
+                if activated and activated[0].activation > 0.1:
+                    answer = self._synthesize_from_activation(activated, question)
+                    if answer and len(answer) > 10:
+                        return answer
+        except Exception:
+            pass
+
+        # 路径1.5: 概念空间多跳推理（利用 A→B→C 图路径）
+        try:
+            cs = self._registry.get('concept_space')
+            if cs and activated:
+                multi_hop_answer = self._synthesize_multihop(cs, activated, question)
+                if multi_hop_answer and len(multi_hop_answer) > 10:
+                    return multi_hop_answer
+        except Exception:
+            pass
+
+        # 路径2: 统一推理引擎（fallback）
         if not hasattr(self, '_reasoning_engine'):
             from src.reasoning.unified_engine import UnifiedReasoningEngine
             self._reasoning_engine = UnifiedReasoningEngine(self)
 
-        # 使用统一推理引擎
         reasoning_results = self._reasoning_engine.reason(question)
 
         if reasoning_results:
@@ -2463,6 +3077,418 @@ class Learner:
         # 回退到原有逻辑
         return self._think_legacy(question)
 
+    def _synthesize_from_activation(self, activated: list, question: str) -> str:
+        """从概念空间激活结果综合生成答案
+
+        改进版（Phase 5）：
+        1. 用统计学习验证概念是否是真正的词（而非跨词碎片）
+        2. KG关系 + 概念空间关系 双通道构建答案
+        3. 更自然的句式（根据关系类型推断）
+        4. 置信度过滤：低质量概念不进入输出
+
+        Args:
+            activated: ActivatedConcept 列表，按激活强度降序
+        """
+        if not activated:
+            return ""
+
+        # ===== 概念质量验证 =====
+        function_chars = set('是的有在了和与被把让给从到以也而')
+
+        # 从统计学习获取已验证的涌现概念（高频+多上下文=真词）
+        verified_concepts = set()
+        try:
+            stat_learner = self._registry.get('statistical_learner')
+            if stat_learner:
+                emergent = stat_learner.get_emergent_concepts(min_freq=2)
+                verified_concepts = {c for c, conf in emergent}
+        except Exception:
+            pass
+
+        # KG 中的实体也视为已验证
+        kg = self.knowledge
+        if kg:
+            verified_concepts.update(kg.entities.keys())
+
+        # 概念空间中的高频率概念（被多次巩固）
+        cs = self._registry.get('concept_space')
+        if cs:
+            for cid, node in cs.concepts.items():
+                if node.frequency >= 3:
+                    verified_concepts.add(cid)
+
+        def is_high_quality(concept_id):
+            """判断概念是否高质量（不是碎片）
+
+            验证策略：
+            1. 统计学习涌现概念 → 直接通过
+            2. KG 实体（3字+）→ 通过但需排除碎片
+            3. 检查是否是更长概念的子串 → 碎片
+            4. 2字概念 → 必须统计学习验证
+            """
+            if len(concept_id) < 2:
+                return False
+            # 虚词开头/结尾 → 碎片
+            if concept_id[0] in function_chars or concept_id[-1] in function_chars:
+                return False
+            # 中间有虚词 + 长度>=4 → 跨词碎片
+            if len(concept_id) >= 4:
+                for i in range(1, len(concept_id) - 1):
+                    if concept_id[i] in function_chars:
+                        return False
+
+            # 统计学习验证通过 → OK
+            if concept_id in verified_concepts:
+                return True
+
+            # 子串检测：如果 concept_id 是某个更长概念的子串 → 很可能是碎片
+            # 如 "物理学理" 是 "物理学理论" 的子串 → 碎片
+            # 收集所有已知的更长概念
+            all_longer = set()
+            if kg:
+                all_longer.update(eid for eid in kg.entities if len(eid) > len(concept_id))
+            if cs:
+                all_longer.update(cid2 for cid2 in cs.concepts if len(cid2) > len(concept_id))
+            for longer in all_longer:
+                if concept_id in longer:
+                    return False
+
+            # KG 实体（3字以上）→ 信任
+            if kg and concept_id in kg.entities and len(concept_id) >= 3:
+                return True
+
+            # 2字概念 → 只在统计学习验证时通过
+            if len(concept_id) == 2:
+                return concept_id in verified_concepts
+
+            # 未验证的3-4字概念 → 不通过
+            return False
+
+        # ===== 提取问题关键词 =====
+        keywords = self._extract_keywords(question)
+
+        # ===== 构建答案 =====
+        answer_parts = []
+        seen_concepts = set()
+        question_core = keywords[0] if keywords else ""
+
+        # 跟踪：是否已包含直接回答问题的句子
+        direct_answer_found = False
+
+        for ac in activated[:15]:
+            cid = ac.concept_id
+            if cid in seen_concepts or len(cid) < 2:
+                continue
+            # 严格质量过滤
+            if not is_high_quality(cid):
+                continue
+
+            # 感知来源降权：纯感知概念（"红色"、"圆形"等）只在感知相关问题时输出
+            # 避免感知探索污染学术推理
+            if cs and cid in cs.concepts:
+                node = cs.concepts[cid]
+                if getattr(node, 'source', 'text') == 'perception':
+                    # 检查问题是否与感知相关
+                    perceptual_keywords = {'红', '蓝', '绿', '颜色', '形状', '圆', '方',
+                                          '大', '小', '物体', '环境', '感知', '看'}
+                    if not any(kw in question for kw in perceptual_keywords):
+                        continue  # 非感知问题，跳过感知概念
+
+            seen_concepts.add(cid)
+
+            if len(answer_parts) >= 4:
+                break
+
+            # 策略1：KG 关系（最可靠的信息源）
+            found_in_kg = False
+            if kg and hasattr(kg, 'get_relations_of'):
+                rels = kg.get_relations_of(cid)
+                for rel in rels[:3]:
+                    target = rel.target_id
+                    if target in seen_concepts or not is_high_quality(target):
+                        continue
+                    if len(target) > 15:  # 过长的目标（可能是整句话）
+                        continue
+                    rel_type = rel.type
+                    seen_concepts.add(target)
+
+                    # 根据关系类型构建自然句式
+                    sentence = self._build_sentence(cid, rel_type, target)
+                    answer_parts.append(sentence)
+                    found_in_kg = True
+
+                    # 如果是直接回答问题的概念，标记
+                    if cid == question_core or question_core in cid:
+                        direct_answer_found = True
+                    break  # 每个概念只取1条KG关系
+
+            # 策略2：概念空间补充（仅当KG无结果时）
+            if not found_in_kg and cs:
+                related = cs.get_related(cid, top_k=5)
+                for related_id, score in related:
+                    if (related_id not in seen_concepts
+                            and is_high_quality(related_id)
+                            and score > 0.6  # 提高阈值：只有强关联才输出
+                            and len(related_id) >= 3):
+                        # 只有当两个概念都不是问题核心词时才输出
+                        if related_id != question_core and cid != question_core:
+                            answer_parts.append(f"{cid}与{related_id}存在关联。")
+                        seen_concepts.add(related_id)
+                        break
+
+        if not answer_parts:
+            # fallback：尝试直接用KG搜索问题关键词
+            if question_core and kg:
+                rels = kg.get_relations_of(question_core)
+                for rel in rels[:3]:
+                    target = rel.target_id
+                    if len(target) <= 15:
+                        sentence = self._build_sentence(question_core, rel.type, target)
+                        answer_parts.append(sentence)
+                if answer_parts:
+                    direct_answer_found = True
+
+        if not answer_parts:
+            return ""
+
+        # 去重
+        unique_parts = list(dict.fromkeys(answer_parts))
+        return " ".join(unique_parts[:4])
+
+    def _synthesize_multihop(self, cs, activated: list, question: str) -> str:
+        """从概念空间图结构中进行多跳推理，生成 A→B→C 链式答案
+
+        当路径1（激活扩散）只返回孤立概念时，
+        通过 BFS 在概念图上搜索连接两个问题关键词的路径。
+
+        例如：问"数学和物理学有什么关系"
+        → BFS 找到 数学→自然科学←物理学 路径
+        → 生成 "数学与自然科学相关联，物理学也与自然科学相关联"
+
+        Args:
+            cs: 概念空间实例
+            activated: 激活扩散结果
+            question: 用户问题
+        """
+        # 提取问题中的已知概念关键词
+        keywords = self._extract_keywords(question)
+        if len(keywords) < 1:
+            return ""
+
+        # 虚词集合（用于过滤碎片）
+        function_chars = set('是的有在了和与被把让给从到以也而')
+
+        # 预收集已验证概念集合（避免 BFS 中重复查询）
+        # Phase 7 修复：不能盲目导入 _concepts 全部 key（包含碎片）
+        # 只导入通过质量检查的概念
+        verified_set = set()
+        stat_learner = self._registry.get('statistical_learner') if self._registry.has('statistical_learner') else None
+        kg = self.knowledge
+
+        if stat_learner and hasattr(stat_learner, '_concepts'):
+            # 只导入通过 _is_complete_word() 验证的概念
+            for cid, candidate in stat_learner._concepts.items():
+                if candidate.frequency >= 2 and stat_learner._is_complete_word(cid):
+                    verified_set.add(cid)
+        if kg and hasattr(kg, 'entities'):
+            verified_set.update(kg.entities.keys())
+        if cs:
+            verified_set.update(cid for cid, node in cs.concepts.items() if node.frequency >= 3)
+
+        # 预计算子串黑名单（未验证概念是已验证概念的子串 → 碎片）
+        fragment_blacklist = set()
+        if cs:
+            for cid in cs.concepts:
+                if cid in verified_set:
+                    continue
+                if len(cid) < 2 or cid[0] in function_chars or cid[-1] in function_chars:
+                    fragment_blacklist.add(cid)
+                    continue
+                for longer in verified_set:
+                    if len(longer) > len(cid) and cid in longer:
+                        fragment_blacklist.add(cid)
+                        break
+
+        def is_valid_concept(cid):
+            """增强版概念验证（Phase 7 — 对齐 is_high_quality 的多层过滤）"""
+            if len(cid) < 2:
+                return False
+            # 黑名单快速路径
+            if cid in fragment_blacklist:
+                return False
+            # 层1: 虚词边界
+            if cid[0] in function_chars or cid[-1] in function_chars:
+                return False
+            # 层2: 中间虚词(4+字)
+            if len(cid) >= 4:
+                for i in range(1, len(cid) - 1):
+                    if cid[i] in function_chars:
+                        return False
+            # 层3: 已验证概念 → 通过
+            if cid in verified_set:
+                # 感知概念降权
+                if cs and cid in cs.concepts:
+                    node = cs.concepts[cid]
+                    if getattr(node, 'source', 'text') == 'perception':
+                        perceptual_kw = {'红','蓝','绿','颜色','形状','圆','方',
+                                        '大','小','物体','环境','感知','看'}
+                        if not any(kw in question for kw in perceptual_kw):
+                            return False
+                return True
+            # 层4: 未验证的2字概念 → 拒绝
+            if len(cid) == 2:
+                return False
+            # 层5: 未验证的3+字概念 — 子串检测
+            all_longer = set()
+            if kg and hasattr(kg, 'entities'):
+                all_longer.update(eid for eid in kg.entities if len(eid) > len(cid))
+            if cs:
+                all_longer.update(c2 for c2 in cs.concepts if len(c2) > len(cid))
+            for longer in all_longer:
+                if cid in longer:
+                    return False
+            # 感知降权
+            if cs and cid in cs.concepts:
+                node = cs.concepts[cid]
+                if getattr(node, 'source', 'text') == 'perception':
+                    perceptual_kw = {'红','蓝','绿','颜色','形状','圆','方',
+                                    '大','小','物体','环境','感知','看'}
+                    if not any(kw in question for kw in perceptual_kw):
+                        return False
+            return True
+
+        # 收集激活的概念作为起点（增强过滤）
+        start_concepts = []
+        for ac in activated[:5]:
+            if is_valid_concept(ac.concept_id):
+                start_concepts.append(ac.concept_id)
+
+        # 也把问题关键词加入起点
+        for kw in keywords:
+            if len(kw) >= 2 and kw in cs.concepts and kw not in start_concepts and is_valid_concept(kw):
+                start_concepts.append(kw)
+
+        if not start_concepts:
+            return ""
+
+        # BFS 多跳搜索：找连接起点的路径
+        max_hops = 3
+        found_paths = []  # List[List[str]] — 每条路径是一系列概念ID
+
+        for start in start_concepts[:3]:
+            if start not in cs.concepts:
+                continue
+
+            # BFS
+            visited = {start}
+            queue = [(start, [start], 0)]  # (current, path, depth)
+
+            while queue:
+                current, path, depth = queue.pop(0)
+
+                if depth >= max_hops:
+                    continue
+
+                # 获取邻居
+                related = cs.get_related(current, top_k=5)
+                for neighbor_id, score in related:
+                    if neighbor_id in visited or not is_valid_concept(neighbor_id):
+                        continue
+                    if score < 0.05:
+                        continue
+
+                    new_path = path + [neighbor_id]
+                    visited.add(neighbor_id)
+
+                    # 如果路径长度>=3（至少2跳），且终点是另一个问题关键词或激活概念
+                    if len(new_path) >= 3:
+                        end_concept = new_path[-1]
+                        # 终点是问题关键词
+                        is_endpoint = any(kw in end_concept or end_concept in kw for kw in keywords)
+                        # 终点是激活的概念
+                        is_endpoint = is_endpoint or end_concept in start_concepts
+                        if is_endpoint and len(new_path) <= max_hops + 1:
+                            confidence = 0.7 / (depth + 1)
+                            found_paths.append((new_path, confidence, score))
+
+                    queue.append((neighbor_id, new_path, depth + 1))
+
+        if not found_paths:
+            # 退而求其次：找深度>=2的激活路径
+            deep_activations = [ac for ac in activated if ac.depth >= 2 and ac.activation > 0.1]
+            for ac in deep_activations[:2]:
+                if len(ac.path) >= 3 and all(is_valid_concept(p) for p in ac.path):
+                    found_paths.append((ac.path, ac.activation * 0.5, ac.activation))
+
+        if not found_paths:
+            return ""
+
+        # 按置信度排序，取最佳路径
+        found_paths.sort(key=lambda x: x[1] * x[2], reverse=True)
+        best_path, confidence, _ = found_paths[0]
+
+        # 从路径生成自然语言答案
+        # 尝试用 KG 关系填充路径中的边
+        kg = self.knowledge
+        path_parts = []
+        for i in range(len(best_path) - 1):
+            src = best_path[i]
+            tgt = best_path[i + 1]
+
+            # 查找 KG 关系
+            rel_type = None
+            if kg and hasattr(kg, 'get_relations_of'):
+                rels = kg.get_relations_of(src)
+                for rel in rels:
+                    if rel.target_id == tgt:
+                        rel_type = rel.type
+                        break
+
+            if rel_type:
+                path_parts.append(f"{src}{rel_type}{tgt}")
+            else:
+                # 查找概念空间关系
+                rel_weight = cs.relations.get(src, {}).get(tgt, 0.0)
+                if rel_weight > 0.1:
+                    path_parts.append(f"{src}与{tgt}相关联")
+                else:
+                    path_parts.append(f"{src}与{tgt}存在联系")
+
+        if not path_parts:
+            return ""
+
+        # 组合为连贯答案
+        chain = "，".join(path_parts)
+
+        # 构建最终答案
+        if len(best_path) >= 3:
+            # A→B→C 链式推理
+            return f"通过{best_path[1]}可以关联：{chain}。"
+        else:
+            return f"{chain}。"
+
+    def _build_sentence(self, subject: str, rel_type: str, obj: str) -> str:
+        """根据关系类型构建自然语言句子"""
+        # 截断过长的宾语
+        if len(obj) > 12:
+            obj = obj[:12] + "..."
+
+        if rel_type == '是':
+            return f"{subject}是{obj}。"
+        elif rel_type in ('包括', '包含'):
+            return f"{subject}包括{obj}。"
+        elif rel_type in ('导致', '引起', '使得'):
+            return f"{subject}导致{obj}。"
+        elif rel_type in ('属于', '属于'):
+            return f"{subject}属于{obj}。"
+        elif rel_type == '研究':
+            return f"{subject}研究{obj}。"
+        elif rel_type in ('描述', '研究描述'):
+            return f"{subject}描述{obj}。"
+        else:
+            # 通用关系：直接拼接
+            return f"{subject}{rel_type}{obj}。"
+
     def _synthesize_from_reasoning(self, results, question: str) -> str:
         """从推理结果综合生成答案"""
         # 提取问题关键词
@@ -2471,23 +3497,30 @@ class Learner:
         # 按置信度排序
         results.sort(key=lambda r: r.confidence, reverse=True)
 
-        # 过滤：只保留包含问题关键词的结果（子串匹配）
+        # 过滤：只保留与问题关键词有实质性关联的结果
         filtered = []
         for r in results:
             content = r.content
+            matched = False
             for keyword in keywords:
-                # 双向子串匹配
-                if keyword in content or content in keyword:
-                    filtered.append(r)
+                if len(keyword) < 2:
+                    continue  # 跳过单字符关键词，避免过度匹配
+                # 关键词在内容中出现
+                if keyword in content:
+                    matched = True
                     break
-                # 字符级匹配（中文）
-                if any(c in content for c in keyword if '一' <= c <= '鿿'):
-                    filtered.append(r)
-                    break
+            if matched:
+                filtered.append(r)
 
-        # 如果过滤后没有结果，使用原始结果
-        if not filtered:
+        # 如果严格过滤无结果，放宽条件：取置信度最高的结果
+        # （统一推理引擎已经做了向量相似度过滤，结果有一定相关性）
+        if not filtered and results:
             filtered = results[:3]
+
+        # 如果过滤后没有结果，说明推理引擎的结果与问题无关
+        # 不要fallback到随机top3，直接返回"我不知道"
+        if not filtered:
+            return "我没有足够的信息来回答这个问题。"
 
         # 去重 + 过滤自引用
         seen = set()
@@ -2645,12 +3678,22 @@ class Learner:
                     break
 
         if not filtered:
-            filtered = results[:3]
+            # legacy路径也使用同样的策略：无相关结果就承认不知道
+            if results:
+                # 尝试宽松过滤：取与任何关键词有部分匹配的
+                for r in results[:10]:
+                    content = r.get('content', '')
+                    for keyword in keywords:
+                        if len(keyword) >= 2 and (keyword in content or any(c in content for c in keyword if '一' <= c <= '鿿')):
+                            filtered.append(r)
+                            break
+            if not filtered:
+                return "我没有足够的信息来回答这个问题。"
 
         # 8. 综合生成答案
         return self._synthesize_answer(filtered, question)
 
-    def _find_similar_entities(self, query_repr: torch.Tensor, top_k: int = 10, threshold: float = -1.0) -> List[Tuple[str, float]]:
+    def _find_similar_entities(self, query_repr: torch.Tensor, top_k: int = 10, threshold: float = 0.3) -> List[Tuple[str, float]]:
         """用向量相似度检索相关实体"""
         similarities = []
 
@@ -2676,19 +3719,30 @@ class Learner:
                               keywords: List[str], question: str) -> List[Dict]:
         """从相似实体出发，遍历知识图谱推理
 
-        支持多步推理（组合泛化）：
-        1. 直接关系
-        2. 两跳关系（A→B→C）
-        3. 因果链推理
+        改进：根据问题类型过滤关系，只返回与问题相关的推理结果。
         """
         results = []
 
-        # 1. 从相似实体获取直接关系
+        # 检测问题类型，用于关系过滤
+        question_type = self._detect_question_type(question)
+        relation_filter = {
+            'definition': {'是', '属于', '包含', '包括', '的'},
+            'causal': {'导致', '引起', '产生'},
+            'method': {'使用', '利用', '通过', '研究'},
+            'location': {'位于', '在'},
+        }
+        allowed_rels = relation_filter.get(question_type, None)
+
+        # 1. 从相似实体获取直接关系（带类型过滤）
         kg = self.knowledge
         for entity_id, similarity in similar_entities[:5]:
             try:
                 relations = kg.get_relations_of(entity_id)
                 for rel in relations[:3]:
+                    # 如果检测到问题类型，只返回相关类型的关系
+                    if allowed_rels and rel.type not in allowed_rels:
+                        continue
+
                     results.append({
                         'type': 'direct',
                         'content': f"{rel.source_id} {rel.type} {rel.target_id}",
@@ -2784,44 +3838,83 @@ class Learner:
     def _synthesize_answer(self, results: List[Dict], question: str = "") -> str:
         """综合多个证据生成答案
 
-        简化版：按置信度排序，返回最相关的结果。
+        改进：将碎片化三元组组织成连贯的自然语言回答。
         """
         if not results:
             return "我没有找到相关的知识。"
 
-        # 去重
+        # 去重 + 过滤低质量内容
         seen = set()
         unique_results = []
         for r in results:
             content = r.get('content', '')
-            if content not in seen:
-                seen.add(content)
-                unique_results.append(r)
+            if not content or content in seen:
+                continue
+            # 过滤自引用（A → A）
+            parts = content.split()
+            if len(parts) >= 3 and parts[0] == parts[-1]:
+                continue
+            # 过滤太短的碎片
+            if len(content) < 3:
+                continue
+            seen.add(content)
+            unique_results.append(r)
+
+        if not unique_results:
+            return "我没有找到相关的知识。"
 
         # 按置信度排序
         unique_results.sort(key=lambda x: x.get('confidence', 0), reverse=True)
 
-        # 生成答案
-        parts = []
-        for r in unique_results[:3]:
-            parts.append(f"- {r['content']}")
+        # 取top结果并转换为自然语言
+        top_results = unique_results[:5]
+        sentences = []
+        for r in top_results:
+            content = r.get('content', '')
+            # 尝试将三元组格式转为自然语言
+            sentence = self._triple_to_sentence(content)
+            # 去掉末尾句号（最后统一加）
+            sentence = sentence.rstrip('。')
+            sentences.append(sentence)
 
-        return '\n'.join(parts)
+        if not sentences:
+            return "我没有找到相关的知识。"
+
+        # 组织答案：用"。"连接所有句子，最后加句号
+        if len(sentences) == 1:
+            return sentences[0] + "。"
+        elif len(sentences) == 2:
+            return sentences[0] + "，" + sentences[1] + "。"
+        else:
+            # 多条结果：用分号或句号连接，保持简洁
+            main = sentences[0]
+            extra = "；".join(sentences[1:3])
+            return f"{main}。此外，{extra}。"
 
     def _extract_keywords(self, text: str) -> List[str]:
         """提取关键词
 
         改进：
-        1. 用动词分割，避免"牛顿发现"被当作一个词
-        2. 保留有意义的子串
+        1. 短查询(< 8字)不分割，直接提取核心名词
+        2. 长查询用动词和标点分割
         3. 过滤停用词
         """
         import re
 
-        # 动词列表（用于分割）
+        # 短查询：提取核心名词，不做分割
+        if len(text) <= 8:
+            # 去掉常见疑问词前缀和尾部助词
+            core = re.sub(r'^什么|^为什么|^怎么|^如何|^哪里|^在哪', '', text)
+            core = re.sub(r'[？?。！!的了]$', '', core)
+            core = core.strip()
+            if core:
+                return [core]
+            # fallback: 用整个问题（去掉疑问词后的部分）
+            return [text]
+
+        # 长查询：原有分割逻辑
         verbs = '发明发现创造提出开发设计编写找到证明提出建立形成产生导致引起'
 
-        # 先用标点和虚词分割
         separators = r'[，。！？；：、\s的是在有位于属于包括使用产生导致引起为了因为所以如果那么但是而且或者而但]'
         parts = re.split(separators, text)
 
@@ -2831,7 +3924,6 @@ class Learner:
             if not part or len(part) < 1:
                 continue
 
-            # 用动词进一步分割
             verb_pattern = '|'.join(re.escape(v) for v in verbs)
             sub_parts = re.split(f'({verb_pattern})', part)
 
@@ -2839,9 +3931,7 @@ class Learner:
                 sub_part = sub_part.strip()
                 if not sub_part or sub_part in verbs:
                     continue
-                # 保留有意义的子串（包括单个中文字符）
                 if len(sub_part) >= 1:
-                    # 单字符只保留中文实词
                     if len(sub_part) == 1:
                         if '一' <= sub_part <= '鿿' and sub_part not in '的了是在有不人大中上下来什么如何怎样':
                             keywords.append(sub_part)
@@ -2853,6 +3943,19 @@ class Learner:
         keywords = [k for k in keywords if k not in stopwords]
 
         return list(set(keywords))
+
+    def _detect_question_type(self, question: str) -> str:
+        """检测问题类型，用于推理路径选择"""
+        if question.startswith('什么') or '是什么' in question:
+            return 'definition'
+        elif question.startswith('为什么') or '为什么' in question:
+            return 'causal'
+        elif question.startswith('怎么') or question.startswith('如何'):
+            return 'method'
+        elif question.startswith('哪里') or question.startswith('在哪') or '位于' in question:
+            return 'location'
+        else:
+            return 'general'
 
     # ------------------------------------------------------------------
     # 语言
@@ -3147,6 +4250,28 @@ class Learner:
             from training.layers.metacognition import Metacognition
             return Metacognition()
 
+        def _make_statistical_learner():
+            from src.learning.statistical_learner import StatisticalLearner
+            return StatisticalLearner(
+                max_ngram=self.config.statistical_max_ngram,
+                min_freq=self.config.statistical_min_freq,
+                min_pmi=self.config.statistical_min_pmi,
+                max_concepts=self.config.statistical_max_concepts,
+            )
+
+        def _make_concept_space():
+            from src.learning.concept_space import ConceptSpace
+            # 不传入encoder — 用懒绑定，在 _encode_text 初始化后自动绑定
+            return ConceptSpace(
+                dim=self.config.obs_dim,
+                encoder=None,
+            )
+
+        def _make_contrastive_trainer():
+            # 延迟初始化：需要先有 _learnable_encoder
+            # 返回 None，实际初始化在 _ensure_contrastive_trainer 中完成
+            return None
+
         # 注册所有模块（顺序无关，依赖通过 r.get() 解析）
         r.register('knowledge', _make_knowledge)
         r.register('lang_bridge', _make_lang_bridge)
@@ -3187,6 +4312,9 @@ class Learner:
         r.register('numerical', _make_numerical)
         r.register('analogical', _make_analogical)
         r.register('metacognition_enhanced', _make_metacognition_enhanced)
+        r.register('statistical_learner', _make_statistical_learner)
+        r.register('concept_space', _make_concept_space)
+        r.register('contrastive_trainer', _make_contrastive_trainer)
 
     # ------------------------------------------------------------------
     # 能力模块属性（委托 registry，保持 API 不变）
