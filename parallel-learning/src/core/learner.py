@@ -1437,7 +1437,11 @@ class Learner:
                         clean_entities.append(entity)
                     # 否则跳过（2字碎片如"理学"、"学分"太多）
                     continue
-                # 层6: 3字以上未验证 → 允许（可能是新概念）
+                # 层6: 3字未验证 → 仅当中间无边界字时通过
+                if len(entity) == 3:
+                    if any(c in boundary_chars for c in entity[1:]):
+                        continue  # "作用是"等跨词碎片
+                # 4字以上且不含虚词 → 大概率完整词（"光合作用"等）
                 clean_entities.append(entity)
 
             # 注册过滤后的实体到概念空间
@@ -2939,8 +2943,8 @@ class Learner:
             part = part.strip()
             if not part or len(part) < 2:
                 continue
-            # 只取2-4字的中文词组作为候选实体（长片段大概率是句子）
-            short_words = re.findall(r'[一-鿿]{2,4}', part)
+            # 只取2-6字的中文词组作为候选实体（长片段大概率是句子）
+            short_words = re.findall(r'[一-鿿]{2,6}', part)
             entities.extend(short_words)
 
         # 1d. 英文实体
@@ -3118,7 +3122,8 @@ class Learner:
                 if activated and activated[0].activation > 0.1:
                     answer = self._synthesize_from_activation(activated, question)
                     if answer and len(answer) > 10:
-                        return answer
+                        if not re.search(r'存在关联|相互关联|有一定关系', answer):
+                            return answer
         except Exception:
             pass
 
@@ -3334,6 +3339,16 @@ class Learner:
 
         # 去重
         unique_parts = list(dict.fromkeys(answer_parts))
+
+        # 尝试用语言习得系统组合更自然的表达
+        try:
+            concepts_for_compose = list(seen_concepts)[:5]
+            composed = self.language_acquisition.compose(concepts_for_compose, goal=question)
+            if composed and len(composed) > 10:
+                return composed
+        except Exception:
+            pass
+
         return " ".join(unique_parts[:4])
 
     def _synthesize_multihop(self, cs, activated: list, question: str) -> str:
