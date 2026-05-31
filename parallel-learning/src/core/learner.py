@@ -37,6 +37,9 @@ from src.knowledge.graph import KnowledgeGraph
 from src.knowledge.bridge import LanguageGraphBridge
 from src.learning.core_knowledge import CoreKnowledgeSystem
 from src.learning.perception_learning_loop import PerceptionLearningLoop
+from src.learning.functional_concept import FunctionalConceptSystem
+from src.learning.language_acquisition import LanguageAcquisitionSystem
+from src.learning.simulation_reasoning import SimulationReasoning
 
 
 # Piaget 发展阶段序列
@@ -110,6 +113,12 @@ class Learner:
 
         # ===== Phase 1: 感知-预测学习循环 =====
         self.perception_loop = PerceptionLearningLoop(self)
+
+        # ===== Phase 2: 功能性概念系统 =====
+        # 延迟初始化：需要concept_space先就绪（在_register_modules中创建）
+
+        # ===== Phase 4: 模拟推理系统 =====
+        # 延迟初始化：需要concept_space和causal_engine先就绪
 
         # 语言子系统
         self.grounding = GroundingModule(obs_dim=config.obs_dim, device=config.device)
@@ -1242,6 +1251,18 @@ class Learner:
         entities = regex_entities
         result['entities'] = entities
 
+        # 2a-new. 语言习得通道：学习标签映射（概念附着）
+        try:
+            la_labels = self.language_acquisition.learn_label(
+                text, context={'source': source}
+            )
+            if la_labels:
+                for label in la_labels:
+                    if label not in entities and len(label) >= 2:
+                        entities.append(label)
+        except Exception:
+            pass
+
         # 2b. BTSP：标记实体为可学习（资格痕迹）
         for entity in entities:
             entity_repr = self._encode_text(entity)
@@ -1347,15 +1368,26 @@ class Learner:
             except Exception:
                 pass
 
-        # 4. 形成概念（使用实际文本表示，不是随机噪声）
+        # 4. 形成概念（功能性概念系统 + 传统概念形成双通道）
         for entity in entities[:10]:  # 限制数量
             result['concepts'].append(entity)
 
-            # 注入概念形成
+            entity_repr = self._encode_text(entity)
+
+            # 通道A: 功能性概念系统（带感知特征+可供性）
+            try:
+                self.functional_concepts.form_concept(
+                    label=entity,
+                    perceptual_features={'source_text': text},
+                    usage_context={'sentence': text, 'source': source},
+                    vector=entity_repr,
+                )
+            except Exception:
+                pass
+
+            # 通道B: 传统概念形成（保持兼容）
             try:
                 cf = self.concept_formation
-                # 使用实体的文本编码作为特征
-                entity_repr = self._encode_text(entity)
                 cf.add_instance(entity, entity_repr)
             except Exception:
                 pass
@@ -2311,6 +2343,43 @@ class Learner:
         return self._tool_engine
 
     @property
+    def functional_concepts(self):
+        """功能性概念系统（懒初始化）"""
+        if not hasattr(self, '_functional_concepts'):
+            cs = self._registry.get('concept_space')
+            self._functional_concepts = FunctionalConceptSystem(
+                concept_space=cs,
+                core_knowledge=self.core_knowledge,
+                encoder=getattr(self, '_learnable_encoder', None),
+            )
+        return self._functional_concepts
+
+    @property
+    def language_acquisition(self):
+        """语言习得系统（懒初始化）"""
+        if not hasattr(self, '_language_acquisition'):
+            cs = self._registry.get('concept_space')
+            stat_learner = self._registry.get('statistical_learner')
+            self._language_acquisition = LanguageAcquisitionSystem(
+                concept_system=self.functional_concepts,
+                statistical_learner=stat_learner,
+                concept_space=cs,
+            )
+        return self._language_acquisition
+
+    @property
+    def simulation_reasoning(self):
+        """模拟推理系统（懒初始化）"""
+        if not hasattr(self, '_simulation_reasoning'):
+            cs = self._registry.get('concept_space')
+            self._simulation_reasoning = SimulationReasoning(
+                concept_space=cs,
+                causal_engine=self.causal_engine,
+                knowledge_graph=self.knowledge,
+            )
+        return self._simulation_reasoning
+
+    @property
     def code_generator(self):
         """代码生成引擎（懒初始化）"""
         if not hasattr(self, '_code_generator'):
@@ -3050,6 +3119,18 @@ class Learner:
                     answer = self._synthesize_from_activation(activated, question)
                     if answer and len(answer) > 10:
                         return answer
+        except Exception:
+            pass
+
+        # 路径1.3: 模拟推理 — 场景构建 + 因果追踪
+        try:
+            if activated:
+                activated_labels = [a.concept_id for a in activated[:5]]
+                sr_result = self.simulation_reasoning.reason(question, activated_labels)
+                if sr_result and sr_result.confidence >= 0.3:
+                    sr_answer = self.simulation_reasoning.express(sr_result, question)
+                    if sr_answer and len(sr_answer) > 5:
+                        return sr_answer
         except Exception:
             pass
 
