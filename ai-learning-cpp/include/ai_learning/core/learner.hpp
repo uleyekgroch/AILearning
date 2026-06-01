@@ -36,6 +36,11 @@
 #include "ai_learning/learning/self_modifier.hpp"
 #include "ai_learning/reasoning/world_model.hpp"
 #include "ai_learning/learning/metacognition.hpp"
+#include "ai_learning/learning/intrinsic_motivation.hpp"
+#include "ai_learning/learning/skill_tree.hpp"
+#include "ai_learning/learning/autonomous_learning_loop.hpp"
+#include "ai_learning/learning/problem_solver.hpp"
+#include "ai_learning/learning/development_milestones.hpp"
 
 #include <chrono>
 #include <deque>
@@ -214,6 +219,50 @@ public:
     auto what_should_i_learn() const
         -> std::vector<KnowledgeGap>;
 
+    // ── 自主学习系统 ─────────────────────────────────────
+
+    /// 生成自主学习目标
+    auto generate_learning_goal()
+        -> learning::LearningGoal;
+
+    /// 自主学习循环（内置策略）
+    auto autonomous_learning_run(int iterations = 10)
+        -> learning::AutonomousLoopReport;
+
+    /// 求解问题
+    auto solve_problem(const std::string& problem_description)
+        -> learning::Solution;
+
+    /// 检查发展里程碑
+    auto check_milestones()
+        -> std::vector<learning::MilestoneEvent>;
+
+    /// 获取学习进展快照
+    [[nodiscard]] auto learning_progress() const
+        -> learning::ProgressSnapshot;
+
+    /// 访问内在动机引擎
+    [[nodiscard]] auto motivation_engine()
+        -> learning::IntrinsicMotivationEngine& { return motivation_; }
+    [[nodiscard]] auto motivation_engine() const
+        -> const learning::IntrinsicMotivationEngine& { return motivation_; }
+
+    /// 访问技能树
+    [[nodiscard]] auto skill_tree()
+        -> learning::SkillTree& { return skill_tree_; }
+    [[nodiscard]] auto skill_tree() const
+        -> const learning::SkillTree& { return skill_tree_; }
+
+    /// 访问里程碑系统
+    [[nodiscard]] auto milestones()
+        -> learning::DevelopmentMilestones& { return milestones_; }
+    [[nodiscard]] auto milestones() const
+        -> const learning::DevelopmentMilestones& { return milestones_; }
+
+    /// 访问问题求解器
+    [[nodiscard]] auto problem_solver()
+        -> learning::ProblemSolver& { return problem_solver_; }
+
 private:
     /// 检查晋升条件
     [[nodiscard]] auto check_promotion_(
@@ -245,6 +294,12 @@ private:
     SelfModifier                      self_modifier_;
     reasoning::WorldModel             world_model_;
     MetacognitionEngine               metacognition_;
+
+    // 自主学习系统
+    learning::IntrinsicMotivationEngine motivation_;
+    learning::SkillTree                 skill_tree_;
+    learning::DevelopmentMilestones     milestones_;
+    learning::ProblemSolver             problem_solver_;
 
     // 发展状态
     std::string stage_;
