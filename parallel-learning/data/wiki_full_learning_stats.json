@@ -1,0 +1,17 @@
+{
+  "stats": {
+    "files_processed": 100,
+    "articles_learned": 9423,
+    "sentences_learned": 124653,
+    "concepts_formed": 9423,
+    "learning_time": 331.58238983154297,
+    "avg_prediction_error": 1.0,
+    "issues_count": 0
+  },
+  "issues_report": {
+    "total_issues": 0,
+    "issues_by_type": {},
+    "sample_issues": {}
+  },
+  "device": "cuda"
+}
