@@ -148,6 +148,7 @@ target_include_directories(debug_main PRIVATE include)
 add_executable(ai_learning_server
     server_main.cpp
     src/server/server.cpp
+    src/server/event_adapter.cpp
 )
 target_link_libraries(ai_learning_server
     PRIVATE ai_learning Crow::Crow nlohmann_json::nlohmann_json
