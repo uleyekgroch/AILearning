@@ -91,7 +91,7 @@ const app = createApp({
           xAxis: { type: 'category', data: [], axisLabel: { color: '#9a9db5' } },
           yAxis: { type: 'value', axisLabel: { color: '#9a9db5' }, splitLine: { lineStyle: { color: '#2e3348' } } },
           series: [
-            { name: 'Steps', type: 'line', smooth: true, data: [], lineStyle: { color: '#4a9eff', width: 2 }, itemStyle: { color: '#4a9eff' }, areaStyle: { color: 'rgba(74,158,255,0.15)' } },
+            { name: '学习步数', type: 'line', smooth: true, data: [], lineStyle: { color: '#4a9eff', width: 2 }, itemStyle: { color: '#4a9eff' }, areaStyle: { color: 'rgba(74,158,255,0.15)' } },
           ],
         });
       }
@@ -103,9 +103,9 @@ const app = createApp({
           backgroundColor: 'transparent',
           radar: {
             indicator: [
-              { name: 'Valence', max: 1, min: -1 },
-              { name: 'Arousal', max: 1, min: -1 },
-              { name: 'Dominance', max: 1, min: -1 },
+              { name: '效价', max: 1, min: -1 },
+              { name: '唤醒度', max: 1, min: -1 },
+              { name: '支配度', max: 1, min: -1 },
             ],
             shape: 'circle',
             splitNumber: 4,
@@ -115,7 +115,7 @@ const app = createApp({
           },
           series: [{
             type: 'radar',
-            data: [{ value: [0, 0, 0], name: 'Emotion', areaStyle: { color: 'rgba(167,139,250,0.25)' }, lineStyle: { color: '#a78bfa' }, itemStyle: { color: '#a78bfa' } }],
+            data: [{ value: [0, 0, 0], name: '情感', areaStyle: { color: 'rgba(167,139,250,0.25)' }, lineStyle: { color: '#a78bfa' }, itemStyle: { color: '#a78bfa' } }],
           }],
         });
       }
@@ -138,14 +138,14 @@ const app = createApp({
     function updateEmotionChart() {
       if (!emotionChart) return;
       emotionChart.setOption({
-        series: [{ data: [{ value: [emotionState.valence, emotionState.arousal, emotionState.dominance], name: 'Emotion', areaStyle: { color: 'rgba(167,139,250,0.25)' }, lineStyle: { color: '#a78bfa' }, itemStyle: { color: '#a78bfa' } }] }],
+        series: [{ data: [{ value: [emotionState.valence, emotionState.arousal, emotionState.dominance], name: '情感', areaStyle: { color: 'rgba(167,139,250,0.25)' }, lineStyle: { color: '#a78bfa' }, itemStyle: { color: '#a78bfa' } }] }],
       });
     }
 
     function updateGraphChart() {
       if (!graphChart) return;
       const categories = [
-        { name: 'Concept' }, { name: 'Relation' }, { name: 'Insight' },
+        { name: '概念' }, { name: '关系' }, { name: '顿悟' },
       ];
       const nodes = graphNodes.value.map(n => ({
         id: String(n.id),
@@ -190,8 +190,8 @@ const app = createApp({
       // Events WS
       try {
         wsEvents = new WebSocket(WS_URL);
-        wsEvents.onopen = () => { wsConnected.value = true; logResult('WS /ws/events connected', 'success'); };
-        wsEvents.onclose = () => { wsConnected.value = false; logResult('WS /ws/events disconnected', 'error'); };
+        wsEvents.onopen = () => { wsConnected.value = true; logResult('WS /ws/events 已连接', 'success'); };
+        wsEvents.onclose = () => { wsConnected.value = false; logResult('WS /ws/events 已断开', 'error'); };
         wsEvents.onerror = () => { wsConnected.value = false; };
         wsEvents.onmessage = (ev) => {
           try {
@@ -204,7 +204,7 @@ const app = createApp({
           } catch { /* ignore */ }
         };
       } catch (e) {
-        logResult('WS events connect failed: ' + e.message, 'error');
+        logResult('WS 事件连接失败: ' + e.message, 'error');
       }
 
       // Stats WS
@@ -226,7 +226,7 @@ const app = createApp({
           } catch { /* ignore */ }
         };
       } catch (e) {
-        logResult('WS stats connect failed: ' + e.message, 'error');
+        logResult('WS 统计连接失败: ' + e.message, 'error');
       }
     }
 
@@ -280,10 +280,10 @@ const app = createApp({
       const text = learnText.value.trim();
       if (!text || learnBusy.value) return;
       learnBusy.value = true;
-      logResult(`Learn: "${text.substring(0, 60)}..."`, 'info');
+      logResult(`学习: "${text.substring(0, 60)}..."`, 'info');
       try {
         const result = await apiPost('/api/learn/text', { text });
-        logResult('Learn result: ' + JSON.stringify(result).substring(0, 200), 'success');
+        logResult('学习结果: ' + JSON.stringify(result).substring(0, 200), 'success');
         // Update graph from result
         if (result.triples) {
           for (const t of result.triples) {
@@ -304,7 +304,7 @@ const app = createApp({
         learnText.value = '';
         fetchStats();
       } catch (e) {
-        logResult('Learn error: ' + e.message, 'error');
+        logResult('学习错误: ' + e.message, 'error');
       } finally {
         learnBusy.value = false;
       }
@@ -314,16 +314,16 @@ const app = createApp({
       const q = qaQuestion.value.trim();
       if (!q || qaBusy.value) return;
       qaBusy.value = true;
-      logResult(`Reason: "${q}"`, 'info');
+      logResult(`推理: "${q}"`, 'info');
       try {
         const results = await apiPost('/api/reason', { question: q });
         const answers = Array.isArray(results) ? results : [results];
         qaHistory.value.unshift({ question: q, answers });
         if (qaHistory.value.length > 50) qaHistory.value.length = 50;
-        logResult(`Reason: ${answers.length} results`, 'success');
+        logResult(`推理完成: ${answers.length} 条结果`, 'success');
         qaQuestion.value = '';
       } catch (e) {
-        logResult('Reason error: ' + e.message, 'error');
+        logResult('推理错误: ' + e.message, 'error');
       } finally {
         qaBusy.value = false;
       }
@@ -332,80 +332,80 @@ const app = createApp({
     async function doThink() {
       const q = qaQuestion.value.trim();
       if (!q) return;
-      logResult(`Think: "${q}"`, 'info');
+      logResult(`思考: "${q}"`, 'info');
       try {
         const result = await apiPost('/api/think', { question: q });
         qaHistory.value.unshift({ question: q, answers: [{ answer: result.answer, confidence: 1.0 }] });
-        logResult('Think: ' + (result.answer || '').substring(0, 120), 'success');
+        logResult('思考结果: ' + (result.answer || '').substring(0, 120), 'success');
         qaQuestion.value = '';
       } catch (e) {
-        logResult('Think error: ' + e.message, 'error');
+        logResult('思考错误: ' + e.message, 'error');
       }
     }
 
     async function doInsight() {
       const ctx = qaQuestion.value.trim() || 'general';
-      logResult('Insight attempt...', 'info');
+      logResult('尝试顿悟...', 'info');
       try {
         const result = await apiPost('/api/insight', { problem_context: ctx });
         if (result.found) {
-          logResult('Insight: ' + JSON.stringify(result.insight).substring(0, 200), 'success');
+          logResult('顿悟: ' + JSON.stringify(result.insight).substring(0, 200), 'success');
         } else {
-          logResult('No insight emerged', 'info');
+          logResult('未产生顿悟', 'info');
         }
       } catch (e) {
-        logResult('Insight error: ' + e.message, 'error');
+        logResult('顿悟错误: ' + e.message, 'error');
       }
     }
 
     async function doAnalogize() {
       const text = learnText.value.trim();
       if (!text) {
-        logResult('Enter text for analogize source/target', 'error');
+        logResult('请输入类比迁移的源/目标文本', 'error');
         return;
       }
-      logResult('Analogize...', 'info');
+      logResult('类比迁移中...', 'info');
       try {
         const result = await apiPost('/api/analogize', {
           source_concepts: [{ name: text, domain: 'source' }],
           target_concepts: [{ name: text, domain: 'target' }],
         });
-        logResult('Analogize result: ' + JSON.stringify(result).substring(0, 200), 'success');
+        logResult('类比迁移结果: ' + JSON.stringify(result).substring(0, 200), 'success');
       } catch (e) {
-        logResult('Analogize error: ' + e.message, 'error');
+        logResult('类比迁移错误: ' + e.message, 'error');
       }
     }
 
     async function doConsolidate() {
-      logResult('Consolidating memory...', 'info');
+      logResult('正在巩固记忆...', 'info');
       try {
         const result = await apiPost('/api/consolidate');
-        logResult('Consolidate: ' + JSON.stringify(result).substring(0, 200), 'success');
+        logResult('巩固记忆完成: ' + JSON.stringify(result).substring(0, 200), 'success');
         fetchStats();
       } catch (e) {
-        logResult('Consolidate error: ' + e.message, 'error');
+        logResult('巩固记忆错误: ' + e.message, 'error');
       }
     }
 
     async function doPipeline() {
       const text = learnText.value.trim() || 'observation';
-      logResult('Integrated pipeline...', 'info');
+      logResult('执行整合流水线...', 'info');
       try {
         const result = await apiPost('/api/integrated/pipeline', { observation: text, domain: 'general' });
-        logResult('Pipeline done: ' + JSON.stringify(result).substring(0, 200), 'success');
+        logResult('整合流水线完成: ' + JSON.stringify(result).substring(0, 200), 'success');
         fetchStats();
       } catch (e) {
-        logResult('Pipeline error: ' + e.message, 'error');
+        logResult('整合流水线错误: ' + e.message, 'error');
       }
     }
 
     async function doAutonomous() {
-      logResult('Starting autonomous learning (10 iterations)...', 'info');
+      logResult('启动自主学习（10轮）...', 'info');
       try {
         const result = await apiPost('/api/autonomous', { iterations: 10 });
-        logResult('Autonomous task: ' + result.task_id + ' ' + result.status, 'success');
+        logResult('自主任务: ' + result.task_id + ' ' + result.status, 'success');
       } catch (e) {
-        logResult('Autonomous error: ' + e.message, 'error');
+        logResult('自主学习错误: ' + e.message, 'error');
       }
     }
 
