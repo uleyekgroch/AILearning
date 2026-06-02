@@ -120,7 +120,7 @@ observe → perceive → predict → choose_action → learn → remember
 **测试**: 251 测试 / 1301 断言全绿  
 **Commit**: `f7b3330` feat: 实现Phase 4增强智能三大模块
 
-### Phase 5: 高级元认知 ✅ 最新完成
+### Phase 5: 高级元认知 ✅
 
 | 模块 | 核心论文 | 关键能力 |
 |------|---------|---------|
@@ -136,18 +136,44 @@ observe → perceive → predict → choose_action → learn → remember
 
 **文件清单**:
 
+| 类型 | 文件 |
+|------|------|
+| 头文件 | `include/ai_learning/learning/meta_learner.hpp` |
+| 头文件 | `include/ai_learning/learning/active_experimenter.hpp` |
+| 实现 | `src/learning/meta_learner.cpp` |
+| 实现 | `src/learning/active_experimenter.cpp` |
+| 测试 | `tests/learning/test_phase5_meta_cognition.cpp` |
+
+**Commit**: `e160ff7`
+
+### Phase 6: 深度整合 ✅ 最新完成
+
+| 整合场景 | 编排方法 | 串联模块 |
+|----------|---------|---------|
+| **全流水线闭环** | `run_full_pipeline()` | observe→learn→analogize→experiment→reflect→insight |
+| **元学习驱动** | `meta_guided_session()` | IntrinsicMotivation + MetaLearner + EmotionEngine |
+| **情感调制** | `compute_system_params()` | EmotionEngine → 全系统学习率/编码/探索参数 |
+| **实验驱动探索** | `experiment_driven_exploration()` | ActiveExperimenter → IntrinsicMotivation 目标 |
+| **社会加速类比** | `social_analogical_transfer()` | SocialLearning → AnalogicalTransfer → ContinualLearner |
+
+**核心设计**:
+- `IntegratedLearner` 持有 9 个子系统引用（Phase 3-5 全部模块）
+- 六步闭环中每步成功/失败独立追踪，不因单步失败中断
+- 顿悟自动触发兴奋情绪（正反馈循环）
+- Yerkes-Dodson 倒U型学习率调制
+- 社会观察提取的策略自动转化为类比迁移源概念
+
+**文件清单**:
+
 | 类型 | 文件 | 行数 |
 |------|------|------|
-| 头文件 | `include/ai_learning/learning/meta_learner.hpp` | 211 |
-| 头文件 | `include/ai_learning/learning/active_experimenter.hpp` | 222 |
-| 实现 | `src/learning/meta_learner.cpp` | 418 |
-| 实现 | `src/learning/active_experimenter.cpp` | 436 |
-| 测试 | `tests/learning/test_phase5_meta_cognition.cpp` | 605 |
-| 集成 | `include/ai_learning/core/learner.hpp`（修改） | +39 行 |
-| 集成 | `src/core/learner.cpp`（修改） | +55 行 |
+| 头文件 | `include/ai_learning/learning/integrated_learner.hpp` | 187 |
+| 实现 | `src/learning/integrated_learner.cpp` | 371 |
+| 测试 | `tests/learning/test_phase6_integration.cpp` | 458 |
+| 集成 | `include/ai_learning/core/learner.hpp`（修改） | +33 行 |
+| 集成 | `src/core/learner.cpp`（修改） | +43 行 |
 
-**测试**: **276 测试 / 1385 断言全绿** (Phase 5 新增 25 测试 / 84 断言)  
-**Commit**: `e160ff7` feat: 实现Phase 5高级元认知
+**Commit**: `58cb1b3`
 
 ---
 
@@ -228,15 +254,14 @@ make -j$(nproc)
 
 ## 七、下一步可做的工作
 
-### 7.1 Phase 6: 高级整合（推荐方向）
+Phase 1-6 全部完成。以下是未来方向：
 
-当前所有模块是**独立子系统**，下一步应做**跨模块深度整合**：
+### 7.1 应用层（推荐优先）
 
-1. **全流水线整合测试** — 一个端到端场景：观察→学习→类比→实验→反思→顿悟
-2. **元学习驱动策略选择** — MetaLearner 自动为 IntrinsicMotivation 选择学习策略
-3. **情感调制全系统** — EmotionEngine 的 arousal 参数影响所有学习模块的学习率
-4. **实验驱动探索** — ActiveExperimenter 生成假设 → IntrinsicMotivation 选择探索目标
-5. **社会学习加速** — SocialLearningEngine 的模仿结果 → AnalogicalTransfer 的源知识
+1. **Python 绑定** — pybind11 暴露 C++ API 给 Python
+2. **REST API** — 暴露学习接口为 HTTP 服务
+3. **可视化** — 学习曲线、知识图谱、情感状态可视化
+4. **实际语料学习** — 接入 Wikipedia/教科书语料进行真实学习实验
 
 ### 7.2 性能优化
 
@@ -244,18 +269,19 @@ make -j$(nproc)
 2. **批量经验处理** — MetaLearner 批量更新策略统计
 3. **并行假设评估** — ActiveExperimenter 并行计算多个假设的信息价值
 
-### 7.3 应用层
+### 7.3 高级扩展
 
-1. **Python 绑定** — pybind11 暴露 C++ API 给 Python
-2. **REST API** — 暴露学习接口为 HTTP 服务
-3. **可视化** — 学习曲线、知识图谱、情感状态可视化
-4. **实际语料学习** — 接入 Wikipedia/教科书语料进行真实学习实验
+1. **多 Agent 协作** — 多个 Learner 实例组成社会，互相观察
+2. **语言接口** — 自然语言输入→学习→自然语言输出
+3. **持续在线学习** — 永不停止的学习循环
+4. **元认知透明化** — 让系统解释"为什么选择这个策略"
 
 ---
 
-## 八、Git 提交历史（最近 5 个）
+## 八、Git 提交历史（最近 6 个）
 
 ```
+58cb1b3 feat: 实现Phase 6深度整合 - 五大跨模块协同编排器
 e160ff7 feat: 实现Phase 5高级元认知 - 元学习引擎+主动实验设计
 f7b3330 feat: 实现Phase 4增强智能三大模块 - 社会学习/情感驱动/顿悟
 e7d19b4 feat: 实现自主学习六大模块 - 让系统主动学习万物
@@ -272,9 +298,9 @@ e7d19b4 feat: 实现自主学习六大模块 - 让系统主动学习万物
 | C++ 头文件 | 54 个 |
 | C++ 源文件 | 40 个 |
 | 测试文件 | 17 个 |
-| 测试用例 | **276** 个 |
-| 断言 | **1385** 个 |
-| Learner 持有子系统 | 25 个 |
+| 测试用例 | **291** 个 |
+| 断言 | **1450** 个 |
+| Learner 持有子系统 | 26 个 |
 | Git 提交数 | ~20+ |
 
 ---
