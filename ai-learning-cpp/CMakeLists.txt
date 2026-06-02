@@ -1,0 +1,161 @@
+cmake_minimum_required(VERSION 3.22)
+project(ai_learning VERSION 0.2.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# ── CUDA 检测 ────────────────────────────────────────────────────
+# 检测 CUDA Toolkit 是否可用（可选，不可用则纯 CPU 构建）
+include(CheckLanguage)
+check_language(CUDA)
+if(CMAKE_CUDA_COMPILER)
+    enable_language(CUDA)
+    set(CUDA_FOUND TRUE)
+    set(CMAKE_CUDA_STANDARD 17)
+    set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+
+    # CMake 3.22 需要显式找 CUDA 包以获得 CUDA::cudart 等目标
+    find_package(CUDAToolkit REQUIRED)
+
+    message(STATUS "✅ CUDA enabled: ${CMAKE_CUDA_COMPILER}")
+else()
+    set(CUDA_FOUND FALSE)
+    message(STATUS "⚠️  CUDA not found — building CPU-only")
+endif()
+
+# ── 编译选项 ────────────────────────────────────────────────────
+if(MSVC)
+    add_compile_options(
+        /W4                 # 高警告级别
+        /WX                 # 警告视为错误
+        /permissive-        # 严格标准一致性
+        /Zc:__cplusplus     # 正确报告 __cplusplus 值
+        /utf-8              # 源码 UTF-8
+    )
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_compile_options(/Od /Zi)
+    else()
+        add_compile_options(/O2 /DNDEBUG)
+    endif()
+else()
+    add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wall>
+                        $<$<COMPILE_LANGUAGE:CXX>:-Wextra>
+                        $<$<COMPILE_LANGUAGE:CXX>:-Werror>
+                        $<$<COMPILE_LANGUAGE:CXX>:-std=c++20>)
+endif()
+
+# ── 外部依赖 ─────────────────────────────────────────────────────
+include(FetchContent)
+
+# Catch2 测试框架
+FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG        v3.7.1
+)
+
+# nlohmann/json — JSON 序列化/反序列化
+FetchContent_Declare(
+    nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG        v3.11.3
+)
+
+# Asio — Crow 的异步 I/O 依赖（standalone 模式）
+# 使用 GitHub tag archive zip 下载（比 git clone 快得多，避免网络超时）
+# 解压后目录结构：asio-asio-1-30-2/asio/include/asio.hpp
+FetchContent_Declare(
+    asio
+    URL https://github.com/chriskohlhoff/asio/archive/refs/tags/asio-1-30-2.zip
+)
+FetchContent_MakeAvailable(asio)
+
+# 设置 ASIO_INCLUDE_DIR，让 Crow 的 Findasio.cmake 能找到 asio 头文件
+if(asio_SOURCE_DIR)
+    set(ASIO_INCLUDE_DIR "${asio_SOURCE_DIR}/asio/include" CACHE PATH "asio include directory" FORCE)
+endif()
+
+# Crow — header-only HTTP 框架（Flask-like）
+FetchContent_Declare(
+    Crow
+    GIT_REPOSITORY https://github.com/CrowCpp/Crow.git
+    GIT_TAG        v1.2.0
+)
+
+FetchContent_MakeAvailable(Catch2 nlohmann_json Crow)
+
+# ── 项目库 ──────────────────────────────────────────────────────
+file(GLOB_RECURSE AI_LEARNING_SOURCES "src/*.cpp")
+list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "tensor_ops_cuda_stub\\.cpp$")
+list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "src/server/")
+
+if(CUDA_FOUND)
+    # CUDA 源文件单独收集，避免 .cu 被 C++ 编译器处理
+    file(GLOB_RECURSE AI_LEARNING_CUDA_SOURCES "src/*.cu")
+    # 创建 CUDA 静态库（包含 .cu → .o）
+    add_library(ai_learning_cuda STATIC ${AI_LEARNING_CUDA_SOURCES})
+    target_include_directories(ai_learning_cuda PUBLIC include)
+    set_target_properties(ai_learning_cuda PROPERTIES
+        CUDA_ARCHITECTURES "86"    # RTX 4060 = sm_86 (Ada)
+        POSITION_INDEPENDENT_CODE ON
+    )
+    target_link_libraries(ai_learning_cuda
+        PUBLIC CUDA::cudart CUDA::cublas)
+else()
+    # 无 CUDA 时，添加 stub 实现（cuda_available() 返回 false）
+    list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/tensor_ops_cuda_stub.cpp")
+endif()
+
+add_library(ai_learning STATIC ${AI_LEARNING_SOURCES})
+target_include_directories(ai_learning PUBLIC include)
+target_compile_features(ai_learning PRIVATE cxx_std_20)
+
+if(CUDA_FOUND)
+    target_link_libraries(ai_learning PUBLIC ai_learning_cuda)
+endif()
+
+# ── 测试 ────────────────────────────────────────────────────────
+enable_testing()
+
+file(GLOB_RECURSE TEST_SOURCES "tests/*.cpp")
+add_executable(ai_learning_tests ${TEST_SOURCES})
+target_link_libraries(ai_learning_tests
+    PRIVATE ai_learning Catch2::Catch2WithMain
+)
+target_include_directories(ai_learning_tests PRIVATE include)
+
+include(CTest)
+list(APPEND CMAKE_PREFIX_PATH "${Catch2_DIR}")
+include(Catch)
+catch_discover_tests(ai_learning_tests)
+
+# ── 主程序 ──────────────────────────────────────────────────────
+add_executable(ai_learning_main main.cpp)
+target_link_libraries(ai_learning_main PRIVATE ai_learning)
+
+# ── 性能基准 ──────────────────────────────────────────────────────
+add_executable(ai_learning_benchmark benchmark.cpp)
+target_link_libraries(ai_learning_benchmark PRIVATE ai_learning)
+
+# ── 调试程序 ────────────────────────────────────────────────────
+add_executable(debug_main debug_main.cpp)
+target_link_libraries(debug_main PRIVATE ai_learning)
+target_include_directories(debug_main PRIVATE include)
+
+# ── REST 服务 ────────────────────────────────────────────────────
+add_executable(ai_learning_server
+    server_main.cpp
+    src/server/server.cpp
+)
+target_link_libraries(ai_learning_server
+    PRIVATE ai_learning Crow::Crow nlohmann_json::nlohmann_json
+)
+target_include_directories(ai_learning_server PRIVATE include)
+# Crow 依赖 ASIO，需要 ASIO_STANDALONE
+target_compile_definitions(ai_learning_server PRIVATE ASIO_STANDALONE)
+# Windows 上 asio 需要 winsock 库
+if(WIN32)
+    target_link_libraries(ai_learning_server PRIVATE ws2_32 wsock32)
+endif()
