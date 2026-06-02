@@ -89,6 +89,12 @@ FetchContent_MakeAvailable(Catch2 nlohmann_json Crow)
 # ── 项目库 ──────────────────────────────────────────────────────
 file(GLOB_RECURSE AI_LEARNING_SOURCES "src/*.cpp")
 list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "tensor_ops_cuda_stub\\.cpp$")
+list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "stdp_learning_cuda_stub\\.cpp$")
+list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "activation_spread_cuda_stub\\.cpp$")
+list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "analogical_transfer_cuda_stub\\.cpp$")
+list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "flash_attention_cuda_stub\\.cpp$")
+list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "knowledge_graph_cuda_stub\\.cpp$")
+list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "active_experimenter_cuda_stub\\.cpp$")
 list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "src/server/")
 
 if(CUDA_FOUND)
@@ -98,7 +104,7 @@ if(CUDA_FOUND)
     add_library(ai_learning_cuda STATIC ${AI_LEARNING_CUDA_SOURCES})
     target_include_directories(ai_learning_cuda PUBLIC include)
     set_target_properties(ai_learning_cuda PROPERTIES
-        CUDA_ARCHITECTURES "86"    # RTX 4060 = sm_86 (Ada)
+        CUDA_ARCHITECTURES "89"    # RTX 4060 Ada = sm_89 (Ada Lovelace)
         POSITION_INDEPENDENT_CODE ON
     )
     target_link_libraries(ai_learning_cuda
@@ -106,6 +112,12 @@ if(CUDA_FOUND)
 else()
     # 无 CUDA 时，添加 stub 实现（cuda_available() 返回 false）
     list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/tensor_ops_cuda_stub.cpp")
+    list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/learning/stdp_learning_cuda_stub.cpp")
+    list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/reasoning/activation_spread_cuda_stub.cpp")
+    list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/learning/analogical_transfer_cuda_stub.cpp")
+    list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/flash_attention_cuda_stub.cpp")
+    list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/domain/knowledge/knowledge_graph_cuda_stub.cpp")
+    list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/learning/active_experimenter_cuda_stub.cpp")
 endif()
 
 add_library(ai_learning STATIC ${AI_LEARNING_SOURCES})
