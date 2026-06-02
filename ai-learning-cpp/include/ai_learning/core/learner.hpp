@@ -49,6 +49,7 @@
 #include "ai_learning/learning/insight_engine.hpp"
 #include "ai_learning/learning/meta_learner.hpp"
 #include "ai_learning/learning/active_experimenter.hpp"
+#include "ai_learning/learning/integrated_learner.hpp"
 
 #include <chrono>
 #include <deque>
@@ -372,6 +373,38 @@ public:
     [[nodiscard]] auto experimenter()
         -> learning::ActiveExperimenter& { return experimenter_; }
 
+    // ── Phase 6：深度整合 ────────────────────────────────────
+
+    /// 全流水线学习闭环（观察→学习→类比→实验→反思→顿悟）
+    auto integrated_pipeline(const std::string& observation,
+                              const std::string& domain)
+        -> learning::IntegratedPipelineReport;
+
+    /// 元学习驱动的学习会话
+    auto meta_guided_learn(
+        const std::vector<std::string>& known_topics,
+        const std::map<std::string, double>& mastery_map)
+        -> learning::MetaGuidedSessionReport;
+
+    /// 情感调制后的系统参数
+    auto emotion_modulated_params() const
+        -> learning::EmotionModulatedParams;
+
+    /// 实验驱动的自主探索
+    auto experiment_driven_explore(const std::string& domain)
+        -> learning::ExperimentDrivenExplorationReport;
+
+    /// 社会学习加速类比迁移
+    auto social_accelerated_transfer(
+        const std::string& source_domain,
+        const std::string& target_domain,
+        const std::vector<learning::ConceptDescriptor>& target_concepts)
+        -> learning::SocialAnalogicalReport;
+
+    /// 访问整合编排器
+    [[nodiscard]] auto integrated()
+        -> learning::IntegratedLearner& { return integrated_; }
+
 private:
     /// 检查晋升条件
     [[nodiscard]] auto check_promotion_(
@@ -423,6 +456,9 @@ private:
     // Phase 5：高级元认知
     learning::MetaLearner               meta_learner_;
     learning::ActiveExperimenter        experimenter_;
+
+    // Phase 6：深度整合
+    learning::IntegratedLearner         integrated_;
 
     // 发展状态
     std::string stage_;

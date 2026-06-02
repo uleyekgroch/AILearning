@@ -61,6 +61,9 @@ Learner::Learner(const LearnerConfig& config)
        insight_engine_(),
        meta_learner_(),
        experimenter_(),
+       integrated_(meta_learner_, experimenter_, emotion_engine_,
+                   social_engine_, analogy_engine_, insight_engine_,
+                   motivation_, continual_, concept_engine_),
        stage_(config.initial_stage) {
 
     // 设置阶段索引
@@ -812,6 +815,45 @@ auto Learner::build_theory(const std::string& domain)
     -> std::optional<learning::Theory>
 {
     return experimenter_.build_theory(domain);
+}
+
+// ── Phase 6：深度整合 ────────────────────────────────────
+
+auto Learner::integrated_pipeline(const std::string& observation,
+                                   const std::string& domain)
+    -> learning::IntegratedPipelineReport
+{
+    return integrated_.run_full_pipeline(observation, domain);
+}
+
+auto Learner::meta_guided_learn(
+    const std::vector<std::string>& known_topics,
+    const std::map<std::string, double>& mastery_map)
+    -> learning::MetaGuidedSessionReport
+{
+    return integrated_.meta_guided_session(known_topics, mastery_map);
+}
+
+auto Learner::emotion_modulated_params() const
+    -> learning::EmotionModulatedParams
+{
+    return integrated_.compute_system_params();
+}
+
+auto Learner::experiment_driven_explore(const std::string& domain)
+    -> learning::ExperimentDrivenExplorationReport
+{
+    return integrated_.experiment_driven_exploration(domain);
+}
+
+auto Learner::social_accelerated_transfer(
+    const std::string& source_domain,
+    const std::string& target_domain,
+    const std::vector<learning::ConceptDescriptor>& target_concepts)
+    -> learning::SocialAnalogicalReport
+{
+    return integrated_.social_analogical_transfer(
+        source_domain, target_domain, target_concepts);
 }
 
 }  // namespace ai_learning::core
