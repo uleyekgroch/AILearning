@@ -47,6 +47,8 @@
 #include "ai_learning/learning/social_learning.hpp"
 #include "ai_learning/learning/emotion_engine.hpp"
 #include "ai_learning/learning/insight_engine.hpp"
+#include "ai_learning/learning/meta_learner.hpp"
+#include "ai_learning/learning/active_experimenter.hpp"
 
 #include <chrono>
 #include <deque>
@@ -333,6 +335,43 @@ public:
     [[nodiscard]] auto insight_engine_ref()
         -> learning::InsightEngine& { return insight_engine_; }
 
+    // ── Phase 5：高级元认知 ────────────────────────────────────
+
+    /// 元学习：推荐最佳学习策略
+    auto meta_recommend(const learning::TaskDescriptor& task) const
+        -> learning::MetaLearningRecommendation;
+
+    /// 元学习：记录学习经验
+    void meta_record(const learning::LearningExperience& experience);
+
+    /// 元学习：自我反思
+    auto meta_reflect() const -> std::vector<std::string>;
+
+    /// 主动实验：从观察生成假设
+    auto generate_hypothesis(const std::string& observation,
+                              const std::string& domain)
+        -> learning::Hypothesis;
+
+    /// 主动实验：自动设计实验
+    auto design_experiment()
+        -> std::optional<learning::ExperimentDesign>;
+
+    /// 主动实验：记录实验结果
+    auto record_experiment(const learning::ExperimentResult& result)
+        -> std::string;
+
+    /// 主动实验：构建理论
+    auto build_theory(const std::string& domain)
+        -> std::optional<learning::Theory>;
+
+    /// 访问元学习引擎
+    [[nodiscard]] auto meta_learner()
+        -> learning::MetaLearner& { return meta_learner_; }
+
+    /// 访问实验引擎
+    [[nodiscard]] auto experimenter()
+        -> learning::ActiveExperimenter& { return experimenter_; }
+
 private:
     /// 检查晋升条件
     [[nodiscard]] auto check_promotion_(
@@ -380,6 +419,10 @@ private:
     learning::SocialLearningEngine      social_engine_;
     learning::EmotionEngine             emotion_engine_;
     learning::InsightEngine             insight_engine_;
+
+    // Phase 5：高级元认知
+    learning::MetaLearner               meta_learner_;
+    learning::ActiveExperimenter        experimenter_;
 
     // 发展状态
     std::string stage_;

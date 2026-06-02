@@ -59,6 +59,8 @@ Learner::Learner(const LearnerConfig& config)
        social_engine_(),
        emotion_engine_(),
        insight_engine_(),
+       meta_learner_(),
+       experimenter_(),
        stage_(config.initial_stage) {
 
     // 设置阶段索引
@@ -763,6 +765,53 @@ auto Learner::try_insight(const std::string& problem_context)
     }
 
     return insight;
+}
+
+// ── Phase 5：高级元认知 ────────────────────────────────────
+
+auto Learner::meta_recommend(
+    const learning::TaskDescriptor& task) const
+    -> learning::MetaLearningRecommendation
+{
+    return meta_learner_.recommend_strategy(task);
+}
+
+void Learner::meta_record(
+    const learning::LearningExperience& experience)
+{
+    meta_learner_.record_experience(experience);
+}
+
+auto Learner::meta_reflect() const -> std::vector<std::string>
+{
+    return meta_learner_.reflect();
+}
+
+auto Learner::generate_hypothesis(
+    const std::string& observation,
+    const std::string& domain)
+    -> learning::Hypothesis
+{
+    return experimenter_.generate_hypothesis(observation, domain);
+}
+
+auto Learner::design_experiment()
+    -> std::optional<learning::ExperimentDesign>
+{
+    return experimenter_.auto_design_experiment();
+}
+
+auto Learner::record_experiment(
+    const learning::ExperimentResult& result)
+    -> std::string
+{
+    return experimenter_.record_result(result);
+}
+
+auto Learner::build_theory(const std::string& domain)
+    -> std::optional<learning::Theory>
+{
+    return experimenter_.build_theory(domain);
 }
 
 }  // namespace ai_learning::core
