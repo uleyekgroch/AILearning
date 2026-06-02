@@ -46,6 +46,21 @@ const app = createApp({
     // operation results log
     const resultLog = ref([]);
 
+    // Chat
+    const chatMessages = ref([]);
+    const chatInput = ref('');
+    const chatBusy = ref(false);
+    const chatSessionId = ref('');
+    const chatMessagesRef = ref(null);
+
+    // Society
+    const societyAgents = ref([]);
+    const societyMetrics = ref(null);
+    const newAgentPort = ref('');
+
+    // Runtime
+    const runtimeStatus = reactive({ running: false, uptime: '0s', iterations: 0, retention: '0%', pending_data: 0 });
+
     // knowledge graph data
     const graphNodes = ref([]);
     const graphLinks = ref([]);
@@ -409,6 +424,149 @@ const app = createApp({
       }
     }
 
+    // ── Chat API ──
+    async function doChat() {
+      const text = chatInput.value.trim();
+      if (!text || chatBusy.value) return;
+      chatBusy.value = true;
+      chatMessages.value.push({ role: 'user', content: text });
+      chatInput.value = '';
+      scrollChatToBottom();
+      logResult(`对话: "${text.substring(0, 60)}"`, 'info');
+      try {
+        const body = { message: text };
+        if (chatSessionId.value) body.session_id = chatSessionId.value;
+        const result = await apiPost('/api/chat', body);
+        if (result.session_id) chatSessionId.value = result.session_id;
+        const learned = result.learned_knowledge || [];
+        chatMessages.value.push({ role: 'assistant', content: result.response || result.reply || JSON.stringify(result), learned });
+        scrollChatToBottom();
+        logResult('对话回复: ' + (result.response || '').substring(0, 100), 'success');
+        fetchStats();
+      } catch (e) {
+        chatMessages.value.push({ role: 'assistant', content: '错误: ' + e.message, learned: [] });
+        logResult('对话错误: ' + e.message, 'error');
+      } finally {
+        chatBusy.value = false;
+      }
+    }
+
+    async function fetchChatHistory() {
+      try {
+        const result = await apiGet('/api/chat/history' + (chatSessionId.value ? '?session_id=' + chatSessionId.value : ''));
+        if (Array.isArray(result)) {
+          chatMessages.value = result.map(m => ({
+            role: m.role,
+            content: m.content || m.message,
+            learned: m.learned_knowledge || [],
+          }));
+          scrollChatToBottom();
+        }
+      } catch { /* ignore */ }
+    }
+
+    function scrollChatToBottom() {
+      nextTick(() => {
+        const el = chatMessagesRef.value;
+        if (el) el.scrollTop = el.scrollHeight;
+      });
+    }
+
+    // ── Society API ──
+    async function createAgent() {
+      const port = parseInt(newAgentPort.value.trim());
+      if (!port || port < 1 || port > 65535) {
+        logResult('请输入有效端口号 (1-65535)', 'error');
+        return;
+      }
+      logResult(`创建智能体 port=${port}...`, 'info');
+      try {
+        const result = await apiPost('/api/society/agents', { port });
+        logResult('智能体创建: ' + JSON.stringify(result).substring(0, 120), 'success');
+        newAgentPort.value = '';
+        fetchSocietyMetrics();
+      } catch (e) {
+        logResult('创建智能体错误: ' + e.message, 'error');
+      }
+    }
+
+    async function removeAgent(agent) {
+      logResult(`移除智能体 ${agent.host}:${agent.port}...`, 'info');
+      try {
+        await apiPost('/api/society/agents/remove', { host: agent.host, port: agent.port });
+        logResult('智能体已移除', 'success');
+        fetchSocietyMetrics();
+      } catch (e) {
+        logResult('移除智能体错误: ' + e.message, 'error');
+      }
+    }
+
+    async function fetchSocietyMetrics() {
+      try {
+        const result = await apiGet('/api/society/metrics');
+        societyMetrics.value = result;
+        if (Array.isArray(result.agents)) {
+          societyAgents.value = result.agents;
+        }
+      } catch { /* ignore */ }
+    }
+
+    async function triggerObservation() {
+      logResult('触发观察学习...', 'info');
+      try {
+        const result = await apiPost('/api/society/observe');
+        logResult('观察学习结果: ' + JSON.stringify(result).substring(0, 200), 'success');
+        fetchSocietyMetrics();
+        fetchStats();
+      } catch (e) {
+        logResult('观察学习错误: ' + e.message, 'error');
+      }
+    }
+
+    // ── Runtime API ──
+    async function startRuntime() {
+      logResult('启动持续学习...', 'info');
+      try {
+        const result = await apiPost('/api/runtime/start');
+        runtimeStatus.running = true;
+        logResult('持续学习已启动: ' + JSON.stringify(result).substring(0, 120), 'success');
+      } catch (e) {
+        logResult('启动错误: ' + e.message, 'error');
+      }
+    }
+
+    async function stopRuntime() {
+      logResult('停止持续学习...', 'info');
+      try {
+        const result = await apiPost('/api/runtime/stop');
+        runtimeStatus.running = false;
+        logResult('持续学习已停止', 'success');
+      } catch (e) {
+        logResult('停止错误: ' + e.message, 'error');
+      }
+    }
+
+    async function doCheckpoint() {
+      logResult('保存检查点...', 'info');
+      try {
+        const result = await apiPost('/api/runtime/checkpoint');
+        logResult('检查点已保存: ' + JSON.stringify(result).substring(0, 120), 'success');
+      } catch (e) {
+        logResult('检查点错误: ' + e.message, 'error');
+      }
+    }
+
+    async function fetchRuntimeStatus() {
+      try {
+        const data = await apiGet('/api/runtime/status');
+        runtimeStatus.running = data.running || false;
+        runtimeStatus.uptime = data.uptime || '0s';
+        runtimeStatus.iterations = data.iterations || 0;
+        runtimeStatus.retention = data.retention || '0%';
+        runtimeStatus.pending_data = data.pending_data || 0;
+      } catch { /* ignore */ }
+    }
+
     async function fetchEmotionParams() {
       try {
         const result = await apiGet('/api/integrated/emotion-params');
@@ -427,6 +585,9 @@ const app = createApp({
       await fetchHealth();
       await fetchStats();
       await fetchEmotionParams();
+      await fetchRuntimeStatus();
+      await fetchSocietyMetrics();
+      await fetchChatHistory();
 
       nextTick(() => {
         initCharts();
@@ -440,6 +601,8 @@ const app = createApp({
         fetchHealth();
         fetchStats();
         fetchEmotionParams();
+        fetchRuntimeStatus();
+        fetchSocietyMetrics();
       }, 5000);
     });
 
@@ -463,6 +626,15 @@ const app = createApp({
       knowledgeCount, stageName,
       doLearn, doReason, doThink, doInsight, doAnalogize,
       doConsolidate, doPipeline, doAutonomous,
+      // Chat
+      chatMessages, chatInput, chatBusy, chatSessionId, chatMessagesRef,
+      doChat, fetchChatHistory,
+      // Society
+      societyAgents, societyMetrics, newAgentPort,
+      createAgent, removeAgent, fetchSocietyMetrics, triggerObservation,
+      // Runtime
+      runtimeStatus,
+      startRuntime, stopRuntime, doCheckpoint, fetchRuntimeStatus,
     };
   },
 });

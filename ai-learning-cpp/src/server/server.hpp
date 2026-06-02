@@ -15,6 +15,10 @@
 #include "event_adapter.hpp"
 
 #include "ai_learning/core/learner.hpp"
+#include "ai_learning/society/society.hpp"
+#include "ai_learning/language/dialog_manager.hpp"
+#include "ai_learning/language/llm_provider.hpp"
+#include "ai_learning/learning/continuous_loop.hpp"
 
 #include <crow.h>
 
@@ -22,6 +26,7 @@
 
 #include <atomic>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <string>
 
@@ -73,6 +78,15 @@ private:
     /// 注册 WebSocket 路由（Phase 7.4）
     auto register_ws_routes_(crow::SimpleApp& app) -> void;
 
+    /// 注册社会路由（Phase 9）
+    auto register_society_routes_(crow::SimpleApp& app) -> void;
+
+    /// 注册对话路由（Phase 9）
+    auto register_chat_routes_(crow::SimpleApp& app) -> void;
+
+    /// 注册运行时路由（Phase 9）
+    auto register_runtime_routes_(crow::SimpleApp& app) -> void;
+
     /// 启动心跳和统计推送的后台线程
     auto start_ws_background_tasks_() -> void;
 
@@ -98,6 +112,12 @@ private:
 
     /// 后台线程控制
     std::atomic<bool> ws_bg_running_{false};
+
+    /// Phase 9: 懒初始化组件
+    std::unique_ptr<society::Society> society_;
+    std::unique_ptr<language::DialogManager> dialog_;
+    std::unique_ptr<learning::ContinuousLearningLoop> continuous_loop_;
+    std::unique_ptr<language::ILLMProvider> llm_provider_;
 };
 
 }  // namespace ai_learning::server

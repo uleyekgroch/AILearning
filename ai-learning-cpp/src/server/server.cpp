@@ -16,6 +16,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstdlib>
 #include <iostream>
 #include <thread>
 #include <fstream>
@@ -60,6 +61,9 @@ auto ai_learning::server::LearningServer::register_routes_(::crow::SimpleApp& ap
     register_system_routes_(app);
     register_core_routes_(app);
     register_advanced_routes_(app);
+    register_society_routes_(app);
+    register_chat_routes_(app);
+    register_runtime_routes_(app);
     register_static_routes_(app);
     register_ws_routes_(app);
 }
@@ -872,6 +876,493 @@ auto ai_learning::server::LearningServer::register_advanced_routes_(::crow::Simp
             return res;
         } catch (const std::exception& e) {
             ::crow::response res{500, dto::make_error_response(e.what()).dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        }
+    });
+}
+
+// ── 社会路由（Phase 9）──────────────────────────────────────────────
+
+auto ai_learning::server::LearningServer::register_society_routes_(::crow::SimpleApp& app) -> void {
+    using json = nlohmann::json;
+    namespace dto = ai_learning::server::dto;
+
+    // POST /society/create — 创建新 Agent
+    CROW_ROUTE(app, "/society/create").methods("POST"_method)
+    ([this](const ::crow::request& req) -> ::crow::response {
+        try {
+            if (!society_) {
+                society_ = std::make_unique<society::Society>(society::SocietyConfig{});
+            }
+            int port = 0;
+            if (!req.body.empty()) {
+                auto body = json::parse(req.body);
+                port = body.value("port", 0);
+            }
+            std::string agent_id = society_->create_agent(port);
+
+            json resp;
+            resp["status"] = "ok";
+            resp["agent_id"] = agent_id;
+
+            ::crow::response res{resp.dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        } catch (const std::exception& e) {
+            ::crow::response res{400, dto::make_error_response(e.what()).dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        }
+    });
+
+    // DELETE /society/agents/<id> — 移除 Agent
+    CROW_ROUTE(app, "/society/agents/<string>").methods("DELETE"_method)
+    ([this](const std::string& agent_id) -> ::crow::response {
+        try {
+            if (!society_) {
+                ::crow::response res{400, dto::make_error_response("society not initialized").dump()};
+                res.set_header("Content-Type", "application/json");
+                return res;
+            }
+            bool removed = society_->remove_agent(agent_id);
+
+            json resp;
+            resp["status"] = removed ? "ok" : "not_found";
+            resp["agent_id"] = agent_id;
+
+            ::crow::response res{resp.dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        } catch (const std::exception& e) {
+            ::crow::response res{400, dto::make_error_response(e.what()).dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        }
+    });
+
+    // GET /society/agents — 列出所有 Agent
+    CROW_ROUTE(app, "/society/agents").methods("GET"_method)
+    ([this]() -> ::crow::response {
+        try {
+            if (!society_) {
+                society_ = std::make_unique<society::Society>(society::SocietyConfig{});
+            }
+            auto agents = society_->list_agents();
+            json arr = json::array();
+            for (const auto& a : agents) {
+                json item;
+                item["agent_id"] = a.agent_id;
+                item["port"] = a.port;
+                item["pid"] = a.pid;
+                item["status"] = society::to_string(a.status);
+                item["knowledge_count"] = a.knowledge_count;
+                arr.push_back(item);
+            }
+
+            json resp;
+            resp["agents"] = arr;
+            resp["count"] = static_cast<int>(agents.size());
+
+            ::crow::response res{resp.dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        } catch (const std::exception& e) {
+            ::crow::response res{500, dto::make_error_response(e.what()).dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        }
+    });
+
+    // POST /society/observe — 触发社会观察
+    CROW_ROUTE(app, "/society/observe").methods("POST"_method)
+    ([this](const ::crow::request& req) -> ::crow::response {
+        try {
+            if (!society_) {
+                society_ = std::make_unique<society::Society>(society::SocietyConfig{});
+            }
+            auto body = json::parse(req.body);
+            if (!body.contains("observer_id") || !body.contains("model_id")
+                || !body.contains("domain")) {
+                ::crow::response res{400,
+                    dto::make_error_response(
+                        "missing required fields: observer_id, model_id, domain").dump()};
+                res.set_header("Content-Type", "application/json");
+                return res;
+            }
+            auto result = society_->trigger_observation(
+                body["observer_id"].get<std::string>(),
+                body["model_id"].get<std::string>(),
+                body["domain"].get<std::string>());
+
+            ::crow::response res{result.dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        } catch (const std::exception& e) {
+            ::crow::response res{400, dto::make_error_response(e.what()).dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        }
+    });
+
+    // POST /society/broadcast — 广播知识
+    CROW_ROUTE(app, "/society/broadcast").methods("POST"_method)
+    ([this](const ::crow::request& req) -> ::crow::response {
+        try {
+            if (!society_) {
+                society_ = std::make_unique<society::Society>(society::SocietyConfig{});
+            }
+            auto body = json::parse(req.body);
+            if (!body.contains("from_id") || !body.contains("domain")) {
+                ::crow::response res{400,
+                    dto::make_error_response(
+                        "missing required fields: from_id, domain").dump()};
+                res.set_header("Content-Type", "application/json");
+                return res;
+            }
+            auto result = society_->broadcast_knowledge(
+                body["from_id"].get<std::string>(),
+                body["domain"].get<std::string>());
+
+            ::crow::response res{result.dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        } catch (const std::exception& e) {
+            ::crow::response res{400, dto::make_error_response(e.what()).dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        }
+    });
+
+    // GET /society/metrics — 社会指标
+    CROW_ROUTE(app, "/society/metrics").methods("GET"_method)
+    ([this]() -> ::crow::response {
+        try {
+            if (!society_) {
+                society_ = std::make_unique<society::Society>(society::SocietyConfig{});
+            }
+            auto metrics = society_->social_metrics();
+            json resp;
+            resp["total_agents"] = metrics.total_agents;
+            resp["active_agents"] = metrics.active_agents;
+            resp["avg_knowledge_per_agent"] = metrics.avg_knowledge_per_agent;
+            resp["knowledge_diversity"] = metrics.knowledge_diversity;
+            resp["cultural_transmission_count"] = metrics.cultural_transmission_count;
+            resp["collective_learning_speed"] = metrics.collective_learning_speed;
+
+            ::crow::response res{resp.dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        } catch (const std::exception& e) {
+            ::crow::response res{500, dto::make_error_response(e.what()).dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        }
+    });
+}
+
+// ── 对话路由（Phase 9）──────────────────────────────────────────────
+
+auto ai_learning::server::LearningServer::register_chat_routes_(::crow::SimpleApp& app) -> void {
+    using json = nlohmann::json;
+    namespace dto = ai_learning::server::dto;
+
+    // POST /api/chat — 多轮对话
+    CROW_ROUTE(app, "/api/chat").methods("POST"_method)
+    ([this](const ::crow::request& req) -> ::crow::response {
+        try {
+            // 懒初始化 LLM 提供者和对话管理器
+            if (!llm_provider_) {
+                const char* api_key = std::getenv("DASHSCOPE_API_KEY");
+                if (api_key && api_key[0] != '\0') {
+                    llm_provider_ = std::make_unique<language::OpenAICompatibleProvider>(
+                        "dashscope.aliyuncs.com", api_key, "qwen-plus-latest");
+                } else {
+                    llm_provider_ = std::make_unique<language::StubLLMProvider>();
+                }
+            }
+            if (!dialog_) {
+                dialog_ = std::make_unique<language::DialogManager>(*llm_provider_, learner_);
+            }
+
+            auto body = json::parse(req.body);
+            if (!body.contains("message")) {
+                ::crow::response res{400,
+                    dto::make_error_response("missing 'message' field").dump()};
+                res.set_header("Content-Type", "application/json");
+                return res;
+            }
+            std::string message = body["message"].get<std::string>();
+            std::string session_id = body.value("session_id", "default");
+
+            auto response = dialog_->chat(message, session_id);
+            json resp;
+            resp["assistant_message"] = response.assistant_message;
+            resp["knowledge_learned"] = response.knowledge_learned;
+            resp["learner_action"] = response.learner_action;
+            resp["intent"] = response.intent;
+
+            ::crow::response res{resp.dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        } catch (const std::exception& e) {
+            ::crow::response res{400, dto::make_error_response(e.what()).dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        }
+    });
+
+    // GET /api/chat/history — 获取对话历史
+    CROW_ROUTE(app, "/api/chat/history").methods("GET"_method)
+    ([this](const ::crow::request& req) -> ::crow::response {
+        try {
+            if (!dialog_) {
+                json resp;
+                resp["history"] = json::array();
+                resp["count"] = 0;
+
+                ::crow::response res{resp.dump()};
+                res.set_header("Content-Type", "application/json");
+                return res;
+            }
+            // 从 query string 获取 session 参数
+            std::string session_id = "default";
+            // crow 不直接提供 query string 解析，从 raw_url 提取
+            std::string url = req.raw_url;
+            auto pos = url.find("?session=");
+            if (pos != std::string::npos) {
+                session_id = url.substr(pos + 9);
+                auto amp = session_id.find('&');
+                if (amp != std::string::npos) session_id = session_id.substr(0, amp);
+            }
+
+            int last_n = 20;
+            auto history = dialog_->get_history(session_id, last_n);
+            json arr = json::array();
+            for (const auto& turn : history) {
+                json item;
+                item["role"] = turn.role;
+                item["content"] = turn.content;
+                item["timestamp"] = turn.timestamp;
+                arr.push_back(item);
+            }
+
+            json resp;
+            resp["history"] = arr;
+            resp["count"] = static_cast<int>(history.size());
+            resp["session_id"] = session_id;
+
+            ::crow::response res{resp.dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        } catch (const std::exception& e) {
+            ::crow::response res{500, dto::make_error_response(e.what()).dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        }
+    });
+
+    // DELETE /api/chat/session/<id> — 清除会话
+    CROW_ROUTE(app, "/api/chat/session/<string>").methods("DELETE"_method)
+    ([this](const std::string& session_id) -> ::crow::response {
+        try {
+            if (dialog_) {
+                dialog_->clear_session(session_id);
+            }
+            json resp;
+            resp["status"] = "ok";
+            resp["session_id"] = session_id;
+
+            ::crow::response res{resp.dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        } catch (const std::exception& e) {
+            ::crow::response res{400, dto::make_error_response(e.what()).dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        }
+    });
+}
+
+// ── 运行时路由（Phase 9）──────────────────────────────────────────────
+
+auto ai_learning::server::LearningServer::register_runtime_routes_(::crow::SimpleApp& app) -> void {
+    using json = nlohmann::json;
+    namespace dto = ai_learning::server::dto;
+
+    // GET /api/runtime/status — 获取运行时状态
+    CROW_ROUTE(app, "/api/runtime/status").methods("GET"_method)
+    ([this]() -> ::crow::response {
+        try {
+            if (!continuous_loop_) {
+                json resp;
+                resp["running"] = false;
+                resp["iterations"] = 0;
+                resp["data_processed"] = 0;
+                resp["pending_data_count"] = 0;
+                resp["message"] = "continuous loop not started";
+
+                ::crow::response res{resp.dump()};
+                res.set_header("Content-Type", "application/json");
+                return res;
+            }
+            auto s = continuous_loop_->status();
+            json resp;
+            resp["running"] = s.running;
+            resp["iterations"] = s.iterations;
+            resp["data_processed"] = s.data_processed;
+            resp["last_checkpoint_time"] = s.last_checkpoint_time;
+            resp["last_consolidation_time"] = s.last_consolidation_time;
+            resp["knowledge_retention"] = s.knowledge_retention;
+            resp["uptime_seconds"] = s.uptime_seconds;
+            resp["pending_data_count"] = s.pending_data_count;
+
+            ::crow::response res{resp.dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        } catch (const std::exception& e) {
+            ::crow::response res{500, dto::make_error_response(e.what()).dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        }
+    });
+
+    // POST /api/runtime/start — 启动持续学习循环
+    CROW_ROUTE(app, "/api/runtime/start").methods("POST"_method)
+    ([this](const ::crow::request& req) -> ::crow::response {
+        try {
+            if (!continuous_loop_) {
+                continuous_loop_ = std::make_unique<learning::ContinuousLearningLoop>(learner_);
+            }
+            learning::ContinuousLoopConfig cfg;
+            if (!req.body.empty()) {
+                auto body = json::parse(req.body);
+                cfg.checkpoint_interval_seconds = body.value("checkpoint_interval_seconds", 300);
+                cfg.consolidation_interval_seconds = body.value("consolidation_interval_seconds", 60);
+                cfg.max_iterations = body.value("max_iterations", 0);
+                cfg.data_buffer_size = body.value("data_buffer_size", 100);
+                cfg.checkpoint_dir = body.value("checkpoint_dir", "./checkpoints");
+                cfg.auto_recover = body.value("auto_recover", true);
+            }
+            continuous_loop_->start(cfg);
+
+            json resp;
+            resp["status"] = "ok";
+            resp["message"] = "continuous loop started";
+
+            ::crow::response res{resp.dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        } catch (const std::exception& e) {
+            ::crow::response res{400, dto::make_error_response(e.what()).dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        }
+    });
+
+    // POST /api/runtime/stop — 停止持续学习循环
+    CROW_ROUTE(app, "/api/runtime/stop").methods("POST"_method)
+    ([this](const ::crow::request& /*req*/) -> ::crow::response {
+        try {
+            if (continuous_loop_) {
+                continuous_loop_->stop();
+            }
+            json resp;
+            resp["status"] = "ok";
+            resp["message"] = "continuous loop stopped";
+
+            ::crow::response res{resp.dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        } catch (const std::exception& e) {
+            ::crow::response res{400, dto::make_error_response(e.what()).dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        }
+    });
+
+    // POST /api/runtime/checkpoint — 强制检查点
+    CROW_ROUTE(app, "/api/runtime/checkpoint").methods("POST"_method)
+    ([this](const ::crow::request& /*req*/) -> ::crow::response {
+        try {
+            if (!continuous_loop_) {
+                ::crow::response res{400,
+                    dto::make_error_response("continuous loop not initialized").dump()};
+                res.set_header("Content-Type", "application/json");
+                return res;
+            }
+            continuous_loop_->checkpoint_now();
+
+            json resp;
+            resp["status"] = "ok";
+            resp["message"] = "checkpoint triggered";
+
+            ::crow::response res{resp.dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        } catch (const std::exception& e) {
+            ::crow::response res{500, dto::make_error_response(e.what()).dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        }
+    });
+
+    // POST /api/runtime/feed — 喂数据给学习循环
+    CROW_ROUTE(app, "/api/runtime/feed").methods("POST"_method)
+    ([this](const ::crow::request& req) -> ::crow::response {
+        try {
+            if (!continuous_loop_) {
+                continuous_loop_ = std::make_unique<learning::ContinuousLearningLoop>(learner_);
+            }
+            auto body = json::parse(req.body);
+            if (!body.contains("data")) {
+                ::crow::response res{400,
+                    dto::make_error_response("missing 'data' field").dump()};
+                res.set_header("Content-Type", "application/json");
+                return res;
+            }
+            std::string data = body["data"].get<std::string>();
+            std::string source = body.value("source", "api");
+            continuous_loop_->feed_data(data, source);
+
+            json resp;
+            resp["status"] = "ok";
+            resp["message"] = "data enqueued";
+
+            ::crow::response res{resp.dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        } catch (const std::exception& e) {
+            ::crow::response res{400, dto::make_error_response(e.what()).dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        }
+    });
+
+    // POST /api/runtime/recover — 从检查点恢复
+    CROW_ROUTE(app, "/api/runtime/recover").methods("POST"_method)
+    ([this](const ::crow::request& req) -> ::crow::response {
+        try {
+            if (!continuous_loop_) {
+                continuous_loop_ = std::make_unique<learning::ContinuousLearningLoop>(learner_);
+            }
+            std::string dir = "./checkpoints";
+            if (!req.body.empty()) {
+                auto body = json::parse(req.body);
+                dir = body.value("dir", "./checkpoints");
+            }
+            bool ok = continuous_loop_->recover(dir);
+
+            json resp;
+            resp["status"] = ok ? "ok" : "failed";
+            resp["message"] = ok ? "recovered from checkpoint" : "no checkpoint found";
+            resp["dir"] = dir;
+
+            ::crow::response res{resp.dump()};
+            res.set_header("Content-Type", "application/json");
+            return res;
+        } catch (const std::exception& e) {
+            ::crow::response res{400, dto::make_error_response(e.what()).dump()};
             res.set_header("Content-Type", "application/json");
             return res;
         }

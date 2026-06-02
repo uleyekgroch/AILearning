@@ -123,6 +123,10 @@ endif()
 add_library(ai_learning STATIC ${AI_LEARNING_SOURCES})
 target_include_directories(ai_learning PUBLIC include)
 target_compile_features(ai_learning PRIVATE cxx_std_20)
+# Windows: asio requires _WIN32_WINNT definition
+if(WIN32)
+    target_compile_definitions(ai_learning PUBLIC _WIN32_WINNT=0x0601)
+endif()
 
 if(CUDA_FOUND)
     target_link_libraries(ai_learning PUBLIC ai_learning_cuda)

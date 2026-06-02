@@ -65,10 +65,68 @@
         <div class="card-title">知识图谱</div>
         <div ref="graphChartRef" class="chart-box tall"></div>
       </div>
+
+      <!-- Society Panel -->
+      <div class="card society-panel">
+        <div class="card-title">社会智能</div>
+
+        <!-- Agent list -->
+        <div class="society-agents" v-if="societyAgents.length">
+          <div class="agent-item" v-for="(agent, idx) in societyAgents" :key="idx">
+            <span class="agent-status-dot" :class="{ online: agent.online }"></span>
+            <span class="agent-name">{{ agent.name || ('Agent-' + idx) }}</span>
+            <span class="agent-addr">{{ agent.host }}:{{ agent.port }}</span>
+            <button class="btn btn-sm btn-danger" @click="removeAgent(agent)">移除</button>
+          </div>
+        </div>
+        <div v-else class="society-empty">暂无智能体</div>
+
+        <!-- Create agent -->
+        <div class="input-group" style="margin-top:8px">
+          <input v-model="newAgentPort" placeholder="输入端口号..." />
+          <button class="btn btn-success btn-sm" @click="createAgent">创建智能体</button>
+        </div>
+
+        <!-- Social metrics -->
+        <div class="society-metrics" v-if="societyMetrics">
+          <div class="metric-pill">
+            <span class="metric-label">活跃智能体</span>
+            <span class="metric-value">{{ societyMetrics.active_agents || 0 }}</span>
+          </div>
+          <div class="metric-pill">
+            <span class="metric-label">总交互数</span>
+            <span class="metric-value">{{ societyMetrics.total_interactions || 0 }}</span>
+          </div>
+          <div class="metric-pill">
+            <span class="metric-label">共识达成</span>
+            <span class="metric-value">{{ societyMetrics.consensus_reached || 0 }}</span>
+          </div>
+        </div>
+
+        <button class="btn btn-purple" style="margin-top:8px;width:100%" @click="triggerObservation">触发观察学习</button>
+      </div>
     </div>
 
     <!-- RIGHT PANEL: Operations + Results -->
     <div class="panel-right">
+
+      <!-- Runtime Controls -->
+      <div class="card runtime-bar">
+        <div class="card-title">运行控制</div>
+        <div class="runtime-controls">
+          <button class="btn btn-success" @click="startRuntime" :disabled="runtimeStatus.running">启动学习</button>
+          <button class="btn btn-danger" @click="stopRuntime" :disabled="!runtimeStatus.running">停止学习</button>
+          <button class="btn btn-warning" @click="doCheckpoint">保存检查点</button>
+        </div>
+        <div class="runtime-status-line" v-if="runtimeStatus">
+          <span v-if="runtimeStatus.running" class="runtime-running">运行中</span>
+          <span v-else class="runtime-stopped">已停止</span>
+          <span class="runtime-stat">运行时间: {{ runtimeStatus.uptime || '0s' }}</span>
+          <span class="runtime-stat">迭代次数: {{ runtimeStatus.iterations || 0 }}</span>
+          <span class="runtime-stat">记忆保留: {{ runtimeStatus.retention || '0%' }}</span>
+          <span class="runtime-stat" v-if="runtimeStatus.pending_data">待处理: {{ runtimeStatus.pending_data }}</span>
+        </div>
+      </div>
 
       <!-- Learn input -->
       <div class="card">
@@ -106,6 +164,27 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Chat Panel -->
+      <div class="card">
+        <div class="card-title">对话</div>
+        <div class="chat-messages" ref="chatMessagesRef">
+          <div v-if="chatMessages.length === 0" style="color:var(--text-secondary);text-align:center;padding:20px">开始对话...</div>
+          <div v-for="(msg, idx) in chatMessages" :key="idx"
+               class="chat-msg" :class="msg.role === 'user' ? 'msg-user' : 'msg-assistant'">
+            <div class="msg-bubble">
+              <div class="msg-text">{{ msg.content }}</div>
+              <div v-if="msg.learned && msg.learned.length" class="msg-learned">
+                <span class="learned-tag" v-for="(tag, ti) in msg.learned" :key="ti">{{ tag }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="input-group" style="margin-top:8px">
+          <input v-model="chatInput" placeholder="输入消息..." @keydown.enter="doChat" />
+          <button class="btn btn-primary" :disabled="chatBusy" @click="doChat">发送</button>
         </div>
       </div>
 
