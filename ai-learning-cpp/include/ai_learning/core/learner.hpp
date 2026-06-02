@@ -41,6 +41,12 @@
 #include "ai_learning/learning/autonomous_learning_loop.hpp"
 #include "ai_learning/learning/problem_solver.hpp"
 #include "ai_learning/learning/development_milestones.hpp"
+#include "ai_learning/learning/analogical_transfer.hpp"
+#include "ai_learning/learning/continual_learner.hpp"
+#include "ai_learning/learning/abstract_concept.hpp"
+#include "ai_learning/learning/social_learning.hpp"
+#include "ai_learning/learning/emotion_engine.hpp"
+#include "ai_learning/learning/insight_engine.hpp"
 
 #include <chrono>
 #include <deque>
@@ -263,6 +269,70 @@ public:
     [[nodiscard]] auto problem_solver()
         -> learning::ProblemSolver& { return problem_solver_; }
 
+    // ── Phase 3：高级认知能力 ──────────────────────────────────
+
+    /// 跨领域类比迁移：将源领域知识迁移到目标领域
+    auto analogical_transfer(
+        const std::vector<learning::ConceptDescriptor>& source_concepts,
+        const std::vector<learning::ConceptDescriptor>& target_concepts,
+        const std::vector<std::string>& source_facts)
+        -> learning::TransferResult;
+
+    /// 持续学习保护：注册知识防止遗忘
+    void protect_knowledge(const std::string& knowledge_id,
+                           const std::string& domain,
+                           double confidence,
+                           int usage_count);
+
+    /// 持续学习保护：检测遗忘
+    auto detect_forgetting() const
+        -> std::vector<learning::ForgettingAlert>;
+
+    /// 抽象概念形成：观察实例，触发概念涌现
+    auto form_abstractions(const std::string& instance_id,
+                           const std::vector<std::string>& attributes,
+                           const std::map<std::string, double>& features = {},
+                           const std::vector<std::string>& relations = {})
+        -> learning::ConceptFormationReport;
+
+    /// 访问类比迁移引擎
+    [[nodiscard]] auto analogy_engine()
+        -> learning::AnalogicalTransferEngine& { return analogy_engine_; }
+
+    /// 访问持续学习引擎
+    [[nodiscard]] auto continual_learner()
+        -> learning::ContinualLearner& { return continual_; }
+
+    /// 访问抽象概念引擎
+    [[nodiscard]] auto concept_engine()
+        -> learning::AbstractConceptEngine& { return concept_engine_; }
+
+    // ── Phase 4：增强智能 ────────────────────────────────────
+
+    /// 社会观察学习：观察一次行为
+    auto observe_behavior(const learning::BehaviorObservation& observation)
+        -> learning::SocialLearningReport;
+
+    /// 情感处理：处理一次情绪事件
+    auto process_emotion(const learning::EmotionEvent& event)
+        -> learning::EmotionState;
+
+    /// 尝试产生顿悟
+    auto try_insight(const std::string& problem_context)
+        -> std::optional<learning::InsightEvent>;
+
+    /// 访问社会学习引擎
+    [[nodiscard]] auto social_engine()
+        -> learning::SocialLearningEngine& { return social_engine_; }
+
+    /// 访问情感引擎
+    [[nodiscard]] auto emotion_engine()
+        -> learning::EmotionEngine& { return emotion_engine_; }
+
+    /// 访问顿悟引擎
+    [[nodiscard]] auto insight_engine_ref()
+        -> learning::InsightEngine& { return insight_engine_; }
+
 private:
     /// 检查晋升条件
     [[nodiscard]] auto check_promotion_(
@@ -300,6 +370,16 @@ private:
     learning::SkillTree                 skill_tree_;
     learning::DevelopmentMilestones     milestones_;
     learning::ProblemSolver             problem_solver_;
+
+    // Phase 3：高级认知能力
+    learning::AnalogicalTransferEngine  analogy_engine_;
+    learning::ContinualLearner          continual_;
+    learning::AbstractConceptEngine     concept_engine_;
+
+    // Phase 4：增强智能
+    learning::SocialLearningEngine      social_engine_;
+    learning::EmotionEngine             emotion_engine_;
+    learning::InsightEngine             insight_engine_;
 
     // 发展状态
     std::string stage_;

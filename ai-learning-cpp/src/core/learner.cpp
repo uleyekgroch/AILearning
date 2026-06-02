@@ -53,7 +53,13 @@ Learner::Learner(const LearnerConfig& config)
       skill_tree_(),
       milestones_(),
       problem_solver_(),
-      stage_(config.initial_stage) {
+       analogy_engine_(),
+       continual_(),
+       concept_engine_(),
+       social_engine_(),
+       emotion_engine_(),
+       insight_engine_(),
+       stage_(config.initial_stage) {
 
     // 设置阶段索引
     for (int i = 0; i < static_cast<int>(kStageOrder.size()); ++i) {
@@ -664,6 +670,99 @@ auto Learner::check_milestones()
 auto Learner::learning_progress() const
     -> learning::ProgressSnapshot {
     return milestones_.progress(skill_tree_);
+}
+
+// ── Phase 3：高级认知能力 ────────────────────────────────────────
+
+auto Learner::analogical_transfer(
+    const std::vector<learning::ConceptDescriptor>& source_concepts,
+    const std::vector<learning::ConceptDescriptor>& target_concepts,
+    const std::vector<std::string>& source_facts)
+    -> learning::TransferResult
+{
+    auto result = analogy_engine_.transfer(
+        source_concepts, target_concepts, source_facts);
+
+    // 将迁移成功的知识注册到持续学习保护
+    for (const auto& knowledge : result.transferred_knowledge) {
+        continual_.register_knowledge(
+            knowledge, result.target_domain, result.transfer_quality, 1);
+    }
+
+    return result;
+}
+
+void Learner::protect_knowledge(const std::string& knowledge_id,
+                                 const std::string& domain,
+                                 double confidence,
+                                 int usage_count) {
+    continual_.register_knowledge(knowledge_id, domain, confidence, usage_count);
+}
+
+auto Learner::detect_forgetting() const
+    -> std::vector<learning::ForgettingAlert> {
+    return continual_.detect_forgetting();
+}
+
+auto Learner::form_abstractions(
+    const std::string& instance_id,
+    const std::vector<std::string>& attributes,
+    const std::map<std::string, double>& features,
+    const std::vector<std::string>& relations)
+    -> learning::ConceptFormationReport
+{
+    return concept_engine_.observe_instance(
+        instance_id, attributes, features, relations);
+}
+
+// ── Phase 4：增强智能 ────────────────────────────────────────
+
+auto Learner::observe_behavior(
+    const learning::BehaviorObservation& observation)
+    -> learning::SocialLearningReport
+{
+    // 情感调制：高唤醒状态增强社会学习效果
+    auto report = social_engine_.observe(observation);
+
+    // 将学到的策略注册到持续学习保护
+    for (const auto& strategy : report.learned_strategies) {
+        continual_.register_knowledge(
+            strategy.id, strategy.domain,
+            strategy.observed_success_rate, strategy.observation_count);
+    }
+
+    return report;
+}
+
+auto Learner::process_emotion(const learning::EmotionEvent& event)
+    -> learning::EmotionState
+{
+    return emotion_engine_.process_event(event);
+}
+
+auto Learner::try_insight(const std::string& problem_context)
+    -> std::optional<learning::InsightEvent>
+{
+    auto insight = insight_engine_.try_insight(problem_context);
+
+    // 如果产生顿悟，触发情感事件（兴奋）
+    if (insight.has_value()) {
+        learning::EmotionEvent event;
+        event.event_type = "surprise";
+        event.domain = "insight";
+        event.description = insight->new_perspective;
+        event.magnitude = insight->surprise_level;
+        event.actual_outcome = insight->confidence;
+        event.expected_outcome = 0.3;
+        emotion_engine_.process_event(event);
+
+        // 保护顿悟知识
+        continual_.register_knowledge(
+            insight->id, "insight",
+            insight->confidence, 1);
+    }
+
+    return insight;
 }
 
 }  // namespace ai_learning::core
