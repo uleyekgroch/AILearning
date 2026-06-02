@@ -123,6 +123,12 @@ endif()
 add_library(ai_learning STATIC ${AI_LEARNING_SOURCES})
 target_include_directories(ai_learning PUBLIC include)
 target_compile_features(ai_learning PRIVATE cxx_std_20)
+# ai_learning 内部源码依赖 nlohmann/json 和 asio
+target_link_libraries(ai_learning PUBLIC nlohmann_json::nlohmann_json)
+if(asio_SOURCE_DIR)
+    target_include_directories(ai_learning PUBLIC "${asio_SOURCE_DIR}/asio/include")
+endif()
+target_compile_definitions(ai_learning PUBLIC ASIO_STANDALONE)
 # Windows: asio requires _WIN32_WINNT definition
 if(WIN32)
     target_compile_definitions(ai_learning PUBLIC _WIN32_WINNT=0x0601)
@@ -176,3 +182,8 @@ target_compile_definitions(ai_learning_server PRIVATE ASIO_STANDALONE)
 if(WIN32)
     target_link_libraries(ai_learning_server PRIVATE ws2_32 wsock32)
 endif()
+
+# ── 语料学习 ────────────────────────────────────────────────────
+add_executable(ai_learning_corpus corpus_main.cpp)
+target_link_libraries(ai_learning_corpus PRIVATE ai_learning nlohmann_json::nlohmann_json)
+target_include_directories(ai_learning_corpus PRIVATE include)

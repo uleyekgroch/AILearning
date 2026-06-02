@@ -26,6 +26,8 @@
 #include "ai_learning/reasoning/simulation.hpp"
 #include "ai_learning/reasoning/unified_engine.hpp"
 #include "ai_learning/learning/statistical_learner.hpp"
+#include "ai_learning/learning/distributional_semantics.hpp"
+#include "ai_learning/learning/embedding_trainer.hpp"
 #include "ai_learning/language/grounding.hpp"
 #include "ai_learning/language/development.hpp"
 #include "ai_learning/learning/hippocampal.hpp"
@@ -192,6 +194,15 @@ public:
         -> perception::MultiModalEncoder& { return encoder_; }
     [[nodiscard]] auto encoder() const
         -> const perception::MultiModalEncoder& { return encoder_; }
+
+    [[nodiscard]] auto distributional_semantics()
+        -> learning::DistributionalSemantics& { return ds_; }
+    [[nodiscard]] auto distributional_semantics() const
+        -> const learning::DistributionalSemantics& { return ds_; }
+    [[nodiscard]] auto embedding_trainer()
+        -> learning::EmbeddingTrainer& { return embedding_trainer_; }
+    [[nodiscard]] auto embedding_trainer() const
+        -> const learning::EmbeddingTrainer& { return embedding_trainer_; }
 
     [[nodiscard]] auto config() const -> const LearnerConfig& {
         return config_;
@@ -423,6 +434,10 @@ private:
     learning::KnowledgeVerifier      verifier_;
     reasoning::SimulationReasoning   simulation_reasoning_;
     learning::StatisticalLearner     stat_learner_;
+    // 嵌入学习子系统
+    learning::DistributionalSemantics ds_;
+    learning::EmbeddingTrainer        embedding_trainer_;
+    int                               consolidation_count_ = 0;
     reasoning::UnifiedReasoningEngine unified_engine_;
     language::GroundingModule         grounding_;
     language::DevelopmentTracker      dev_tracker_;

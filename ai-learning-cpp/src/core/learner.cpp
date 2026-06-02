@@ -40,6 +40,28 @@ Learner::Learner(const LearnerConfig& config)
       verifier_(),
       simulation_reasoning_(kg_),
       stat_learner_(),
+      ds_(learning::DistributionalSemanticsConfig{
+          5,                          // window_size
+          config.ds_min_freq,         // min_cpt_freq
+          0.5,                        // ppmi_threshold
+          500,                        // max_dimensions
+          10000,                      // max_cpts
+          0.3,                        // similarity_threshold
+          false                       // use_causal_prior: 关闭因果先验（构造时未连接 WorldModel）
+      }),
+      embedding_trainer_(learning::EmbeddingTrainerConfig{
+          config.embedding_dim,       // embedding_dim
+          config.embedding_window_size, // window_size
+          config.embedding_neg_samples, // neg_samples
+          config.embedding_learning_rate, // learning_rate
+          0.001,                      // min_learning_rate
+          config.embedding_epochs,    // epochs
+          config.embedding_min_count, // min_count
+          512,                        // batch_size
+          50000,                      // max_vocab
+          42                          // seed
+      }),
+      consolidation_count_(0),
       unified_engine_(kg_),
       hippocampal_(config.episodic_memory_capacity),
       cortical_(),
@@ -83,6 +105,12 @@ auto Learner::learn_from_text(const std::string& text,
     auto result = text_learner_.learn_from_text(text, source);
     // 同时观察文本以触发统计概念涌现
     stat_learner_.observe(text);
+
+    // 嵌入管线（config 开关控制）
+    if (config_.embedding_learning_enabled) {
+        ds_.learn_from_text(text);
+        embedding_trainer_.add_text(text);
+    }
 
     // 海马快速记忆：存储提取的实体和关系
     std::vector<std::string> rel_strs;
@@ -236,6 +264,24 @@ auto Learner::consolidate() -> std::map<std::string, double> {
     report["cortical_facts"]       = static_cast<double>(cortical_.size());
     report["consolidated"]         = static_cast<double>(sleep_report.memories_consolidated);
     report["forgotten"]            = static_cast<double>(sleep_report.memories_forgotten);
+
+    // 嵌入训练（周期性）
+    if (config_.embedding_learning_enabled) {
+        ++consolidation_count_;
+        if (consolidation_count_ % config_.embedding_train_interval == 0) {
+            auto ds_concepts = ds_.all_cpts();
+            embedding_trainer_.import_vocabulary(ds_concepts);
+            auto emb_result = embedding_trainer_.train();
+            report["embedding_vocab_size"] = static_cast<double>(emb_result.vocab_size);
+            report["embedding_loss"]       = emb_result.final_loss;
+            report["embedding_trained"]    = 1.0;
+        } else {
+            report["embedding_trained"] = 0.0;
+        }
+        auto ds_stats = ds_.stats();
+        report["ds_concepts"]   = static_cast<double>(ds_stats.cpts_represented);
+        report["ds_dimensions"] = static_cast<double>(ds_stats.total_dimensions);
+    }
 
     return report;
 }
@@ -395,7 +441,7 @@ auto Learner::evolve(int iterations)
 // ── 统计 ─────────────────────────────────────────────────────────
 
 auto Learner::get_stats() const -> std::map<std::string, double> {
-    return {
+    std::map<std::string, double> stats{
         {"total_steps", static_cast<double>(total_steps_)},
         {"entity_count", static_cast<double>(kg_.entity_count())},
         {"relation_count", static_cast<double>(kg_.relation_count())},
@@ -405,6 +451,15 @@ auto Learner::get_stats() const -> std::map<std::string, double> {
         {"hippocampal_episodes", static_cast<double>(hippocampal_.size())},
         {"cortical_facts", static_cast<double>(cortical_.size())},
     };
+
+    if (config_.embedding_learning_enabled) {
+        auto ds_stats = ds_.stats();
+        stats["ds_concepts"] = static_cast<double>(ds_stats.cpts_represented);
+        stats["embedding_vocab"] = static_cast<double>(embedding_trainer_.vocab_size());
+        stats["embedding_trained"] = embedding_trainer_.is_trained() ? 1.0 : 0.0;
+    }
+
+    return stats;
 }
 
 // ── 持久化 ───────────────────────────────────────────────────────
@@ -451,6 +506,18 @@ void Learner::save(const std::string& path) const {
     out << "[modality_weights]\n";
     for (const auto& [mod, w] : encoder_.get_modality_weights()) {
         out << mod << "=" << w << "\n";
+    }
+
+    // ── 嵌入学习 ──
+    if (config_.embedding_learning_enabled) {
+        out << "[embeddings]\n";
+        auto ds_stats = ds_.stats();
+        out << "ds_concepts=" << ds_stats.cpts_represented << "\n";
+        out << "ds_dimensions=" << ds_stats.total_dimensions << "\n";
+        out << "ds_texts_processed=" << ds_stats.texts_processed << "\n";
+        out << "embedding_vocab_size=" << embedding_trainer_.vocab_size() << "\n";
+        out << "embedding_trained=" << (embedding_trainer_.is_trained() ? 1 : 0) << "\n";
+        out << "consolidation_count=" << consolidation_count_ << "\n";
     }
 }
 
@@ -500,6 +567,10 @@ void Learner::load(const std::string& path) {
                 encoder_.get_modality_weights().count(key)
                 ? (encoder_.get_modality_weights().at(key))
                 : 0.0);
+        } else if (section == "embeddings") {
+            if (key == "consolidation_count") {
+                consolidation_count_ = std::stoi(val);
+            }
         }
     }
 }

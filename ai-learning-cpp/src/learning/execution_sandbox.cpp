@@ -270,7 +270,7 @@ auto LocalProcessSandbox::run_process_(const std::string& command,
 
 /// POSIX 实现：fork + exec + pipe + waitpid 超时
 auto LocalProcessSandbox::run_process_(const std::string& command,
-                                         int timeout_ms) const
+                                         [[maybe_unused]] int timeout_ms) const
     -> ExecutionResult {
     ExecutionResult result;
     auto t0 = std::chrono::high_resolution_clock::now();
