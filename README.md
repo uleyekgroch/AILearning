@@ -89,7 +89,7 @@ auto similar = learner.distributional_semantics().similarity("数学", "物理")
 **预训练模型集成（llama.cpp，可选）：**
 
 ```cpp
-// 配置预训练嵌入模型路径（bge-small-zh-v1.5 Q4_K_M, ~300MB）
+// 配置预训练嵌入模型路径（bge-small-zh-v1.5 Q4_K_M, ~15MB）
 config.embedding_model_path = "/path/to/bge-small-zh-v1.5-q4_k_m.gguf";
 
 // 构造 Learner 时自动加载模型
@@ -98,6 +98,8 @@ ai_learning::core::Learner learner(config);
 // embedding_trainer() 优先使用预训练模型，无需从零训练
 auto vec = learner.embedding_trainer().get_embedding("人工智能");
 ```
+
+> **推荐**: `bge-small-zh-v1.5 Q4_K_M` (15MB) 是专门的中文嵌入模型，语义判别能力远优于通用 LLM (如 Qwen) 的隐藏层状态。详见 [`LLAMA_CPP_VERIFICATION.md`](ai-learning-cpp/LLAMA_CPP_VERIFICATION.md)。
 
 > 启用：`cmake -DAI_LEARNING_WITH_LLAMA_CPP=ON ..`
 > 不启用时现有代码完全不受影响，SGNS 训练照常工作。

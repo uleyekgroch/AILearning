@@ -260,4 +260,8 @@ if(AI_LEARNING_WITH_LLAMA_CPP)
     add_executable(verify_llama_cpp verify_llama_cpp.cpp)
     target_link_libraries(verify_llama_cpp PRIVATE ai_learning)
     target_include_directories(verify_llama_cpp PRIVATE include)
+
+    add_executable(compare_embeddings compare_embeddings.cpp)
+    target_link_libraries(compare_embeddings PRIVATE ai_learning)
+    target_include_directories(compare_embeddings PRIVATE include)
 endif()

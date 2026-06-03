@@ -586,7 +586,8 @@ inline void mat_vec(...) {
 | **H.1** | Embedding 接口 + LlamaCppEmbeddingProvider | `c9e3a82` IEmbeddingProvider + Learner 条件加载 |
 | **H.2** | 对话后端 + LlamaCppLLMProvider | `2f5aac5` ILLMProvider 实现 + `--llm-model` CLI |
 | **H.3** | 推理增强（UnifiedReasoningEngine 神经增强）| `55ae844` LLM 语义推理补充符号推理 |
-| **H.4** | 三阶段验证（Qwen2.5-3B）| `NEW` Embedding + Dialog + Reasoning 实测通过 |
+| **H.4** | 三阶段验证（Qwen2.5-3B）| `3e382fe` Embedding + Dialog + Reasoning 实测通过 |
+| **H.5** | bge-small-zh-v1.5 embedding 模型 | `NEW` 15MB Q4_K_M，判别能力 gap +0.26 vs Qwen -0.02 |
 
 ### 8.4 技术债务修复状态
 

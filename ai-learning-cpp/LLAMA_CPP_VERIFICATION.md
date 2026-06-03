@@ -34,8 +34,20 @@
 
 ### 分析
 - AI 相关词之间的相似度 (0.86) > AI 与水果的相似度 (0.85)，语义方向正确
-- Qwen 的隐藏层状态作为 embedding 可用，但效果不如专门模型 (bge-small-zh)
-- 生产环境建议下载 bge-small-zh-v1.5 Q4 专用 embedding 模型
+- Qwen 的隐藏层状态作为 embedding **效果很差**：discrimination gap = **-0.02**（不相似对反而得分更高）
+- **bge-small-zh-v1.5 Q4_K_M 远优于 Qwen**：discrimination gap = **+0.26**
+- 生产环境**强烈建议**使用 bge-small-zh-v1.5 Q4_K_M（15MB）作为 embedding 模型
+
+---
+
+## Phase 1.5: Embedding 质量对比 (Qwen vs bge-small-zh)
+
+| 模型 | 相似对均值 | 不相似对均值 | **判别间隙** | 评价 |
+|------|-----------|-------------|-------------|------|
+| Qwen2.5-3B-Instruct | 0.966 | 0.983 | **-0.017** | 无判别能力（不相似反而更高） |
+| **bge-small-zh-v1.5 Q4_K_M** | 0.540 | 0.280 | **+0.260** | 优秀判别能力 |
+
+**结论**: Qwen 作为生成模型，其隐藏层状态不适合做语义嵌入。bge-small-zh-v1.5 是专门的嵌入模型，判别能力显著优于 Qwen。
 
 ---
 
