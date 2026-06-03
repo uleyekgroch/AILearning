@@ -198,6 +198,18 @@ auto learner3 = ai_learning::core::LearnerFactory::create_with_engine(
 | **mlp** | 2 | 否 | SGD 反向传播 | 标准深度学习基线 |
 | **light** | 1 | 否 | Hebbian | 快速、轻量、嵌入式 |
 
+**性能基准（WSL, CPU-only）：**
+
+| 引擎 | predict(ns) | learn(ns) | ops/sec (obs=128) |
+|------|-------------|-----------|-------------------|
+| PC | 5,543 | 501,480 | 2,082 |
+| MLP | 5,626 | 12,368 | 40,855 |
+| Light | 7,803 | 13,661 | 40,022 |
+
+> PC 因迭代推理（3-10 步收敛）比 MLP/Light 慢 ~20-240x，适合需要精化预测的场景；
+> MLP 与 Light 吞吐量在同一量级，Light 结构更简单，MLP 双层表达力更强。
+> 运行 `./ai_learning_benchmark_engines` 获取完整数据。
+
 #### Windows (MinGW)
 
 ```powershell

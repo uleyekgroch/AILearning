@@ -78,8 +78,10 @@ auto LightPredictiveEngine::learn(
     if (!std::isfinite(error)) error = 10.0f;
 
     // 反向误差传播到隐藏层
+    // W2 是 row-major (obs_dim × hidden_dim)
+    // vec_mat(eps_out, w2_.data, w2_.rows, w2_.cols) 正确计算 W2^T · eps_out
     auto relu_d = tensor_relu_deriv(z1);
-    auto feedback = vec_mat(eps_out, w2_.data, w2_.cols, w2_.rows);
+    auto feedback = vec_mat(eps_out, w2_.data, w2_.rows, w2_.cols);
     auto eps_h = tensor_mul(feedback, relu_d);
 
     // Hebbian 更新

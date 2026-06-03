@@ -91,13 +91,19 @@ auto MLPForwardEngine::learn(
 
     // 反向传播
     // δ2 = (W3^T · δ3) ⊙ relu'(z2)
+    // W3 是 row-major (obs_dim × hidden2_dim)
+    // vec_mat(vec, mat, cols, rows): result[r] = sum_c vec[c] * mat[c*rows + r]
+    // 令 cols=w3_.rows (=obs_dim), rows=w3_.cols (=hidden2_dim)
+    // 则 mat[c*rows + r] = w3_.data[c*w3_.cols + r] = W3[c,r] 正确
     auto relu_d2 = tensor_relu_deriv(f.z2);
-    auto delta3_w3 = vec_mat(delta3, w3_.data, w3_.cols, w3_.rows);
+    auto delta3_w3 = vec_mat(delta3, w3_.data, w3_.rows, w3_.cols);
     auto delta2 = tensor_mul(delta3_w3, relu_d2);
 
     // δ1 = (W2^T · δ2) ⊙ relu'(z1)
+    // W2 是 row-major (hidden2_dim × hidden1_dim)
+    // 同理: cols=w2_.rows, rows=w2_.cols
     auto relu_d1 = tensor_relu_deriv(f.z1);
-    auto delta2_w2 = vec_mat(delta2, w2_.data, w2_.cols, w2_.rows);
+    auto delta2_w2 = vec_mat(delta2, w2_.data, w2_.rows, w2_.cols);
     auto delta1 = tensor_mul(delta2_w2, relu_d1);
 
     // 权重更新（SGD）

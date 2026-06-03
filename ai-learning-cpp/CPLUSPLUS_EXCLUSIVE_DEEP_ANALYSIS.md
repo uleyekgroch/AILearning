@@ -571,7 +571,7 @@ inline void mat_vec(...) {
 | **P0** | Tensor 类型安全 | **已完成** | `Matrix` 结构体内嵌 rows/cols + 运行时 assert 检查 |
 | **P1** | 性能基础设施 | **已完成** | Eigen 加速 mat_vec/mat_vec_bias（≥2048 元素） |
 
-### 8.3 已完成行动（Phase A-D）
+### 8.3 已完成行动（Phase A-G）
 
 | Phase | 内容 | 关键提交 |
 |-------|------|----------|
@@ -579,6 +579,9 @@ inline void mat_vec(...) {
 | **B** | Eigen 加速 | `cca55c5` mat_vec/mat_vec_bias Eigen 路径（≥64×32） |
 | **C** | 类型安全 Matrix | `8baf7d6` Matrix 结构体 + 运行时维度检查 |
 | **D** | 引擎扩展 | `63d0d04` MLPForwardEngine + LightPredictiveEngine + 工厂运行时选择 |
+| **E** | 测试补充 + 文档 | `7899548` Matrix 边界测试 + README 引擎选择 |
+| **F** | REST API 引擎暴露 | `aff8f1a` `--engine` CLI + `/api/health` `engine_type` |
+| **G** | 性能基准对比 | `aff8f1a+` benchmark_engines + `vec_mat` 维度 bug 修复 |
 
 ### 8.4 技术债务修复状态
 
@@ -591,12 +594,36 @@ inline void mat_vec(...) {
 | 债务6：事件发布器裸指针 | **已修复** | `std::weak_ptr<IEventPublisher>` 替换裸指针 |
 | 债务8：UTF-8 重复代码 | **已修复** | `utils/utf8.hpp` 统一提取 |
 
-### 8.5 下一步行动
+### 8.5 引擎性能基准（WSL Ubuntu-22.04, CPU-only）
 
-1. **Week 1**：Phase E 文档完善 + 测试补充（Matrix 边界测试）
-2. **Week 2-3**：REST API 暴露引擎选择端点
-3. **Month 2**：三种引擎 head-to-head 基准对比（速度/收敛/泛化）
-4. **Month 3**：语义理解层（llama.cpp 集成评估）
+运行：`./ai_learning_benchmark_engines`
+
+**Small Network (obs=16, action=4):**
+
+| Engine | predict(ns) | learn(ns) | throughput(ops/sec) |
+|--------|-------------|-----------|---------------------|
+| PC     | 1,335       | 216,116   | 3,575               |
+| MLP    | 1,755       | 3,420     | 53,207              |
+| Light  | 885         | 2,023     | 55,901              |
+
+**Medium Network (obs=128, action=8):**
+
+| Engine | predict(ns) | learn(ns) | throughput(ops/sec) |
+|--------|-------------|-----------|---------------------|
+| PC     | 5,543       | 501,480   | 2,082               |
+| MLP    | 5,626       | 12,368    | 40,855              |
+| Light  | 7,803       | 13,661    | 40,022              |
+
+**结论：**
+- **PC 慢 15-240x**：迭代推理（3-10 步收敛）是瓶颈，适合需要迭代精化场景
+- **MLP ≈ Light**：两者都是单次前向，吞吐量在同一量级
+- **Light 略胜小网络**：单层结构更轻量；MLP 双层在较大网络略胜
+
+### 8.6 下一步行动
+
+1. **Month 2**：语义理解层（llama.cpp 集成评估）
+2. **Month 3**：多线程推理并行化
+3. **Q3**：CUDA 加速 MLP/Light 前向路径
 
 ---
 

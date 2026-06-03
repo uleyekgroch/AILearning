@@ -194,6 +194,9 @@ target_link_libraries(ai_learning_main PRIVATE ai_learning)
 add_executable(ai_learning_benchmark benchmark.cpp)
 target_link_libraries(ai_learning_benchmark PRIVATE ai_learning)
 
+add_executable(ai_learning_benchmark_engines benchmark_engines.cpp)
+target_link_libraries(ai_learning_benchmark_engines PRIVATE ai_learning)
+
 # ── 调试程序 ────────────────────────────────────────────────────
 add_executable(debug_main debug_main.cpp)
 target_link_libraries(debug_main PRIVATE ai_learning)
