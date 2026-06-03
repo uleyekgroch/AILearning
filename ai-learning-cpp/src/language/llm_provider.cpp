@@ -262,6 +262,153 @@ auto LlamaCppLLMProvider::complete(const std::string& prompt,
     return generate_(build_chat_prompt(prompt, system_prompt));
 }
 
+// ── KV Cache 管理 ───────────────────────────────────────────────
+
+void LlamaCppLLMProvider::clear_kv_cache() {
+    if (!ctx_) return;
+    std::lock_guard<std::mutex> lock(mutex_);
+    llama_kv_cache_clear(to_ctx(ctx_));
+    cached_prompt_.clear();
+    cached_n_prompt_ = 0;
+}
+
+auto LlamaCppLLMProvider::kv_cache_token_count() const -> int {
+    if (!ctx_) return 0;
+    return llama_kv_cache_seq_pos_max(to_ctx(ctx_), 0);
+}
+
+auto LlamaCppLLMProvider::prefill(const std::string& prompt) -> int {
+    if (!ctx_ || !model_) return -1;
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    const int n_ctx = llama_n_ctx(to_ctx(ctx_));
+    std::vector<llama_token> prompt_tokens(n_ctx);
+    const int n_prompt = llama_tokenize(
+        to_model(model_), prompt.c_str(), static_cast<int>(prompt.size()),
+        prompt_tokens.data(), static_cast<int>(prompt_tokens.size()),
+        true, false);
+    if (n_prompt < 0) return -1;
+    prompt_tokens.resize(n_prompt);
+
+    llama_batch batch = llama_batch_init(n_prompt, 0, 1);
+    for (int i = 0; i < n_prompt; ++i) {
+        batch.token[i] = prompt_tokens[i];
+        batch.pos[i] = i;
+        batch.n_seq_id[i] = 1;
+        batch.seq_id[i][0] = 0;
+        batch.logits[i] = 0;
+    }
+    batch.logits[n_prompt - 1] = 1;
+    batch.n_tokens = n_prompt;
+
+    if (llama_decode(to_ctx(ctx_), batch) != 0) {
+        llama_batch_free(batch);
+        return -1;
+    }
+    llama_batch_free(batch);
+
+    cached_prompt_ = prompt;
+    cached_n_prompt_ = n_prompt;
+    return n_prompt;
+}
+
+auto LlamaCppLLMProvider::generate_from_cache(int max_tokens) -> std::string {
+    if (!ctx_ || !model_) return "[llama.cpp not initialized]";
+    if (cached_n_prompt_ == 0) return "[no prefill cache]";
+    std::lock_guard<std::mutex> lock(mutex_);
+    return generate_from_cache_();
+}
+
+auto LlamaCppLLMProvider::generate_from_cache_() -> std::string {
+    // Sampler
+    llama_sampler* smpl = llama_sampler_chain_init({});
+    llama_sampler_chain_add(smpl, llama_sampler_init_top_k(40));
+    llama_sampler_chain_add(smpl, llama_sampler_init_top_p(0.9f, 1));
+    llama_sampler_chain_add(smpl, llama_sampler_init_temp(temperature_));
+    llama_sampler_chain_add(smpl, llama_sampler_init_dist(42));
+
+    std::string result;
+    int n_cur = cached_n_prompt_;
+    const int gen_limit = max_tokens_;
+
+    for (int i = 0; i < gen_limit; ++i) {
+        const llama_token next = llama_sampler_sample(smpl, to_ctx(ctx_), -1);
+        if (llama_token_is_eog(to_model(model_), next)) break;
+
+        char buf[32];
+        const int n = llama_token_to_piece(
+            to_model(model_), next, buf, sizeof(buf), 0, true);
+        if (n > 0) result.append(buf, n);
+
+        llama_batch b = llama_batch_init(1, 0, 1);
+        b.token[0] = next;
+        b.pos[0] = n_cur++;
+        b.n_seq_id[0] = 1;
+        b.seq_id[0][0] = 0;
+        b.logits[0] = 1;
+        b.n_tokens = 1;
+
+        if (llama_decode(to_ctx(ctx_), b) != 0) {
+            llama_batch_free(b);
+            break;
+        }
+        llama_batch_free(b);
+    }
+
+    llama_sampler_free(smpl);
+    return result;
+}
+
+// ── 批量推理 ──────────────────────────────────────────────────────
+
+auto LlamaCppLLMProvider::complete_batch(
+    const std::vector<std::string>& prompts,
+    const std::vector<std::string>& system_prompts)
+    -> std::vector<std::string> {
+    if (!ctx_ || !model_) {
+        return std::vector<std::string>(prompts.size(),
+            "[llama.cpp not initialized]");
+    }
+
+    std::vector<std::string> results;
+    results.reserve(prompts.size());
+
+    for (size_t i = 0; i < prompts.size(); ++i) {
+        const std::string& sys = (i < system_prompts.size())
+            ? system_prompts[i] : "";
+        results.push_back(complete(prompts[i], sys));
+    }
+    return results;
+}
+
+// ── 投机解码（文档占位）───────────────────────────────────────────
+
+void LlamaCppLLMProvider::enable_speculative_decoding(
+    const std::string& draft_model_path, int n_draft_tokens) {
+    // 占位符：未来接入 llama.cpp 的 llama_decode_speculative() 或自定义草稿循环
+    // 原理：
+    //   1. 加载小型草稿模型（如 Qwen2.5-0.5B）
+    //   2. 每步先用草稿模型预测 n 个 token
+    //   3. 主模型并行验证（一次 decode n 个 token）
+    //   4. 接受匹配的部分，拒绝后回退到主模型生成
+    // 参考：llama.cpp examples/speculative/
+    (void)draft_model_path;
+    (void)n_draft_tokens;
+}
+
+void LlamaCppLLMProvider::disable_speculative_decoding() {
+    if (speculative_draft_model_) {
+        llama_free_model(static_cast<llama_model*>(speculative_draft_model_));
+        speculative_draft_model_ = nullptr;
+    }
+    if (speculative_draft_ctx_) {
+        llama_free(static_cast<llama_context*>(speculative_draft_ctx_));
+        speculative_draft_ctx_ = nullptr;
+    }
+}
+
+// ── 核心生成逻辑 ──────────────────────────────────────────────────
+
 auto LlamaCppLLMProvider::generate_(const std::string& full_prompt)
     -> std::string {
     // ── Tokenize prompt ─────────────────────────────────────────
@@ -299,51 +446,10 @@ auto LlamaCppLLMProvider::generate_(const std::string& full_prompt)
     }
     llama_batch_free(batch);
 
-    // ── Build sampler chain ─────────────────────────────────────
-    llama_sampler* smpl = llama_sampler_chain_init({});
-    llama_sampler_chain_add(smpl, llama_sampler_init_top_k(40));
-    llama_sampler_chain_add(smpl, llama_sampler_init_top_p(0.9f, 1));
-    llama_sampler_chain_add(smpl, llama_sampler_init_temp(temperature_));
-    llama_sampler_chain_add(smpl, llama_sampler_init_dist(42));
+    cached_prompt_ = full_prompt;
+    cached_n_prompt_ = n_prompt;
 
-    // ── Generation loop ─────────────────────────────────────────
-    std::string result;
-    int n_cur = n_prompt;
-
-    for (int i = 0; i < max_tokens_; ++i) {
-        const llama_token next = llama_sampler_sample(smpl, to_ctx(ctx_), -1);
-
-        // Check end-of-generation
-        if (llama_token_is_eog(to_model(model_), next)) {
-            break;
-        }
-
-        // Detokenize
-        char buf[32];
-        const int n = llama_token_to_piece(
-            to_model(model_), next, buf, sizeof(buf), 0, true);
-        if (n > 0) {
-            result.append(buf, n);
-        }
-
-        // Decode next token
-        llama_batch b = llama_batch_init(1, 0, 1);
-        b.token[0] = next;
-        b.pos[0] = n_cur++;
-        b.n_seq_id[0] = 1;
-        b.seq_id[0][0] = 0;
-        b.logits[0] = 1;
-        b.n_tokens = 1;
-
-        if (llama_decode(to_ctx(ctx_), b) != 0) {
-            llama_batch_free(b);
-            break;
-        }
-        llama_batch_free(b);
-    }
-
-    llama_sampler_free(smpl);
-    return result;
+    return generate_from_cache_();
 }
 
 #endif  // AI_LEARNING_WITH_LLAMA_CPP

@@ -593,12 +593,15 @@ inline void mat_vec(...) {
 | **H.8** | CUDA 后端修复（WSL + RTX 4060） | `ece703d` 修复 CMake CUDA 检测，llama.cpp GGML_CUDA=ON，sm_89 架构 |
 | **I.1** | CI/CD 自动化 (GitHub Actions) | `7c9af2e` Linux/Windows 构建矩阵 + 缓存 + 代码行数限制检查 |
 | **I.3** | 模型自动下载脚本 | `496b11c` `download_models.sh` + `download_models.ps1`，镜像回退 + 断点续传 |
+| **J.1** | 推理性能优化 | `NEW` KV Cache 复用(prefill/generate_from_cache) + 批量推理 + 投机解码占位 |
 | **J.2** | REST API 完善 | `396a929` 健康检查(/health/live/ready) + OpenAPI + RateLimiter 中间件类 |
 | **J.3** | 监控与可观测性 | `463d3d5` 延迟百分位(P50/P95/P99) + GPU显存监控 + 结构化日志 + Prometheus指标 |
 | **K.1** | 多模态扩展（图像感知） | `4e8807e` IImageEncoder接口 + Stub实现 + /api/perceive/image端点 |
 | **K.1+** | CLIP 真实编码器 | `c643569` OnnxClipImageEncoder (ONNX Runtime) + stb_image预处理 + 自动回退Stub |
-| **K.1++** | 音频/语音模态 | `NEW` IModalEncoder通用接口 + IAudioEncoder + StubAudioEncoder + /api/perceive/audio |
+| **K.1++** | 音频/语音模态 | `a82d2ec` IModalEncoder通用接口 + IAudioEncoder + StubAudioEncoder + /api/perceive/audio |
 | **K.2** | 知识图谱可视化 | `716ea78` GraphML/Cytoscape/D3导出 + /api/knowledge/* + D3.js交互页面 |
+| **K.3** | 模型量化 | `NEW` GGUF 量化工具脚本 + /api/model/quantize/info + 8种量化类型参考 |
+| **L.1** | 分布式推理集群 | `NEW` InferenceCluster轮询负载均衡 + 节点注册/心跳/统计 + /api/cluster/* |
 
 ### 8.4 技术债务修复状态
 
@@ -644,12 +647,15 @@ inline void mat_vec(...) {
 4. ~~Q3：llama.cpp GPU offload~~ — **已完成** (`87d3db2` + `ece703d`)
 5. **I.3**：模型自动下载脚本 — **已完成** (`496b11c`)
 6. **I.1**：CI/CD 自动化 — **已完成** (`7c9af2e`)
-7. **J.2**：REST API 完善 — **已完成** (`396a929`)
-8. **J.3**：监控与可观测性 — **已完成** (`463d3d5`)
-9. **K.1**：多模态扩展（图像感知） — **已完成** (`4e8807e`)
-10. **K.1+**：CLIP 真实编码器 — **已完成** (`c643569`)
-11. **K.1++**：音频/语音模态 — **已完成** (IModalEncoder + IAudioEncoder + Stub + /api/perceive/audio)
-12. **K.2**：知识图谱可视化 — **已完成** (`716ea78`)
+7. **J.1**：推理性能优化 — **已完成** (KV Cache 复用 + 批量推理 + 投机解码占位)
+8. **J.2**：REST API 完善 — **已完成** (`396a929`)
+9. **J.3**：监控与可观测性 — **已完成** (`463d3d5`)
+10. **K.1**：多模态扩展（图像感知） — **已完成** (`4e8807e`)
+11. **K.1+**：CLIP 真实编码器 — **已完成** (`c643569`)
+12. **K.1++**：音频/语音模态 — **已完成** (`a82d2ec`)
+13. **K.2**：知识图谱可视化 — **已完成** (`716ea78`)
+14. **K.3**：模型量化 — **已完成** (GGUF 量化工具 + 8种类型参考)
+15. **L.1**：分布式推理集群 — **已完成** (InferenceCluster + 轮询负载均衡)
 
 ---
 

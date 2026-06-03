@@ -4,24 +4,25 @@
     自动下载推荐的 llama.cpp 预训练模型 (Windows PowerShell)
 
 .DESCRIPTION
-    下载 bge-small-zh-v1.5 和 Qwen2.5-3B-Instruct GGUF 模型文件。
+    下载 bge-small-zh-v1.5、Qwen2.5-3B-Instruct GGUF 和 CLIP ONNX 模型文件。
     支持断点续传和镜像回退。
 
 .PARAMETER Dir
     模型下载目录 (默认: ../models)
 
 .PARAMETER Model
-    仅下载指定类型: embedding | llm | all (默认: all)
+    仅下载指定类型: embedding | llm | clip | all (默认: all)
 
 .EXAMPLE
     .\download_models.ps1
     .\download_models.ps1 -Model embedding
+    .\download_models.ps1 -Model clip
     .\download_models.ps1 -Dir "C:\Models"
 #>
 [CmdletBinding()]
 param(
     [string]$Dir = (Join-Path $PSScriptRoot "..\models"),
-    [ValidateSet("all", "embedding", "llm")]
+    [ValidateSet("all", "embedding", "llm", "clip")]
     [string]$Model = "all"
 )
 
@@ -42,6 +43,14 @@ $Models = @{
         PrimaryUrl = "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q4_k_m.gguf"
         FallbackUrl = "https://hf-mirror.com/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q4_k_m.gguf"
         FileName = "qwen2.5-3b-instruct-q4_k_m.gguf"
+    }
+    clip = @{
+        Name = "CLIP ViT-B/32 Image Encoder ONNX"
+        Purpose = "Vision encoding for multimodal perception"
+        Size = "~330 MB"
+        PrimaryUrl = "https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/onnx/model.onnx"
+        FallbackUrl = "https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/onnx/model.onnx"
+        FileName = "clip-vit-base-patch32.onnx"
     }
 }
 
@@ -151,6 +160,17 @@ if ($Model -eq "all" -or $Model -eq "llm") {
     Write-Host ""
 }
 
+if ($Model -eq "all" -or $Model -eq "clip") {
+    Write-Info "========================================"
+    Write-Info "Model: $($Models.clip.Name)"
+    Write-Info "Purpose: $($Models.clip.Purpose) ($($Models.clip.Size))"
+    Write-Info "========================================"
+    Write-Warn "Requires: cmake -DAI_LEARNING_WITH_ONNX=ON"
+    Write-Warn "This is a large file (~330MB). Download may take a few minutes."
+    if (-not (Download-WithFallback $Models.clip)) { $failed++ }
+    Write-Host ""
+}
+
 # ── 摘要 ────────────────────────────────────────────────────────
 Write-Host ""
 Write-Info "========================================"
@@ -158,6 +178,9 @@ Write-Info "Download Summary"
 Write-Info "========================================"
 
 Get-ChildItem $Dir -Filter "*.gguf" -ErrorAction SilentlyContinue | ForEach-Object {
+    Write-OK "$($_.Name): $([math]::Round($_.Length / 1MB, 2)) MB"
+}
+Get-ChildItem $Dir -Filter "*.onnx" -ErrorAction SilentlyContinue | ForEach-Object {
     Write-OK "$($_.Name): $([math]::Round($_.Length / 1MB, 2)) MB"
 }
 
@@ -168,6 +191,10 @@ if ($failed -eq 0) {
     Write-Info "Next steps:"
     Write-Host "  .\verify_llama_cpp.exe $Dir\qwen2.5-3b-instruct-q4_k_m.gguf"
     Write-Host "  .\ai_learning_server.exe --llm-model $Dir\qwen2.5-3b-instruct-q4_k_m.gguf"
+    if (Test-Path (Join-Path $Dir "clip-vit-base-patch32.onnx")) {
+        Write-Host "  cmake -DAI_LEARNING_WITH_ONNX=ON .. && cmake --build ."
+        Write-Host "  .\ai_learning_server.exe  # auto-detects CLIP model"
+    }
     exit 0
 } else {
     Write-Err "$failed download(s) failed."

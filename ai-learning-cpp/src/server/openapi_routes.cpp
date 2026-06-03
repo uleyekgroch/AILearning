@@ -39,6 +39,9 @@ static auto make_openapi_spec_(const ai_learning::server::ServerConfig& config) 
         {{"name", "Memory"}, {"description", "记忆系统"}},
         {{"name", "Dialog"}, {"description", "对话与聊天"}},
         {{"name", "Knowledge"}, {"description", "知识图谱可视化（K.2）"}},
+        {{"name", "Inference"}, {"description", "推理性能优化（J.1）"}},
+        {{"name", "Model"}, {"description", "模型量化（K.3）"}},
+        {{"name", "Cluster"}, {"description", "分布式推理集群（L.1）"}},
         {{"name", "Goals"}, {"description", "目标管理"}},
         {{"name", "Society"}, {"description", "多 Agent 社会"}},
         {{"name", "Runtime"}, {"description", "运行时控制"}},
@@ -403,6 +406,92 @@ static auto make_openapi_spec_(const ai_learning::server::ServerConfig& config) 
             {"tags", json::array({"Runtime"})},
             {"summary", "停止持续学习循环"},
             {"responses", {{"200", {{"description", "停止结果"}}}}}
+        }}
+    };
+
+    // Inference (J.1)
+    paths["/api/inference/kv-cache/clear"] = {
+        {"post", {
+            {"tags", json::array({"Inference"})},
+            {"summary", "清除 KV cache"},
+            {"description", "清除 llama.cpp 的 KV cache，用于新对话开始"},
+            {"responses", {{"200", {{"description", "清除成功"}}}}}
+        }}
+    };
+    paths["/api/inference/kv-cache/stats"] = {
+        {"get", {
+            {"tags", json::array({"Inference"})},
+            {"summary", "KV cache 统计"},
+            {"responses", {{"200", {{"description", "KV cache 状态和投机解码配置"}}}}}
+        }}
+    };
+    paths["/api/inference/batch"] = {
+        {"post", {
+            {"tags", json::array({"Inference"})},
+            {"summary", "批量推理"},
+            {"description", "同时处理多个 prompt，共享模型加载开销"},
+            {"requestBody", {
+                {"required", true},
+                {"content", {{"application/json", {
+                    {"schema", {{"type", "object"}, {"properties", {
+                        {"prompts", {{"type", "array"}, {"items", {{"type", "string"}}}}},
+                        {"system_prompts", {{"type", "array"}, {"items", {{"type", "string"}}}}}
+                    }}, {"required", json::array({"prompts"})}}}
+                }}}}}
+            }},
+            {"responses", {{"200", {{"description", "批量推理结果"}}}}}
+        }}
+    };
+
+    // Model (K.3)
+    paths["/api/model/quantize/info"] = {
+        {"get", {
+            {"tags", json::array({"Model"})},
+            {"summary", "模型量化类型参考"},
+            {"description", "列出支持的 GGUF 量化类型和推荐场景"},
+            {"responses", {{"200", {{"description", "量化类型列表"}}}}}
+        }}
+    };
+
+    // Cluster (L.1)
+    paths["/api/cluster/nodes"] = {
+        {"get", {
+            {"tags", json::array({"Cluster"})},
+            {"summary", "列出集群节点"},
+            {"responses", {{"200", {{"description", "节点列表"}}}}}
+        }},
+        {"post", {
+            {"tags", json::array({"Cluster"})},
+            {"summary", "注册节点"},
+            {"requestBody", {
+                {"required", true},
+                {"content", {{"application/json", {
+                    {"schema", {{"type", "object"}, {"properties", {
+                        {"id", {{"type", "string"}}}},
+                        {"endpoint", {{"type", "string"}}}},
+                        {"gpu_info", {{"type", "string"}}}},
+                        {"max_concurrent", {{"type", "integer"}}}
+                    }}, {"required", json::array({"id", "endpoint"})}}}
+                }}}}}
+            }},
+            {"responses", {{"200", {{"description", "注册成功"}}}}}
+        }}
+    };
+    paths["/api/cluster/nodes/{id}/heartbeat"] = {
+        {"post", {
+            {"tags", json::array({"Cluster"})},
+            {"summary", "节点心跳"},
+            {"parameters", json::array({
+                {{"name", "id"}, {"in", "path"}, {"required", true}, {"schema", {{"type", "string"}}}}
+            })},
+            {"responses", {{"200", {{"description", "心跳成功"}}}}}
+        }}
+    };
+    paths["/api/cluster/stats"] = {
+        {"get", {
+            {"tags", json::array({"Cluster"})},
+            {"summary", "集群统计"},
+            {"responses", {{"200", {{"description", "集群统计信息"}}}}}
         }}
     };
 

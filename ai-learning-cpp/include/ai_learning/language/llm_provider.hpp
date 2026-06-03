@@ -117,6 +117,60 @@ public:
         return "llama_cpp";
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // J.1: KV Cache 管理（对话内复用，避免重复预填充）
+    // ═══════════════════════════════════════════════════════════════
+
+    /// 清除 KV cache（新对话开始时调用）
+    void clear_kv_cache();
+
+    /// 获取当前 KV cache 已使用的 token 数
+    [[nodiscard]] auto kv_cache_token_count() const -> int;
+
+    /// 预填充 prompt 到 KV cache（不生成），返回消耗的 token 数
+    /// 用于多轮对话：第一轮调用 complete()，后续轮调用 prefill() + generate_from_cache()
+    auto prefill(const std::string& prompt) -> int;
+
+    /// 从当前 KV cache 状态继续生成（已预填充后调用）
+    auto generate_from_cache(int max_tokens = -1) -> std::string;
+
+    // ═══════════════════════════════════════════════════════════════
+    // J.1: 批量推理（同时处理多个 prompt）
+    // ═══════════════════════════════════════════════════════════════
+
+    /// 批量补全 — 同时处理多个 prompt，共享模型加载开销
+    /// @param prompts 用户输入列表
+    /// @param system_prompts 对应系统提示词列表（可空）
+    /// @return 每个 prompt 的生成结果
+    auto complete_batch(const std::vector<std::string>& prompts,
+                        const std::vector<std::string>& system_prompts = {})
+        -> std::vector<std::string>;
+
+    // ═══════════════════════════════════════════════════════════════
+    // J.1: 配置
+    // ═══════════════════════════════════════════════════════════════
+
+    void set_max_tokens(int n) { max_tokens_ = n; }
+    void set_temperature(float t) { temperature_ = t; }
+
+    // ═══════════════════════════════════════════════════════════════
+    // J.1: 投机解码（Speculative Decoding）— 文档占位
+    // ═══════════════════════════════════════════════════════════════
+
+    /// 启用投机解码（需要草稿模型）
+    /// @param draft_model_path 小型草稿模型路径（如 Qwen2.5-0.5B）
+    /// @param n_draft_tokens 每步预测的草稿 token 数（默认 4）
+    /// @note 当前为文档占位符，未来接入 llama.cpp speculative 解码
+    void enable_speculative_decoding(const std::string& draft_model_path,
+                                      int n_draft_tokens = 4);
+
+    /// 禁用投机解码
+    void disable_speculative_decoding();
+
+    [[nodiscard]] auto speculative_decoding_enabled() const -> bool {
+        return speculative_draft_model_ != nullptr;
+    }
+
 private:
     void* model_ = nullptr;    // opaque: llama_model*
     void* ctx_ = nullptr;        // opaque: llama_context*
@@ -124,7 +178,17 @@ private:
     float temperature_ = 0.8f;
     mutable std::mutex mutex_;   // llama_context is not thread-safe
 
+    /// 当前 KV cache 中已预填充的 prompt（用于 generate_from_cache）
+    std::string cached_prompt_;
+    int cached_n_prompt_ = 0;
+
+    /// J.1: 投机解码草稿模型（文档占位）
+    void* speculative_draft_model_ = nullptr;
+    void* speculative_draft_ctx_ = nullptr;
+    int n_draft_tokens_ = 4;
+
     auto generate_(const std::string& full_prompt) -> std::string;
+    auto generate_from_cache_() -> std::string;
 };
 
 #else

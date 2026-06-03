@@ -185,6 +185,40 @@ curl -X POST http://localhost:8080/api/perceive/audio \
 # 2. 下载 CLIP 模型: ./scripts/download_models.sh --model clip
 # 3. 编译: cmake -DAI_LEARNING_WITH_ONNX=ON .. && make
 
+# 推理性能优化 (J.1)
+# 清除 KV cache（新对话开始）
+curl -X POST http://localhost:8080/api/inference/kv-cache/clear
+
+# KV cache 统计
+curl http://localhost:8080/api/inference/kv-cache/stats
+
+# 批量推理
+curl -X POST http://localhost:8080/api/inference/batch \
+  -H "Content-Type: application/json" \
+  -d '{"prompts": ["你好", "什么是AI？"], "system_prompts": ["", ""]}'
+
+# 模型量化 (K.3)
+# 查看支持的量化类型
+curl http://localhost:8080/api/model/quantize/info
+
+# 量化模型（需要 llama.cpp 的 quantize 工具）
+./scripts/quantize_model.sh model-f16.gguf model-q4.gguf q4_k_m
+
+# 分布式推理集群 (L.1)
+# 注册节点
+curl -X POST http://localhost:8080/api/cluster/nodes \
+  -H "Content-Type: application/json" \
+  -d '{"id": "gpu-0", "endpoint": "http://192.168.1.10:8080", "gpu_info": "RTX 4090"}'
+
+# 列出节点
+curl http://localhost:8080/api/cluster/nodes
+
+# 节点心跳
+curl -X POST http://localhost:8080/api/cluster/nodes/gpu-0/heartbeat
+
+# 集群统计
+curl http://localhost:8080/api/cluster/stats
+
 # 设置日志级别（DEBUG/INFO/WARN/ERROR）
 LOG_LEVEL=DEBUG ./ai_learning_server --port 8080
 
