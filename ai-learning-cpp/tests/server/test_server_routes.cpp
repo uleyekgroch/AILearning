@@ -23,6 +23,7 @@
 #include "event_adapter.hpp"
 
 #include "ai_learning/core/learner.hpp"
+#include "ai_learning/core/learner_factory.hpp"
 
 #include <crow.h>
 #include <nlohmann/json.hpp>

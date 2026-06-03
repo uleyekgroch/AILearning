@@ -22,6 +22,10 @@ if(CMAKE_CUDA_COMPILER)
     # 允许在 CUDA 代码中使用 __host__/__device__ lambda（cuda_fp16_utils.cuh 需要）
     set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --extended-lambda")
 
+    # 设置 CUDA 架构（支持 RTX 4060 Laptop 的 sm_89）
+    # 也可设为 "native" 自动检测，但 CMake 3.22 可能不支持
+    set(CMAKE_CUDA_ARCHITECTURES "89")
+
     message(STATUS "✅ CUDA enabled: ${CMAKE_CUDA_COMPILER}")
 else()
     set(CUDA_FOUND FALSE)
@@ -97,6 +101,11 @@ if(AI_LEARNING_WITH_LLAMA_CPP)
     set(LLAMA_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
     set(LLAMA_BUILD_SERVER   OFF CACHE BOOL "" FORCE)
     set(LLAMA_BUILD_COMMON   ON  CACHE BOOL "" FORCE)
+    # 自动传递 CUDA 设置给 llama.cpp
+    if(CUDA_FOUND)
+        set(GGML_CUDA ON CACHE BOOL "" FORCE)
+        message(STATUS "✅ llama.cpp CUDA backend enabled")
+    endif()
     FetchContent_Declare(
         llama_cpp
         GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git

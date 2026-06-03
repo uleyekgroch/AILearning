@@ -1,51 +1,57 @@
 # Logging Guidelines
 
-> How logging is done in this project.
+> No logging framework. Use `std::cout` / `std::cerr` with `[Tag]` prefix.
 
 ---
 
 ## Overview
 
-<!--
-Document your project's logging conventions here.
-
-Questions to answer:
-- What logging library do you use?
-- What are the log levels and when to use each?
-- What should be logged?
-- What should NOT be logged (PII, secrets)?
--->
-
-(To be filled by the team)
+This is a research prototype. Logging is ad-hoc via `std::cout` (info) and `std::cerr` (warnings/errors). No structured logging library.
 
 ---
 
-## Log Levels
+## Log Levels (by convention)
 
-<!-- When to use each level: debug, info, warn, error -->
-
-(To be filled by the team)
+| Stream | Level | When |
+|--------|-------|------|
+| `std::cout` | Info | Startup, shutdown, client connect/disconnect, CUDA ready |
+| `std::cerr` | Warn/Error | GPU alloc failure, WS send failure, model load failure |
 
 ---
 
-## Structured Logging
+## Format
 
-<!-- Log format, required fields -->
+Tagged prefix pattern: `[Component] Message`
 
-(To be filled by the team)
+```cpp
+// Server lifecycle
+std::cout << "[Server] AILearning REST API starting on port " << port << "\n";
+std::cout << "[Server] Stopped gracefully.\n";
+
+// WebSocket events
+std::cout << "[WS/events] Client connected. Total: " << count << "\n";
+std::cerr << "[WS/events] send_text failed: " << e.what() << "\n";
+
+// CUDA operations
+std::cout << "[Flash Attention] CUDA ready on " << prop.name << "\n";
+std::cerr << "[KnowledgeGraph CUDA] GPU buffer alloc failed\n";
+```
 
 ---
 
 ## What to Log
 
-<!-- Important events to log -->
-
-(To be filled by the team)
+- Server start/stop, port binding
+- WebSocket client connect/disconnect count
+- CUDA initialization success (GPU name)
+- Async task failures
+- Model loading errors
 
 ---
 
 ## What NOT to Log
 
-<!-- Sensitive data, PII, secrets -->
-
-(To be filled by the team)
+- Per-step learning data (too frequent, use WebSocket push instead)
+- Internal tensor values
+- Full JSON request/response bodies
+- Knowledge graph entity contents on every operation

@@ -1,54 +1,50 @@
 # Directory Structure
 
-> How frontend code is organized in this project.
-
----
-
-## Overview
-
-<!--
-Document your project's frontend directory structure here.
-
-Questions to answer:
-- Where do components live?
-- How are features/modules organized?
-- Where are shared utilities?
-- How are assets organized?
--->
-
-(To be filled by the team)
+> Three-file SPA. No src/ tree, no components/ directory.
 
 ---
 
 ## Directory Layout
 
 ```
-<!-- Replace with your actual structure -->
-src/
-├── ...
-└── ...
+ai-learning-cpp/web/
+├── index.html    # Template + Vue 3 + ECharts CDN imports
+├── app.js        # All application logic (setup, API, WS, chart init)
+└── style.css     # Global styles (CSS custom properties for theming)
 ```
+
+That is the entire frontend. No `node_modules/`, no `package.json`, no `vite.config.js`.
 
 ---
 
 ## Module Organization
 
-<!-- How should new features be organized? -->
+Since everything lives in `app.js` (~600 lines), logical sections are separated by comment blocks:
 
-(To be filled by the team)
+```js
+/* ── API helper ─────────────────────────────────────── */
+async function apiGet(path) { ... }
+async function apiPost(path, body = {}) { ... }
+
+/* ── Vue app ────────────────────────────────────────── */
+const app = createApp({
+  setup() {
+    // reactive state
+    // chart init functions
+    // WebSocket connection
+    // API action functions (doLearn, doReason, etc.)
+    // lifecycle hooks (onMounted, onUnmounted)
+    // return template bindings
+  }
+});
+```
 
 ---
 
 ## Naming Conventions
 
-<!-- File and folder naming rules -->
-
-(To be filled by the team)
-
----
-
-## Examples
-
-<!-- Link to well-organized modules as examples -->
-
-(To be filled by the team)
+- **Reactive state**: `camelCase` — `learnText`, `qaHistory`, `chatBusy`
+- **Action functions**: `do<Action>` — `doLearn()`, `doReason()`, `doInsight()`
+- **Fetch functions**: `fetch<Thing>` — `fetchHealth()`, `fetchStats()`
+- **Chart refs**: `<name>ChartRef` for template ref, `<name>Chart` for ECharts instance
+- **CSS**: BEM-lite with `.card`, `.card-title`, `.stat-pill`, `.stat-row`

@@ -1,51 +1,67 @@
 # Type Safety
 
-> Type safety patterns in this project.
+> No TypeScript. Type discipline via consistent naming and structure.
 
 ---
 
 ## Overview
 
-<!--
-Document your project's type safety conventions here.
-
-Questions to answer:
-- What type system do you use?
-- How are types organized?
-- What validation library do you use?
-- How do you handle type inference?
--->
-
-(To be filled by the team)
+This project has no TypeScript, no JSDoc types, no build step. Type safety comes from consistent naming conventions and matching backend JSON schemas.
 
 ---
 
 ## Type Organization
 
-<!-- Where types are defined, shared types vs local types -->
+API response shapes match the backend `dto.hpp` serialization exactly:
 
-(To be filled by the team)
+| API Endpoint | Response Shape | JS Access Pattern |
+|--------------|---------------|-------------------|
+| `GET /api/health` | `{status, version, stage, total_steps, engine_type}` | `health.value.version` |
+| `GET /api/stats` | `{key: number}` flat map | `stats.triples_count` |
+| `POST /api/learn/text` | `{entities, triples, verification_score}` | `result.entities.length` |
+| `POST /api/reason` | `[{content, confidence, method}]` | `results[0].content` |
+| `POST /api/emotion` | `{valence, arousal, dominance, label}` | `emotionState.valence` |
+| WS event | `{type, timestamp, data}` | `event.type`, `event.data` |
 
 ---
 
 ## Validation
 
-<!-- Runtime validation patterns (Zod, Yup, io-ts, etc.) -->
+No runtime validation library. Validate by checking required fields:
 
-(To be filled by the team)
+```js
+async function apiPost(path, body = {}) {
+  const r = await fetch(API + path, { ... });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+```
+
+Server-side validation is in the C++ route handlers (checks for required JSON fields).
 
 ---
 
 ## Common Patterns
 
-<!-- Type utilities, generics, type guards -->
+```js
+// Safe optional chaining for nested data
+const entityCount = result?.entities?.length ?? 0;
 
-(To be filled by the team)
+// Default values via reactive init
+const health = reactive({ status: '-', version: '-', total_steps: 0 });
+
+// Enum mapping (match backend strategy_type_to_string)
+const strategyNames = {
+  rote_memorization: 'Rote Memorization',
+  spaced_repetition: 'Spaced Repetition',
+  // ...
+};
+```
 
 ---
 
 ## Forbidden Patterns
 
-<!-- any, type assertions, etc. -->
-
-(To be filled by the team)
+- **No `as` type casts** — not available without TypeScript
+- **No runtime type checking libraries** — keep it simple
+- **Don't assume response shape** — always handle `undefined`/`null` with `?.`
