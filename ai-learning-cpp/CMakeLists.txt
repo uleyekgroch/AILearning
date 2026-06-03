@@ -116,6 +116,7 @@ list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "analogical_transfer_cuda_stub\\.c
 list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "flash_attention_cuda_stub\\.cpp$")
 list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "knowledge_graph_cuda_stub\\.cpp$")
 list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "active_experimenter_cuda_stub\\.cpp$")
+list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "embedding_trainer_cuda_stub\\.cpp$")
 list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "src/server/")
 
 if(CUDA_FOUND)
@@ -141,6 +142,7 @@ else()
     list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/flash_attention_cuda_stub.cpp")
     list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/domain/knowledge/knowledge_graph_cuda_stub.cpp")
     list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/learning/active_experimenter_cuda_stub.cpp")
+    list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/learning/embedding_trainer_cuda_stub.cpp")
 endif()
 
 add_library(ai_learning STATIC ${AI_LEARNING_SOURCES})
@@ -252,3 +254,10 @@ endif()
 add_executable(ai_learning_corpus corpus_main.cpp)
 target_link_libraries(ai_learning_corpus PRIVATE ai_learning nlohmann_json::nlohmann_json)
 target_include_directories(ai_learning_corpus PRIVATE include)
+
+# ── llama.cpp 三阶段验证 ─────────────────────────────────────────
+if(AI_LEARNING_WITH_LLAMA_CPP)
+    add_executable(verify_llama_cpp verify_llama_cpp.cpp)
+    target_link_libraries(verify_llama_cpp PRIVATE ai_learning)
+    target_include_directories(verify_llama_cpp PRIVATE include)
+endif()

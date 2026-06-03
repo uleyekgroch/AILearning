@@ -234,6 +234,13 @@ auto results = learner.reason("为什么天空是蓝色的");
 // results[0].method == "neural" (LLM 补充)
 ```
 
+**验证状态：** llama.cpp 三阶段集成已通过 Qwen2.5-3B-Instruct Q4_K_M 验证：
+- ✅ Phase 1 (Embedding): 语义相似度合理
+- ✅ Phase 2 (Dialog): 对话生成连贯
+- ✅ Phase 3 (Reasoning): 符号-神经混合推理
+
+详见 [`LLAMA_CPP_VERIFICATION.md`](ai-learning-cpp/LLAMA_CPP_VERIFICATION.md)
+
 **性能基准（WSL, CPU-only）：**
 
 | 引擎 | predict(ns) | learn(ns) | ops/sec (obs=128) |

@@ -89,8 +89,6 @@ private:
 // ── llama.cpp 本地模型提供者（可选依赖）──────────────────────────
 
 #ifdef AI_LEARNING_WITH_LLAMA_CPP
-struct llama_model;
-struct llama_context;
 
 /// llama.cpp 本地模型 LLM 提供者
 ///
@@ -118,8 +116,8 @@ public:
     }
 
 private:
-    llama_model* model_ = nullptr;
-    llama_context* ctx_ = nullptr;
+    void* model_ = nullptr;    // opaque: llama_model*
+    void* ctx_ = nullptr;        // opaque: llama_context*
     int max_tokens_ = 512;
     float temperature_ = 0.8f;
 

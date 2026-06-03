@@ -15,6 +15,11 @@
 // llama.cpp 头文件
 #include <llama.h>
 
+namespace {
+inline auto to_model(void* p) -> llama_model* { return static_cast<llama_model*>(p); }
+inline auto to_ctx(void* p)   -> llama_context* { return static_cast<llama_context*>(p); }
+} // namespace
+
 namespace ai_learning::language {
 
 // ── 构造 / 析构 ─────────────────────────────────────────────────
@@ -28,13 +33,13 @@ LlamaCppEmbeddingProvider::LlamaCppEmbeddingProvider(
     // embedding 模型通常不需要 GPU offload，保持 CPU 推理
     mparams.n_gpu_layers = 0;
 
-    model_ = llama_model_load_from_file(model_path.c_str(), mparams);
+    model_ = llama_load_model_from_file(model_path.c_str(), mparams);
     if (!model_) {
         throw std::runtime_error(
             "Failed to load llama.cpp model: " + model_path);
     }
 
-    model_n_vocab_ = llama_model_n_vocab(model_);
+    model_n_vocab_ = llama_n_vocab(to_model(model_));
 
     // 上下文参数
     auto cparams = llama_context_default_params();
@@ -43,9 +48,9 @@ LlamaCppEmbeddingProvider::LlamaCppEmbeddingProvider(
     cparams.pooling_type = LLAMA_POOLING_TYPE_MEAN;  // mean pooling
     cparams.embeddings = true;     // 启用 embedding 模式
 
-    ctx_ = llama_init_from_model(model_, cparams);
+    ctx_ = llama_new_context_with_model(to_model(model_), cparams);
     if (!ctx_) {
-        llama_model_free(model_);
+        llama_free_model(to_model(model_));
         model_ = nullptr;
         throw std::runtime_error(
             "Failed to initialize llama.cpp context");
@@ -54,11 +59,11 @@ LlamaCppEmbeddingProvider::LlamaCppEmbeddingProvider(
 
 LlamaCppEmbeddingProvider::~LlamaCppEmbeddingProvider() {
     if (ctx_) {
-        llama_free(ctx_);
+        llama_free(to_ctx(ctx_));
         ctx_ = nullptr;
     }
     if (model_) {
-        llama_model_free(model_);
+        llama_free_model(to_model(model_));
         model_ = nullptr;
     }
 }
@@ -78,8 +83,8 @@ LlamaCppEmbeddingProvider::LlamaCppEmbeddingProvider(
 LlamaCppEmbeddingProvider& LlamaCppEmbeddingProvider::operator=(
     LlamaCppEmbeddingProvider&& other) noexcept {
     if (this != &other) {
-        if (ctx_) llama_free(ctx_);
-        if (model_) llama_model_free(model_);
+        if (ctx_) llama_free(to_ctx(ctx_));
+        if (model_) llama_free_model(to_model(model_));
         model_ = other.model_;
         ctx_ = other.ctx_;
         embedding_dim_ = other.embedding_dim_;
@@ -114,12 +119,10 @@ auto LlamaCppEmbeddingProvider::embed_batch(
 auto LlamaCppEmbeddingProvider::embed_impl_(const std::string& text)
     -> std::vector<float> {
 
-    const llama_vocab* vocab = llama_model_get_vocab(model_);
-
     // Tokenize
     std::vector<llama_token> tokens(512);
     const int n_tokens = llama_tokenize(
-        vocab,
+        to_model(model_),
         text.c_str(),
         static_cast<int>(text.size()),
         tokens.data(),
@@ -133,7 +136,7 @@ auto LlamaCppEmbeddingProvider::embed_impl_(const std::string& text)
     tokens.resize(n_tokens);
 
     // 获取模型嵌入维度
-    const int model_embd_dim = llama_model_n_embd(model_);
+    const int model_embd_dim = llama_n_embd(to_model(model_));
 
     // Decode (single batch)
     llama_batch batch = llama_batch_init(n_tokens, 0, 1);
@@ -147,7 +150,7 @@ auto LlamaCppEmbeddingProvider::embed_impl_(const std::string& text)
     batch.logits[n_tokens - 1] = 1;  // 只在最后位置取 embedding
     batch.n_tokens = n_tokens;
 
-    const int decode_ok = llama_decode(ctx_, batch);
+    const int decode_ok = llama_decode(to_ctx(ctx_), batch);
     llama_batch_free(batch);
 
     if (decode_ok != 0) {
@@ -155,10 +158,10 @@ auto LlamaCppEmbeddingProvider::embed_impl_(const std::string& text)
     }
 
     // 获取 embeddings (mean pooling)
-    const float* emb = llama_get_embeddings_seq(ctx_, 0);
+    const float* emb = llama_get_embeddings_seq(to_ctx(ctx_), 0);
     if (!emb) {
         // 回退到上下文级 embedding
-        emb = llama_get_embeddings(ctx_);
+        emb = llama_get_embeddings(to_ctx(ctx_));
     }
     if (!emb) {
         return std::vector<float>(embedding_dim_, 0.0f);

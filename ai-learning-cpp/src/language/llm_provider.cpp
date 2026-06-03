@@ -176,6 +176,10 @@ auto OpenAICompatibleProvider::exec_curl_(const std::string& url,
 #ifdef AI_LEARNING_WITH_LLAMA_CPP
 
 #include <llama.h>
+namespace {
+inline auto to_model(void* p) -> llama_model* { return static_cast<llama_model*>(p); }
+inline auto to_ctx(void* p)   -> llama_context* { return static_cast<llama_context*>(p); }
+} // namespace
 
 namespace {
 
@@ -196,7 +200,7 @@ LlamaCppLLMProvider::LlamaCppLLMProvider(const std::string& model_path)
     auto mparams = llama_model_default_params();
     mparams.n_gpu_layers = 0;  // CPU-only for compatibility
 
-    model_ = llama_model_load_from_file(model_path.c_str(), mparams);
+    model_ = llama_load_model_from_file(model_path.c_str(), mparams);
     if (!model_) {
         throw std::runtime_error(
             "Failed to load llama.cpp model: " + model_path);
@@ -206,9 +210,9 @@ LlamaCppLLMProvider::LlamaCppLLMProvider(const std::string& model_path)
     cparams.n_ctx = 4096;
     cparams.n_batch = 512;
 
-    ctx_ = llama_init_from_model(model_, cparams);
+    ctx_ = llama_new_context_with_model(to_model(model_), cparams);
     if (!ctx_) {
-        llama_model_free(model_);
+        llama_free_model(to_model(model_));
         model_ = nullptr;
         throw std::runtime_error(
             "Failed to initialize llama.cpp context");
@@ -217,11 +221,11 @@ LlamaCppLLMProvider::LlamaCppLLMProvider(const std::string& model_path)
 
 LlamaCppLLMProvider::~LlamaCppLLMProvider() {
     if (ctx_) {
-        llama_free(ctx_);
+        llama_free(to_ctx(ctx_));
         ctx_ = nullptr;
     }
     if (model_) {
-        llama_model_free(model_);
+        llama_free_model(to_model(model_));
         model_ = nullptr;
     }
 }
@@ -236,8 +240,8 @@ LlamaCppLLMProvider::LlamaCppLLMProvider(LlamaCppLLMProvider&& other) noexcept
 LlamaCppLLMProvider& LlamaCppLLMProvider::operator=(
     LlamaCppLLMProvider&& other) noexcept {
     if (this != &other) {
-        if (ctx_) llama_free(ctx_);
-        if (model_) llama_model_free(model_);
+        if (ctx_) llama_free(to_ctx(ctx_));
+        if (model_) llama_free_model(to_model(model_));
         model_ = other.model_;
         ctx_ = other.ctx_;
         max_tokens_ = other.max_tokens_;
@@ -257,13 +261,11 @@ auto LlamaCppLLMProvider::complete(const std::string& prompt,
 
 auto LlamaCppLLMProvider::generate_(const std::string& full_prompt)
     -> std::string {
-    const llama_vocab* vocab = llama_model_get_vocab(model_);
-
     // ── Tokenize prompt ─────────────────────────────────────────
-    const int n_ctx = llama_n_ctx(ctx_);
+    const int n_ctx = llama_n_ctx(to_ctx(ctx_));
     std::vector<llama_token> prompt_tokens(n_ctx);
     const int n_prompt = llama_tokenize(
-        vocab,
+        to_model(model_),
         full_prompt.c_str(),
         static_cast<int>(full_prompt.size()),
         prompt_tokens.data(),
@@ -288,7 +290,7 @@ auto LlamaCppLLMProvider::generate_(const std::string& full_prompt)
     batch.logits[n_prompt - 1] = 1;  // 只在最后位置计算 logits
     batch.n_tokens = n_prompt;
 
-    if (llama_decode(ctx_, batch) != 0) {
+    if (llama_decode(to_ctx(ctx_), batch) != 0) {
         llama_batch_free(batch);
         return "[decode failed]";
     }
@@ -306,17 +308,17 @@ auto LlamaCppLLMProvider::generate_(const std::string& full_prompt)
     int n_cur = n_prompt;
 
     for (int i = 0; i < max_tokens_; ++i) {
-        const llama_token next = llama_sampler_sample(smpl, ctx_, -1);
+        const llama_token next = llama_sampler_sample(smpl, to_ctx(ctx_), -1);
 
         // Check end-of-generation
-        if (llama_token_is_eog(vocab, next)) {
+        if (llama_token_is_eog(to_model(model_), next)) {
             break;
         }
 
         // Detokenize
         char buf[32];
         const int n = llama_token_to_piece(
-            vocab, next, buf, sizeof(buf), 0, true);
+            to_model(model_), next, buf, sizeof(buf), 0, true);
         if (n > 0) {
             result.append(buf, n);
         }
@@ -330,7 +332,7 @@ auto LlamaCppLLMProvider::generate_(const std::string& full_prompt)
         b.logits[0] = 1;
         b.n_tokens = 1;
 
-        if (llama_decode(ctx_, b) != 0) {
+        if (llama_decode(to_ctx(ctx_), b) != 0) {
             llama_batch_free(b);
             break;
         }

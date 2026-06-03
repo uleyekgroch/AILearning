@@ -23,10 +23,6 @@ namespace ai_learning::language {
 
 #ifdef AI_LEARNING_WITH_LLAMA_CPP
 
-// 前向声明 llama.cpp 类型（避免在头文件中暴露 llama.h）
-struct llama_model;
-struct llama_context;
-
 /// llama.cpp 嵌入提供者
 class LlamaCppEmbeddingProvider : public IEmbeddingProvider {
 public:
@@ -53,8 +49,8 @@ public:
     [[nodiscard]] auto is_available() const -> bool override { return ctx_ != nullptr; }
 
 private:
-    llama_model* model_ = nullptr;
-    llama_context* ctx_ = nullptr;
+    void* model_ = nullptr;   // opaque: llama_model*
+    void* ctx_ = nullptr;       // opaque: llama_context*
     int embedding_dim_ = 512;
     int model_n_vocab_ = 0;
 
