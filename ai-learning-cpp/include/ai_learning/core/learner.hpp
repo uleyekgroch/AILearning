@@ -52,6 +52,7 @@
 #include "ai_learning/learning/meta_learner.hpp"
 #include "ai_learning/learning/active_experimenter.hpp"
 #include "ai_learning/learning/integrated_learner.hpp"
+#include "ai_learning/goals/goal_manager.hpp"
 
 #include <chrono>
 #include <deque>
@@ -416,10 +417,21 @@ public:
     [[nodiscard]] auto integrated()
         -> learning::IntegratedLearner& { return integrated_; }
 
+    // ── 目标系统 ──────────────────────────────────────────────────
+
+    /// 访问目标管理器
+    [[nodiscard]] auto goal_manager()
+        -> goals::GoalManager& { return goal_manager_; }
+    [[nodiscard]] auto goal_manager() const
+        -> const goals::GoalManager& { return goal_manager_; }
+
 private:
     /// 检查晋升条件
     [[nodiscard]] auto check_promotion_(
         const std::map<std::string, double>& evaluation) const -> bool;
+
+    /// PC 嵌入预测学习
+    void learn_predictive_(const std::vector<std::string>& tokens);
 
     // 配置
     LearnerConfig config_;
@@ -475,12 +487,16 @@ private:
     // Phase 6：深度整合
     learning::IntegratedLearner         integrated_;
 
+    // 目标系统
+    goals::GoalManager                  goal_manager_;
+
     // 发展状态
     std::string stage_;
     int stage_index_ = 0;
 
     // 统计
     int total_steps_ = 0;
+    int pc_steps_ = 0;  // PC 学习累计步数
     std::deque<float> error_history_;
 
     // 能力评估

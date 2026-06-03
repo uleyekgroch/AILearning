@@ -279,6 +279,8 @@ int main(int argc, char* argv[]) {
     config.embedding_learning_enabled = true;
     config.embedding_train_interval = 2;
     config.embedding_epochs = 3;
+    config.embedding_predictive_learning = true;
+    config.pc_max_steps_per_text = 30;
     Learner learner(config);
 
     LearningStats stats;

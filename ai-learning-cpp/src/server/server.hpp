@@ -4,41 +4,33 @@
  *
  * 设计原则：
  * - 持有一个 Learner 引用（不拥有）
- * - 路由注册集中管理
+ * - 路由注册委托到 route_groups 中的各注册函数
  * - 优雅关闭（信号处理）
- * - 异步任务管理（长时间操作不阻塞服务）
- * - Phase 7.4: WebSocket 实时事件推送
+ * - WebSocket 实时事件推送
+ * - 静态文件服务（Web Console）
+ *
+ * 路由实现文件：
+ * - core_routes.cpp      系统 + 核心学习端点
+ * - advanced_routes.cpp  Phase 3-6 高级认知端点
+ * - society_routes.cpp   Phase 9 多 Agent 社会端点
+ * - chat_routes.cpp      Phase 9 对话端点
+ * - runtime_routes.cpp   Phase 9 运行时端点
  */
 #pragma once
 
 #include "server_config.hpp"
 #include "event_adapter.hpp"
+#include "route_groups.hpp"
 
 #include "ai_learning/core/learner.hpp"
-#include "ai_learning/society/society.hpp"
-#include "ai_learning/language/dialog_manager.hpp"
-#include "ai_learning/language/llm_provider.hpp"
-#include "ai_learning/learning/continuous_loop.hpp"
 
 #include <crow.h>
 
-#include <nlohmann/json.hpp>
-
 #include <atomic>
-#include <map>
 #include <memory>
-#include <mutex>
 #include <string>
 
 namespace ai_learning::server {
-
-/// 异步任务状态
-struct AsyncTask {
-    std::string task_id;
-    std::string status;           // pending / running / completed / failed
-    nlohmann::json result;        // 完成后的结果
-    std::string error;            // 失败原因
-};
 
 /// REST HTTP + WebSocket 服务
 ///
@@ -60,17 +52,8 @@ public:
     [[nodiscard]] auto is_running() const -> bool;
 
 private:
-    /// 注册所有路由
+    /// 注册所有路由（委托到 route_groups）
     auto register_routes_(crow::SimpleApp& app) -> void;
-
-    /// 注册核心 API 路由（Phase 1-2）
-    auto register_core_routes_(crow::SimpleApp& app) -> void;
-
-    /// 注册高级 API 路由（Phase 3-6）
-    auto register_advanced_routes_(crow::SimpleApp& app) -> void;
-
-    /// 注册系统路由（健康检查、统计等）
-    auto register_system_routes_(crow::SimpleApp& app) -> void;
 
     /// 注册静态文件路由（Phase 7.5 — Web Console）
     auto register_static_routes_(crow::SimpleApp& app) -> void;
@@ -78,32 +61,19 @@ private:
     /// 注册 WebSocket 路由（Phase 7.4）
     auto register_ws_routes_(crow::SimpleApp& app) -> void;
 
-    /// 注册社会路由（Phase 9）
-    auto register_society_routes_(crow::SimpleApp& app) -> void;
-
-    /// 注册对话路由（Phase 9）
-    auto register_chat_routes_(crow::SimpleApp& app) -> void;
-
-    /// 注册运行时路由（Phase 9）
-    auto register_runtime_routes_(crow::SimpleApp& app) -> void;
-
     /// 启动心跳和统计推送的后台线程
     auto start_ws_background_tasks_() -> void;
 
     /// 停止后台线程
     auto stop_ws_background_tasks_() -> void;
 
-    /// 生成唯一 task_id
-    static auto generate_task_id_() -> std::string;
-
     core::Learner& learner_;
     ServerConfig config_;
 
     std::atomic<bool> running_{false};
 
-    /// 异步任务管理
-    std::mutex tasks_mutex_;
-    std::map<std::string, AsyncTask> tasks_;
+    /// 路由间共享状态（任务管理、懒初始化组件）
+    std::unique_ptr<SharedState> shared_state_;
 
     /// Phase 7.4: WebSocket 事件管理
     EventAdapter event_adapter_;
@@ -112,12 +82,6 @@ private:
 
     /// 后台线程控制
     std::atomic<bool> ws_bg_running_{false};
-
-    /// Phase 9: 懒初始化组件
-    std::unique_ptr<society::Society> society_;
-    std::unique_ptr<language::DialogManager> dialog_;
-    std::unique_ptr<learning::ContinuousLearningLoop> continuous_loop_;
-    std::unique_ptr<language::ILLMProvider> llm_provider_;
 };
 
 }  // namespace ai_learning::server

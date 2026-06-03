@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include "ai_learning/learning/tokenizer.hpp"  // for Language enum
 
 namespace ai_learning::core {
 
@@ -112,6 +113,13 @@ struct LearnerConfig {
     int    embedding_neg_samples      = 5;       // 负采样数
     double embedding_learning_rate    = 0.025;   // SGNS 初始学习率
     int    ds_min_freq                = 3;       // DS 最低概念频率
+
+    // ── 分词 ──
+    learning::Language language               = learning::Language::kAuto;
+
+    // ── 预测学习（PC engine 嵌入预测） ──
+    bool   embedding_predictive_learning = false;   // PC engine 预测学习
+    int    pc_max_steps_per_text        = 20;       // 每篇文章最多 N 个预测步
 };
 
 /// 训练编排器配置（值对象）

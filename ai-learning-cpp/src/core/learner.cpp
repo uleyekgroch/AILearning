@@ -5,13 +5,11 @@
 
 #include "ai_learning/core/learner.hpp"
 #include "ai_learning/core/tensor_ops.hpp"
+#include "ai_learning/learning/tokenizer.hpp"
 
 #include <algorithm>
 #include <cmath>
-#include <fstream>
-#include <functional>
 #include <random>
-#include <sstream>
 
 namespace ai_learning::core {
 
@@ -86,6 +84,7 @@ Learner::Learner(const LearnerConfig& config)
        integrated_(meta_learner_, experimenter_, emotion_engine_,
                    social_engine_, analogy_engine_, insight_engine_,
                    motivation_, continual_, concept_engine_),
+       goal_manager_(kg_, &metacognition_),
        stage_(config.initial_stage) {
 
     // 设置阶段索引
@@ -103,13 +102,20 @@ auto Learner::learn_from_text(const std::string& text,
                                const std::string& source)
     -> TextLearnResult {
     auto result = text_learner_.learn_from_text(text, source);
-    // 同时观察文本以触发统计概念涌现
-    stat_learner_.observe(text);
+
+    // 通过统一分词器处理
+    auto tokens = learning::tokenize(text, config_.language);
+    stat_learner_.observe_tokens(tokens);
 
     // 嵌入管线（config 开关控制）
     if (config_.embedding_learning_enabled) {
-        ds_.learn_from_text(text);
-        embedding_trainer_.add_text(text);
+        ds_.learn_from_tokens(tokens);
+        embedding_trainer_.add_tokens(tokens);
+    }
+
+    // PC 嵌入预测学习
+    if (config_.embedding_predictive_learning) {
+        learn_predictive_(tokens);
     }
 
     // 海马快速记忆：存储提取的实体和关系
@@ -120,6 +126,26 @@ auto Learner::learn_from_text(const std::string& text,
     (void)hippocampal_.encode(result.entities, rel_strs, text);
 
     return result;
+}
+
+void Learner::learn_predictive_(const std::vector<std::string>& tokens) {
+    // 从 DS 获取有 PPMI 向量的概念
+    std::vector<std::vector<float>> embeddings;
+    for (const auto& t : tokens) {
+        auto vec = ds_.get_dense_vector(t, config_.obs_dim);
+        if (vec) {
+            embeddings.push_back(std::move(*vec));
+        }
+    }
+
+    // 连续概念嵌入对送入 PC engine
+    int steps = 0;
+    for (size_t i = 0; i + 1 < embeddings.size() && steps < config_.pc_max_steps_per_text; ++i) {
+        auto action = std::vector<float>{1.0f};  // 固定 "预测下一个"
+        engine_.learn(embeddings[i], action, embeddings[i + 1]);
+        ++steps;
+    }
+    pc_steps_ += steps;
 }
 
 auto Learner::observe_text(const std::string& text)
@@ -282,6 +308,8 @@ auto Learner::consolidate() -> std::map<std::string, double> {
         report["ds_concepts"]   = static_cast<double>(ds_stats.cpts_represented);
         report["ds_dimensions"] = static_cast<double>(ds_stats.total_dimensions);
     }
+
+    report["pc_steps"] = static_cast<double>(pc_steps_);
 
     return report;
 }
@@ -459,293 +487,11 @@ auto Learner::get_stats() const -> std::map<std::string, double> {
         stats["embedding_trained"] = embedding_trainer_.is_trained() ? 1.0 : 0.0;
     }
 
+    if (config_.embedding_predictive_learning) {
+        stats["pc_steps"] = static_cast<double>(pc_steps_);
+    }
+
     return stats;
-}
-
-// ── 持久化 ───────────────────────────────────────────────────────
-
-void Learner::save(const std::string& path) const {
-    std::ofstream out(path);
-    if (!out.is_open()) return;
-
-    // ── 元数据 ──
-    out << "[meta]\n";
-    out << "version=1\n";
-    out << "stage=" << stage_ << "\n";
-    out << "stage_index=" << stage_index_ << "\n";
-    out << "total_steps=" << total_steps_ << "\n";
-
-    // ── 配置 ──
-    out << "[config]\n";
-    out << "obs_dim=" << config_.obs_dim << "\n";
-    out << "action_dim=" << config_.action_dim << "\n";
-    out << "learning_rate=" << config_.learning_rate << "\n";
-
-    // ── 知识图谱 ──
-    out << "[knowledge_graph]\n";
-    out << "entities=" << kg_.entity_count() << "\n";
-    out << "relations=" << kg_.relation_count() << "\n";
-
-    // ── 统计学习 ──
-    out << "[statistics]\n";
-    out << "hippocampal_episodes=" << hippocampal_.size() << "\n";
-    out << "cortical_facts=" << cortical_.size() << "\n";
-    out << "learning_progress=" << engine_.get_learning_progress() << "\n";
-    out << "curiosity=" << engine_.get_curiosity() << "\n";
-
-    // ── 误差历史 ──
-    out << "[error_history]\n";
-    out << "count=" << error_history_.size() << "\n";
-    int cnt = 0;
-    for (auto e : error_history_) {
-        out << "e" << cnt << "=" << e << "\n";
-        ++cnt;
-    }
-
-    // ── 模态权重 ──
-    out << "[modality_weights]\n";
-    for (const auto& [mod, w] : encoder_.get_modality_weights()) {
-        out << mod << "=" << w << "\n";
-    }
-
-    // ── 嵌入学习 ──
-    if (config_.embedding_learning_enabled) {
-        out << "[embeddings]\n";
-        auto ds_stats = ds_.stats();
-        out << "ds_concepts=" << ds_stats.cpts_represented << "\n";
-        out << "ds_dimensions=" << ds_stats.total_dimensions << "\n";
-        out << "ds_texts_processed=" << ds_stats.texts_processed << "\n";
-        out << "embedding_vocab_size=" << embedding_trainer_.vocab_size() << "\n";
-        out << "embedding_trained=" << (embedding_trainer_.is_trained() ? 1 : 0) << "\n";
-        out << "consolidation_count=" << consolidation_count_ << "\n";
-    }
-}
-
-void Learner::load(const std::string& path) {
-    std::ifstream in(path);
-    if (!in.is_open()) return;
-
-    std::string section;
-    std::string line;
-    while (std::getline(in, line)) {
-        // 空行跳过
-        if (line.empty()) continue;
-
-        // 检测节
-        if (line[0] == '[') {
-            section = line.substr(1, line.size() - 2);
-            continue;
-        }
-
-        auto eq = line.find('=');
-        if (eq == std::string::npos) continue;
-        auto key = line.substr(0, eq);
-        auto val = line.substr(eq + 1);
-
-        if (section == "meta") {
-            if (key == "stage") {
-                stage_ = val;
-                for (int i = 0; i < static_cast<int>(kStageOrder.size()); ++i) {
-                    if (kStageOrder[i] == stage_) {
-                        stage_index_ = i;
-                        break;
-                    }
-                }
-            } else if (key == "total_steps") {
-                total_steps_ = std::stoi(val);
-            }
-        } else if (section == "error_history") {
-            if (key[0] == 'e') {
-                error_history_.push_back(std::stof(val));
-                // 限制历史长度
-                if (error_history_.size() > 1000) {
-                    error_history_.pop_front();
-                }
-            }
-        } else if (section == "modality_weights") {
-            encoder_.update_weight(key, std::stod(val) -
-                encoder_.get_modality_weights().count(key)
-                ? (encoder_.get_modality_weights().at(key))
-                : 0.0);
-        } else if (section == "embeddings") {
-            if (key == "consolidation_count") {
-                consolidation_count_ = std::stoi(val);
-            }
-        }
-    }
-}
-
-// ── 四大人类核心能力 ─────────────────────────────────────────────
-
-auto Learner::learn_by_doing(const std::string& code,
-                               const std::string& language)
-    -> learning::ExecutionFeedback {
-    (void)language;  // sandbox_.run_tests 统一用 cpp
-    auto feedback = sandbox_.run_tests(code);
-
-    // 从执行反馈中学习
-    if (!feedback.compiled) {
-        // 编译错误 → 学习因果规则
-        for (const auto& err : feedback.errors) {
-            auto analysis = learning::FeedbackParser::analyze_compile_error(err);
-            if (analysis.contains("category")) {
-                world_model_.add_causal_rule({
-                    analysis["category"], "compile_error",
-                    reasoning::CausalEdgeType::kCauses, 0.9, {}
-                });
-            }
-        }
-    } else if (feedback.ran) {
-        // 成功执行 → 记录到元认知
-        metacognition_.record_outcome("code_execution", true);
-    } else {
-        // 运行时错误 → 学习
-        metacognition_.record_outcome("code_execution", false);
-    }
-
-    return feedback;
-}
-
-auto Learner::self_evolve()
-    -> MutationResult {
-    auto fitness = [this](Learner& l) -> double {
-        auto stats = l.get_stats();
-        return stats.at("entity_count") * 2.0 +
-               stats.at("relation_count") * 3.0 +
-               stats.at("learning_progress") * 10.0;
-    };
-
-    return self_modifier_.evolve_once(*this, fitness);
-}
-
-void Learner::learn_causal(const std::vector<std::string>& events,
-                             const std::string& outcome) {
-    world_model_.observe_sequence(events, outcome);
-}
-
-auto Learner::reason_causal(const std::string& question) const
-    -> reasoning::CounterfactualResult {
-    // 简化的因果推理：将问题解析为反事实
-    return world_model_.counterfactual(question, {}, {});
-}
-
-auto Learner::plan_with_world_model(const std::string& goal) const
-    -> reasoning::ImaginationPlan {
-    return world_model_.imagine_plan(goal, 5);
-}
-
-auto Learner::metacognitive_report()
-    -> MetacognitiveReport {
-    return metacognition_.generate_report(*this);
-}
-
-auto Learner::knows_about(const std::string& topic) const
-    -> bool {
-    return metacognition_.knows_about(topic);
-}
-
-auto Learner::what_should_i_learn() const
-    -> std::vector<KnowledgeGap> {
-    return metacognition_.detect_gaps(*this);
-}
-
-// ── 自主学习系统 ─────────────────────────────────────────────
-
-/// 内置学习策略：用 Learner 已有的文本学习+因果推理能力
-class LearnerBuiltInStrategy : public learning::ILearningStrategy {
-public:
-    explicit LearnerBuiltInStrategy(
-        std::function<TextLearnResult(const std::string&)> learn_fn)
-        : learn_fn_(std::move(learn_fn)) {}
-
-    auto execute(const learning::LearningGoal& goal,
-                 const learning::LearningPlan& /*plan*/)
-        -> learning::LearningOutcome override {
-        // 用文本学习作为实际学习手段
-        auto result = learn_fn_(goal.topic);
-
-        double progress = 0.3;
-        if (!result.entities.empty()) progress += 0.2;
-        if (!result.triples.empty()) progress += 0.2;
-        progress = std::min(1.0, progress);
-
-        return learning::LearningOutcome{
-            goal.topic,
-            progress,
-            0.3,     // surprise
-            progress > 0.4,
-            false    // goal_completed
-        };
-    }
-
-    [[nodiscard]] auto name() const -> std::string override {
-        return "learner_builtin";
-    }
-
-private:
-    std::function<TextLearnResult(const std::string&)> learn_fn_;
-};
-
-auto Learner::generate_learning_goal()
-    -> learning::LearningGoal {
-    // 收集已知主题
-    std::vector<std::string> topics;
-    for (const auto& [id, _] : skill_tree_.all_skills()) {
-        topics.push_back(id);
-    }
-    if (topics.empty()) {
-        topics.push_back("general");
-    }
-
-    // 收集掌握度
-    std::map<std::string, double> mastery;
-    for (const auto& [id, skill] : skill_tree_.all_skills()) {
-        mastery[id] = skill.mastery;
-    }
-
-    double curiosity = engine_.get_curiosity();
-    return motivation_.generate_goal(topics, curiosity, mastery);
-}
-
-auto Learner::autonomous_learning_run(int iterations)
-    -> learning::AutonomousLoopReport {
-
-    // 收集已知主题
-    std::vector<std::string> topics;
-    for (const auto& [id, _] : skill_tree_.all_skills()) {
-        topics.push_back(id);
-    }
-    if (topics.empty()) {
-        topics.push_back("general");
-    }
-
-    learning::AutonomousLearningLoop loop(motivation_, skill_tree_);
-    LearnerBuiltInStrategy strategy(
-        [this](const std::string& text) {
-            return learn_from_text(text);
-        });
-
-    learning::AutonomousLoopConfig config;
-    config.max_iterations = iterations;
-
-    return loop.run(config, topics, strategy);
-}
-
-auto Learner::solve_problem(const std::string& problem_description)
-    -> learning::Solution {
-    // 收集已知事实（从知识图谱获取实体信息）
-    std::vector<std::string> facts;
-    return problem_solver_.solve(problem_description, skill_tree_, facts);
-}
-
-auto Learner::check_milestones()
-    -> std::vector<learning::MilestoneEvent> {
-    return milestones_.check_milestones(skill_tree_);
-}
-
-auto Learner::learning_progress() const
-    -> learning::ProgressSnapshot {
-    return milestones_.progress(skill_tree_);
 }
 
 // ── Phase 3：高级认知能力 ────────────────────────────────────────

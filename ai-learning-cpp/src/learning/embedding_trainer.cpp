@@ -48,6 +48,15 @@ void EmbeddingTrainer::add_text(const std::string& text) {
     }
 }
 
+void EmbeddingTrainer::add_tokens(const std::vector<std::string>& tokens) {
+    if (tokens.empty()) return;
+
+    raw_docs_.push_back(tokens);
+    for (const auto& t : tokens) {
+        raw_freq_[t]++;
+    }
+}
+
 void EmbeddingTrainer::add_corpus(const std::vector<std::string>& texts) {
     for (const auto& t : texts) add_text(t);
 }
