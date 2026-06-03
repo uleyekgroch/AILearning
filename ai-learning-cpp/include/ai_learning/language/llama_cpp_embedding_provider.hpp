@@ -17,6 +17,7 @@
 #include "embedding_provider.hpp"
 
 #include <memory>
+#include <mutex>
 #include <string>
 
 namespace ai_learning::language {
@@ -54,6 +55,7 @@ private:
     void* ctx_ = nullptr;       // opaque: llama_context*
     int embedding_dim_ = 512;
     int model_n_vocab_ = 0;
+    mutable std::mutex mutex_;  // llama_context is not thread-safe
 
     /// 内部编码单条文本
     auto embed_impl_(const std::string& text) -> std::vector<float>;

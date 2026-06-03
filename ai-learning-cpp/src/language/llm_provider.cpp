@@ -7,6 +7,7 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include <mutex>
 #include <nlohmann/json.hpp>
 #include <sstream>
 #include <string>
@@ -257,6 +258,7 @@ auto LlamaCppLLMProvider::complete(const std::string& prompt,
                                    const std::string& system_prompt)
     -> std::string {
     if (!ctx_ || !model_) return "[llama.cpp not initialized]";
+    std::lock_guard<std::mutex> lock(mutex_);
     return generate_(build_chat_prompt(prompt, system_prompt));
 }
 

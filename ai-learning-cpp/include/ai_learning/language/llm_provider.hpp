@@ -12,6 +12,7 @@
  * 2. OpenAICompatibleProvider — 调用 OpenAI 兼容 API（通义千问等）
  */
 
+#include <mutex>
 #include <stdexcept>
 #include <string>
 
@@ -121,6 +122,7 @@ private:
     void* ctx_ = nullptr;        // opaque: llama_context*
     int max_tokens_ = 512;
     float temperature_ = 0.8f;
+    mutable std::mutex mutex_;   // llama_context is not thread-safe
 
     auto generate_(const std::string& full_prompt) -> std::string;
 };

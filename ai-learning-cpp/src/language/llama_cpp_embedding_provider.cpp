@@ -99,6 +99,7 @@ LlamaCppEmbeddingProvider& LlamaCppEmbeddingProvider::operator=(
 auto LlamaCppEmbeddingProvider::embed(const std::string& text)
     -> std::vector<float> {
     if (!ctx_) return std::vector<float>(embedding_dim_, 0.0f);
+    std::lock_guard<std::mutex> lock(mutex_);
     return embed_impl_(text);
 }
 
