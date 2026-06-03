@@ -39,7 +39,7 @@ void ai_learning::server::register_core_routes(
     crow::SimpleApp& app, core::Learner& learner,
     const ServerConfig& config, SharedState& state) {
 
-    // GET /api/health
+    // GET /api/health — Kubernetes-style 综合健康检查
     CROW_ROUTE(app, "/api/health").methods("GET"_method)
     ([&]() -> crow::response {
         json body;
@@ -51,7 +51,63 @@ void ai_learning::server::register_core_routes(
         auto stats = learner.get_stats();
         body["total_steps"] = stats.count("total_steps")
             ? static_cast<int>(stats.at("total_steps")) : 0;
+        // J.2: 详细系统状态
+        body["uptime_seconds"] = static_cast<int>(
+            std::chrono::duration_cast<std::chrono::seconds>(
+                std::chrono::steady_clock::now().time_since_epoch()).count() % 86400);
+        body["api_version"] = "v1";
         return ok_resp(body);
+    });
+
+    // GET /api/health/live — 存活探针（进程是否运行）
+    CROW_ROUTE(app, "/api/health/live").methods("GET"_method)
+    ([]() -> crow::response {
+        return ok_resp(json{{"status", "alive"}, {"checks", json::array()}});
+    });
+
+    // GET /api/health/ready — 就绪探针（是否可以接受请求）
+    CROW_ROUTE(app, "/api/health/ready").methods("GET"_method)
+    ([&]() -> crow::response {
+        json checks = json::array();
+        bool ready = true;
+
+        // 检查引擎是否就绪
+        try {
+            (void)learner.engine_type();  // 轻量检查
+            json engine_check;
+            engine_check["name"] = "engine";
+            engine_check["status"] = "pass";
+            checks.push_back(engine_check);
+        } catch (...) {
+            json engine_check;
+            engine_check["name"] = "engine";
+            engine_check["status"] = "fail";
+            checks.push_back(engine_check);
+            ready = false;
+        }
+
+        // 检查知识图谱（非空）
+        try {
+            auto stats = learner.get_stats();
+            auto it = stats.find("entities");
+            bool has_knowledge = (it != stats.end() && it->second > 0.0);
+            json kg_check;
+            kg_check["name"] = "knowledge_graph";
+            kg_check["status"] = has_knowledge ? "pass" : "warn";
+            kg_check["entities"] = (it != stats.end()) ? it->second : 0.0;
+            checks.push_back(kg_check);
+        } catch (...) {
+            json kg_check;
+            kg_check["name"] = "knowledge_graph";
+            kg_check["status"] = "warn";
+            checks.push_back(kg_check);
+        }
+
+        json body;
+        body["status"] = ready ? "ready" : "not_ready";
+        body["ready"] = ready;
+        body["checks"] = checks;
+        return json_resp(ready ? 200 : 503, body);
     });
 
     // GET /api/stats

@@ -20,11 +20,13 @@
 #include "server.hpp"
 #include "route_groups.hpp"
 #include "dto.hpp"
+#include "ai_learning/server/rate_limit_middleware.hpp"
 
 #include <nlohmann/json.hpp>
 
 #include <atomic>
 #include <chrono>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <thread>
@@ -72,6 +74,7 @@ auto ai_learning::server::LearningServer::register_routes_(::crow::SimpleApp& ap
     register_chat_routes(app, learner_, *shared_state_);
     register_runtime_routes(app, learner_, *shared_state_);
     register_goals_routes(app, learner_, *shared_state_);
+    register_openapi_routes(app, config_);
     register_static_routes_(app);
     register_ws_routes_(app);
 }
@@ -310,6 +313,18 @@ auto ai_learning::server::LearningServer::run() -> void {
     ::crow::SimpleApp app;
 
     register_routes_(app);
+
+    // ── J.2: Rate limiting (available via RateLimiter middleware class)
+    //         Production deployments should use reverse-proxy rate limiting
+    //         (nginx, traefik, etc.). The RateLimiter class is provided for
+    //         reference and can be integrated via Crow middleware if needed.
+    {
+        const char* env_rps = std::getenv("RATE_LIMIT_RPS");
+        if (env_rps) {
+            std::cout << "[Server] Note: RATE_LIMIT_RPS set to " << env_rps
+                      << " — use a reverse proxy for production rate limiting\n";
+        }
+    }
 
     app.loglevel(::crow::LogLevel::Info);
 

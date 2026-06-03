@@ -89,6 +89,11 @@ void register_goals_routes(
     core::Learner& learner,
     SharedState& state);
 
+/// 注册 OpenAPI 文档路由（/api/openapi.json, /api/docs）
+void register_openapi_routes(
+    crow::SimpleApp& app,
+    const ServerConfig& config);
+
 /// 生成唯一 task_id
 auto generate_task_id() -> std::string;
 

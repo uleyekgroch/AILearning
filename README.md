@@ -137,6 +137,14 @@ cd scripts && ./download_models.sh --model llm   # 仅下载对话模型
 # RTX 4060 Laptop 8GB 推荐 10-15 层，可获得 3.5x 加速
 ./ai_learning_server --llm-model ../models/qwen2.5-3b-instruct-q4_k_m.gguf --gpu-layers 15
 
+# 健康检查
+curl http://localhost:8080/api/health
+curl http://localhost:8080/api/health/live    # Kubernetes liveness
+curl http://localhost:8080/api/health/ready   # Kubernetes readiness
+
+# OpenAPI 文档
+curl http://localhost:8080/api/openapi.json
+
 # 文本学习
 curl -X POST http://localhost:8080/api/learn/text \
   -H "Content-Type: application/json" \
