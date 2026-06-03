@@ -268,14 +268,21 @@ auto LocalProcessSandbox::run_process_(const std::string& command,
 
 #else
 
-/// POSIX 实现：fork + exec + pipe + waitpid 超时
+/// POSIX 实现：popen + timeout 命令
 auto LocalProcessSandbox::run_process_(const std::string& command,
-                                         [[maybe_unused]] int timeout_ms) const
+                                         int timeout_ms) const
     -> ExecutionResult {
     ExecutionResult result;
     auto t0 = std::chrono::high_resolution_clock::now();
 
-    FILE* pipe = popen((command + " 2>&1").c_str(), "r");
+    // 使用 GNU timeout 命令包装（timeout <seconds> <command>）
+    // 超时返回码 124（GNU coreutils）
+    auto timeout_sec = (timeout_ms + 999) / 1000;
+    if (timeout_sec < 1) timeout_sec = 1;
+    std::string wrapped = "timeout " + std::to_string(timeout_sec) +
+                          "s " + command + " 2>&1";
+
+    FILE* pipe = popen(wrapped.c_str(), "r");
     if (!pipe) {
         result.exit_code = -1;
         return result;
@@ -285,11 +292,19 @@ auto LocalProcessSandbox::run_process_(const std::string& command,
     while (fgets(buffer, sizeof(buffer), pipe)) {
         result.stdout_output += buffer;
     }
-    result.exit_code = pclose(pipe);
-    result.stderr_output = result.stdout_output;  // 合并模式下相同
+    int exit_code = pclose(pipe);
 
     auto t1 = std::chrono::high_resolution_clock::now();
     result.elapsed_ms = std::chrono::duration<double, std::milli>(t1 - t0).count();
+
+    // 处理 timeout 命令的退出码
+    if (exit_code == 124 || result.elapsed_ms >= timeout_ms) {
+        result.exit_code = -1;
+        result.error_type = "timeout";
+    } else {
+        result.exit_code = exit_code;
+        result.stderr_output = result.stdout_output;
+    }
 
     return result;
 }
