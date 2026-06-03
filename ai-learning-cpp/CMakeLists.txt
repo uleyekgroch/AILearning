@@ -144,6 +144,12 @@ if(asio_SOURCE_DIR)
     target_include_directories(ai_learning PUBLIC "${asio_SOURCE_DIR}/asio/include")
 endif()
 target_compile_definitions(ai_learning PUBLIC ASIO_STANDALONE)
+
+# ── Eigen 集成（可选加速 mat_vec/mat_vec_bias）───────────────────
+if(eigen3_fetch_SOURCE_DIR)
+    target_include_directories(ai_learning PRIVATE ${eigen3_fetch_SOURCE_DIR})
+    target_compile_definitions(ai_learning PRIVATE AI_LEARNING_USE_EIGEN=1)
+endif()
 # Windows: asio requires _WIN32_WINNT definition
 if(WIN32)
     target_compile_definitions(ai_learning PUBLIC _WIN32_WINNT=0x0601)

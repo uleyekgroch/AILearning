@@ -12,6 +12,10 @@
 #include <numeric>
 #include <vector>
 
+#ifdef AI_LEARNING_USE_EIGEN
+#include <Eigen/Dense>
+#endif
+
 namespace ai_learning::core {
 
 using Tensor = std::vector<float>;
@@ -190,6 +194,16 @@ inline auto mat_vec(const std::vector<float>& mat,
     // 小矩阵走 CPU（避免 GPU PCIe 开销）
     // 阈值：矩阵元素 < 4096（约 64×64）时 CPU 更快
     if (rows * cols < 4096 || !cuda_available()) {
+#ifdef AI_LEARNING_USE_EIGEN
+        if (rows * cols >= 2048) {
+            Eigen::Map<const Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic,
+                                            Eigen::RowMajor>>
+                M(mat.data(), rows, cols);
+            Eigen::Map<const Eigen::VectorXf> v(vec.data(), cols);
+            Eigen::VectorXf res = M * v;
+            return Tensor(res.data(), res.data() + res.size());
+        }
+#endif
         auto result = Tensor(rows, 0.0f);
         for (int r = 0; r < rows; ++r) {
             for (int c = 0; c < cols; ++c) {
@@ -250,6 +264,17 @@ inline auto mat_vec_bias(const std::vector<float>& mat,
                           const Tensor& vec,
                           const Tensor& bias) -> Tensor {
     if (rows * cols < 4096 || !cuda_available()) {
+#ifdef AI_LEARNING_USE_EIGEN
+        if (rows * cols >= 2048) {
+            Eigen::Map<const Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic,
+                                            Eigen::RowMajor>>
+                M(mat.data(), rows, cols);
+            Eigen::Map<const Eigen::VectorXf> v(vec.data(), cols);
+            Eigen::Map<const Eigen::VectorXf> b(bias.data(), rows);
+            Eigen::VectorXf res = M * v + b;
+            return Tensor(res.data(), res.data() + res.size());
+        }
+#endif
         auto result = mat_vec(mat, rows, cols, vec);
         for (int i = 0; i < rows; ++i) {
             result[i] += bias[i];
