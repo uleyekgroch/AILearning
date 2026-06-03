@@ -3,7 +3,7 @@
  * @brief AILearning REST 服务入口
  *
  * 创建 Learner 实例并启动 HTTP 服务。
- * 用法：ai_learning_server [--port PORT] [--threads N] [--engine pc|mlp|light]
+ * 用法：ai_learning_server [--port PORT] [--threads N] [--engine pc|mlp|light] [--llm-model PATH]
  */
 
 #include "ai_learning/core/learner.hpp"
@@ -51,16 +51,22 @@ auto main(int argc, char* argv[]) -> int {
     server_config.port = parse_int_arg(argc, argv, "--port", 8080);
     server_config.threads = parse_int_arg(argc, argv, "--threads", 4);
     auto engine_name = parse_str_arg(argc, argv, "--engine", "pc");
+    auto llm_model = parse_str_arg(argc, argv, "--llm-model", "");
 
     std::cout << "=== AILearning REST Server ===\n";
     std::cout << "  Port: " << server_config.port << "\n";
     std::cout << "  Threads: " << server_config.threads << "\n";
-    std::cout << "  Engine: " << engine_name << "\n\n";
+    std::cout << "  Engine: " << engine_name << "\n";
+    if (!llm_model.empty()) {
+        std::cout << "  LLM Model: " << llm_model << "\n";
+    }
+    std::cout << "\n";
 
     // 创建学习体（支持引擎选择）
     core::LearnerConfig learner_config;
     learner_config.obs_dim = 128;
     learner_config.action_dim = 8;
+    learner_config.llm_model_path = llm_model;
 
     auto learner = core::LearnerFactory::create_with_engine(
         learner_config,

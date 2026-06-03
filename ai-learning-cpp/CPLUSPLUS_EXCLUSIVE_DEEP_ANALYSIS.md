@@ -583,7 +583,8 @@ inline void mat_vec(...) {
 | **F** | REST API 引擎暴露 | `aff8f1a` `--engine` CLI + `/api/health` `engine_type` |
 | **G** | 性能基准对比 | `0ebf788` benchmark_engines + `vec_mat` 维度 bug 修复 |
 | **H** | llama.cpp 集成评估 | `49ef724` LLAMA_CPP_INTEGRATION_ASSESSMENT.md 三阶段路线图 |
-| **H.1** | Embedding 接口 + LlamaCppEmbeddingProvider | `NEW` IEmbeddingProvider + Learner 条件加载 |
+| **H.1** | Embedding 接口 + LlamaCppEmbeddingProvider | `c9e3a82` IEmbeddingProvider + Learner 条件加载 |
+| **H.2** | 对话后端 + LlamaCppLLMProvider | `NEW` ILLMProvider 实现 + `--llm-model` CLI |
 
 ### 8.4 技术债务修复状态
 

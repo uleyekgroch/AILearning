@@ -29,13 +29,28 @@ void ai_learning::server::register_chat_routes(
     ([&state, &learner](const crow::request& req) -> crow::response {
         try {
             // 懒初始化 LLM 提供者和对话管理器
+            // 优先级：1) llama.cpp 本地模型 2) OpenAI 兼容 API 3) Stub
             if (!state.llm_provider) {
-                const char* api_key = std::getenv("DASHSCOPE_API_KEY");
-                if (api_key && api_key[0] != '\0') {
-                    state.llm_provider = std::make_unique<language::OpenAICompatibleProvider>(
-                        "dashscope.aliyuncs.com", api_key, "qwen-plus-latest");
-                } else {
-                    state.llm_provider = std::make_unique<language::StubLLMProvider>();
+                const std::string& local_path = learner.config().llm_model_path;
+                if (!local_path.empty()) {
+#ifdef AI_LEARNING_WITH_LLAMA_CPP
+                    try {
+                        state.llm_provider = std::make_unique<language::LlamaCppLLMProvider>(
+                            local_path);
+                    } catch (const std::exception& e) {
+                        std::cerr << "[Warning] Failed to load local LLM: "
+                                  << e.what() << ", falling back to API/Stub\n";
+                    }
+#endif
+                }
+                if (!state.llm_provider) {
+                    const char* api_key = std::getenv("DASHSCOPE_API_KEY");
+                    if (api_key && api_key[0] != '\0') {
+                        state.llm_provider = std::make_unique<language::OpenAICompatibleProvider>(
+                            "dashscope.aliyuncs.com", api_key, "qwen-plus-latest");
+                    } else {
+                        state.llm_provider = std::make_unique<language::StubLLMProvider>();
+                    }
                 }
             }
             if (!state.dialog) {

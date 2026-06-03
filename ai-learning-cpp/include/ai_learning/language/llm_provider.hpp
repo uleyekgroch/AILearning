@@ -12,6 +12,7 @@
  * 2. OpenAICompatibleProvider — 调用 OpenAI 兼容 API（通义千问等）
  */
 
+#include <stdexcept>
 #include <string>
 
 namespace ai_learning::language {
@@ -84,5 +85,64 @@ private:
     std::string api_key_;
     std::string model_;
 };
+
+// ── llama.cpp 本地模型提供者（可选依赖）──────────────────────────
+
+#ifdef AI_LEARNING_WITH_LLAMA_CPP
+struct llama_model;
+struct llama_context;
+
+/// llama.cpp 本地模型 LLM 提供者
+///
+/// 在本地运行 .gguf 模型文件，无需网络或 API Key。
+/// 适合离线部署和隐私敏感场景。
+class LlamaCppLLMProvider final : public ILLMProvider {
+public:
+    explicit LlamaCppLLMProvider(const std::string& model_path);
+    ~LlamaCppLLMProvider() override;
+
+    // 禁止拷贝
+    LlamaCppLLMProvider(const LlamaCppLLMProvider&) = delete;
+    LlamaCppLLMProvider& operator=(const LlamaCppLLMProvider&) = delete;
+
+    // 允许移动
+    LlamaCppLLMProvider(LlamaCppLLMProvider&& other) noexcept;
+    LlamaCppLLMProvider& operator=(LlamaCppLLMProvider&& other) noexcept;
+
+    auto complete(const std::string& prompt,
+                  const std::string& system_prompt = "")
+        -> std::string override;
+
+    [[nodiscard]] auto name() const -> std::string override {
+        return "llama_cpp";
+    }
+
+private:
+    llama_model* model_ = nullptr;
+    llama_context* ctx_ = nullptr;
+    int max_tokens_ = 512;
+    float temperature_ = 0.8f;
+
+    auto generate_(const std::string& full_prompt) -> std::string;
+};
+
+#else
+
+/// 未启用 llama.cpp 时的占位符
+class LlamaCppLLMProvider final : public ILLMProvider {
+public:
+    explicit LlamaCppLLMProvider(const std::string& /*model_path*/) {
+        throw std::runtime_error(
+            "LlamaCppLLMProvider requires AI_LEARNING_WITH_LLAMA_CPP. "
+            "Re-run: cmake -DAI_LEARNING_WITH_LLAMA_CPP=ON ..");
+    }
+    auto complete(const std::string&, const std::string& = "")
+        -> std::string override { return {}; }
+    [[nodiscard]] auto name() const -> std::string override {
+        return "llama_cpp_disabled";
+    }
+};
+
+#endif  // AI_LEARNING_WITH_LLAMA_CPP
 
 }  // namespace ai_learning::language

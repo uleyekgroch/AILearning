@@ -119,8 +119,11 @@ std::string answer = learner.think("什么是人工智能");
 ### 4. REST API 服务
 
 ```bash
-# 启动服务
+# 启动服务（默认 PC 引擎）
 ./ai_learning_server --port 8080 --threads 4
+
+# 使用 MLP 引擎 + 本地 LLM（llama.cpp）
+./ai_learning_server --engine mlp --llm-model /path/to/qwen2.5-3b-instruct-q4.gguf
 
 # 文本学习
 curl -X POST http://localhost:8080/api/learn/text \
@@ -131,6 +134,11 @@ curl -X POST http://localhost:8080/api/learn/text \
 curl -X POST http://localhost:8080/api/think \
   -H "Content-Type: application/json" \
   -d '{"question": "什么是人工智能"}'
+
+# 多轮对话（自动选择后端：llama.cpp > OpenAI API > Stub）
+curl -X POST http://localhost:8080/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "教我一首唐诗", "session_id": "demo"}'
 
 # WebSocket 实时统计
 ws://localhost:8080/ws/stats

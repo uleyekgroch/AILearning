@@ -169,4 +169,178 @@ auto OpenAICompatibleProvider::exec_curl_(const std::string& url,
     return output;
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// LlamaCppLLMProvider（可选依赖）
+// ═══════════════════════════════════════════════════════════════════
+
+#ifdef AI_LEARNING_WITH_LLAMA_CPP
+
+#include <llama.h>
+
+namespace {
+
+/// 构造 chat 格式的 prompt（简单的 system/user/assistant 格式）
+auto build_chat_prompt(const std::string& user_prompt,
+                       const std::string& system_prompt) -> std::string {
+    if (system_prompt.empty()) {
+        return "User: " + user_prompt + "\nAssistant: ";
+    }
+    return "System: " + system_prompt + "\n\nUser: " + user_prompt
+           + "\nAssistant: ";
+}
+
+}  // namespace
+
+LlamaCppLLMProvider::LlamaCppLLMProvider(const std::string& model_path)
+    : max_tokens_(512), temperature_(0.8f) {
+    auto mparams = llama_model_default_params();
+    mparams.n_gpu_layers = 0;  // CPU-only for compatibility
+
+    model_ = llama_model_load_from_file(model_path.c_str(), mparams);
+    if (!model_) {
+        throw std::runtime_error(
+            "Failed to load llama.cpp model: " + model_path);
+    }
+
+    auto cparams = llama_context_default_params();
+    cparams.n_ctx = 4096;
+    cparams.n_batch = 512;
+
+    ctx_ = llama_init_from_model(model_, cparams);
+    if (!ctx_) {
+        llama_model_free(model_);
+        model_ = nullptr;
+        throw std::runtime_error(
+            "Failed to initialize llama.cpp context");
+    }
+}
+
+LlamaCppLLMProvider::~LlamaCppLLMProvider() {
+    if (ctx_) {
+        llama_free(ctx_);
+        ctx_ = nullptr;
+    }
+    if (model_) {
+        llama_model_free(model_);
+        model_ = nullptr;
+    }
+}
+
+LlamaCppLLMProvider::LlamaCppLLMProvider(LlamaCppLLMProvider&& other) noexcept
+    : model_(other.model_), ctx_(other.ctx_),
+      max_tokens_(other.max_tokens_), temperature_(other.temperature_) {
+    other.model_ = nullptr;
+    other.ctx_ = nullptr;
+}
+
+LlamaCppLLMProvider& LlamaCppLLMProvider::operator=(
+    LlamaCppLLMProvider&& other) noexcept {
+    if (this != &other) {
+        if (ctx_) llama_free(ctx_);
+        if (model_) llama_model_free(model_);
+        model_ = other.model_;
+        ctx_ = other.ctx_;
+        max_tokens_ = other.max_tokens_;
+        temperature_ = other.temperature_;
+        other.model_ = nullptr;
+        other.ctx_ = nullptr;
+    }
+    return *this;
+}
+
+auto LlamaCppLLMProvider::complete(const std::string& prompt,
+                                   const std::string& system_prompt)
+    -> std::string {
+    if (!ctx_ || !model_) return "[llama.cpp not initialized]";
+    return generate_(build_chat_prompt(prompt, system_prompt));
+}
+
+auto LlamaCppLLMProvider::generate_(const std::string& full_prompt)
+    -> std::string {
+    const llama_vocab* vocab = llama_model_get_vocab(model_);
+
+    // ── Tokenize prompt ─────────────────────────────────────────
+    const int n_ctx = llama_n_ctx(ctx_);
+    std::vector<llama_token> prompt_tokens(n_ctx);
+    const int n_prompt = llama_tokenize(
+        vocab,
+        full_prompt.c_str(),
+        static_cast<int>(full_prompt.size()),
+        prompt_tokens.data(),
+        static_cast<int>(prompt_tokens.size()),
+        true,   // add_special
+        false   // parse_special
+    );
+    if (n_prompt < 0) {
+        return "[tokenization failed]";
+    }
+    prompt_tokens.resize(n_prompt);
+
+    // ── Decode prompt ───────────────────────────────────────────
+    llama_batch batch = llama_batch_init(n_prompt, 0, 1);
+    for (int i = 0; i < n_prompt; ++i) {
+        batch.token[i] = prompt_tokens[i];
+        batch.pos[i] = i;
+        batch.n_seq_id[i] = 1;
+        batch.seq_id[i][0] = 0;
+        batch.logits[i] = 0;
+    }
+    batch.logits[n_prompt - 1] = 1;  // 只在最后位置计算 logits
+    batch.n_tokens = n_prompt;
+
+    if (llama_decode(ctx_, batch) != 0) {
+        llama_batch_free(batch);
+        return "[decode failed]";
+    }
+    llama_batch_free(batch);
+
+    // ── Build sampler chain ─────────────────────────────────────
+    llama_sampler* smpl = llama_sampler_chain_init({});
+    llama_sampler_chain_add(smpl, llama_sampler_init_top_k(40));
+    llama_sampler_chain_add(smpl, llama_sampler_init_top_p(0.9f, 1));
+    llama_sampler_chain_add(smpl, llama_sampler_init_temp(temperature_));
+    llama_sampler_chain_add(smpl, llama_sampler_init_dist(42));
+
+    // ── Generation loop ─────────────────────────────────────────
+    std::string result;
+    int n_cur = n_prompt;
+
+    for (int i = 0; i < max_tokens_; ++i) {
+        const llama_token next = llama_sampler_sample(smpl, ctx_, -1);
+
+        // Check end-of-generation
+        if (llama_token_is_eog(vocab, next)) {
+            break;
+        }
+
+        // Detokenize
+        char buf[32];
+        const int n = llama_token_to_piece(
+            vocab, next, buf, sizeof(buf), 0, true);
+        if (n > 0) {
+            result.append(buf, n);
+        }
+
+        // Decode next token
+        llama_batch b = llama_batch_init(1, 0, 1);
+        b.token[0] = next;
+        b.pos[0] = n_cur++;
+        b.n_seq_id[0] = 1;
+        b.seq_id[0][0] = 0;
+        b.logits[0] = 1;
+        b.n_tokens = 1;
+
+        if (llama_decode(ctx_, b) != 0) {
+            llama_batch_free(b);
+            break;
+        }
+        llama_batch_free(b);
+    }
+
+    llama_sampler_free(smpl);
+    return result;
+}
+
+#endif  // AI_LEARNING_WITH_LLAMA_CPP
+
 }  // namespace ai_learning::language

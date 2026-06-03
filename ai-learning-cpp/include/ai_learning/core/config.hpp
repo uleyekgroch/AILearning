@@ -115,8 +115,9 @@ struct LearnerConfig {
     int    ds_min_freq                = 3;       // DS 最低概念频率
 
     // ── 预训练模型（llama.cpp 等）──
-    std::string embedding_model_path;   // 空 = 不使用预训练模型
-    int    embedding_model_dim = 512;   // 预训练模型输出维度
+    std::string embedding_model_path;   // 空 = 不使用预训练嵌入模型
+    int    embedding_model_dim = 512;   // 预训练嵌入模型输出维度
+    std::string llm_model_path;         // 空 = 不使用本地 LLM（llama.cpp）
 
     // ── 分词 ──
     learning::Language language               = learning::Language::kAuto;
