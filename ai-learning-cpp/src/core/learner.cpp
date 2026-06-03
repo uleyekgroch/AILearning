@@ -119,7 +119,16 @@ Learner::Learner(const LearnerConfig& config,
             embedding_trainer_.set_embedding_provider(embedding_provider_.get());
         } catch (const std::exception& e) {
             // 模型加载失败时不阻塞启动，记录并继续
-            (void)e;  // 静默处理，生产环境可加入日志
+            (void)e;
+        }
+    }
+    if (!config_.llm_model_path.empty()) {
+        try {
+            llm_provider_ = std::make_unique<language::LlamaCppLLMProvider>(
+                config_.llm_model_path);
+            unified_engine_.set_llm_provider(llm_provider_.get());
+        } catch (const std::exception& e) {
+            (void)e;
         }
     }
     #endif

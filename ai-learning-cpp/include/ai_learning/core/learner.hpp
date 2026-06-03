@@ -63,6 +63,7 @@
 #include <vector>
 
 #include "ai_learning/language/embedding_provider.hpp"
+#include "ai_learning/language/llm_provider.hpp"
 
 namespace ai_learning::core {
 
@@ -539,6 +540,9 @@ private:
 
     // 可选预训练嵌入提供者（llama.cpp）
     std::unique_ptr<language::IEmbeddingProvider> embedding_provider_;
+
+    // 可选本地 LLM 提供者（llama.cpp）
+    std::unique_ptr<language::ILLMProvider> llm_provider_;
 };
 
 }  // namespace ai_learning::core

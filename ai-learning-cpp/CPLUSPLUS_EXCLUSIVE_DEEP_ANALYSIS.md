@@ -584,7 +584,8 @@ inline void mat_vec(...) {
 | **G** | 性能基准对比 | `0ebf788` benchmark_engines + `vec_mat` 维度 bug 修复 |
 | **H** | llama.cpp 集成评估 | `49ef724` LLAMA_CPP_INTEGRATION_ASSESSMENT.md 三阶段路线图 |
 | **H.1** | Embedding 接口 + LlamaCppEmbeddingProvider | `c9e3a82` IEmbeddingProvider + Learner 条件加载 |
-| **H.2** | 对话后端 + LlamaCppLLMProvider | `NEW` ILLMProvider 实现 + `--llm-model` CLI |
+| **H.2** | 对话后端 + LlamaCppLLMProvider | `2f5aac5` ILLMProvider 实现 + `--llm-model` CLI |
+| **H.3** | 推理增强（UnifiedReasoningEngine 神经增强）| `NEW` LLM 语义推理补充符号推理 |
 
 ### 8.4 技术债务修复状态
 
@@ -624,10 +625,10 @@ inline void mat_vec(...) {
 
 ### 8.6 下一步行动
 
-1. **Week 2-3**：Phase 1 验证 — 下载 bge-small-zh-v1.5 模型，验证嵌入质量
-2. **Month 2**：Phase 2 对话后端（LlamaCppLLMProvider）
-3. **Month 3**：多线程推理并行化
-4. **Q3**：CUDA 加速 MLP/Light 前向路径
+1. **Week 2-3**：llama.cpp 三阶段验证 — 下载 Qwen2.5-3B / bge-small-zh 模型，验证嵌入质量、对话能力、推理增强
+2. **Month 2**：多线程推理并行化
+3. **Month 3**：CUDA 加速 MLP/Light 前向路径
+4. **Q3**：llama.cpp GPU offload（n_gpu_layers）性能优化
 
 ---
 

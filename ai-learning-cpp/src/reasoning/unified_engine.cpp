@@ -6,6 +6,7 @@
 #include "ai_learning/reasoning/unified_engine.hpp"
 #include "ai_learning/domain/knowledge/knowledge_graph.hpp"
 #include "ai_learning/domain/knowledge/relation.hpp"
+#include "ai_learning/language/llm_provider.hpp"
 #include "ai_learning/learning/statistical_learner.hpp"
 #include "ai_learning/memory/episodic_memory.hpp"
 #include "ai_learning/utils/utf8.hpp"
@@ -29,6 +30,11 @@ void UnifiedReasoningEngine::set_statistical_learner(
 void UnifiedReasoningEngine::set_episodic_memory(
     memory::EpisodicMemory* em) {
     episodic_ = em;
+}
+
+void UnifiedReasoningEngine::set_llm_provider(
+    language::ILLMProvider* llm) {
+    llm_ = llm;
 }
 
 // ── 主推理 ───────────────────────────────────────────────────────
@@ -87,6 +93,21 @@ auto UnifiedReasoningEngine::reason(const std::string& question) const
               [](const auto& a, const auto& b) {
                   return a.confidence > b.confidence;
               });
+
+    // ── 神经推理增强 ──────────────────────────────────────────
+    // 当最高符号推理置信度低于阈值且配置了 LLM 时，
+    // 调用 LLM 进行语义推理作为补充。
+    bool needs_neural = results.empty() ||
+                        results.front().confidence < kNeuralThreshold;
+    if (needs_neural && llm_ != nullptr) {
+        auto neural = neural_reasoning(question);
+        results.insert(results.end(), neural.begin(), neural.end());
+        // 重新排序
+        std::sort(results.begin(), results.end(),
+                  [](const auto& a, const auto& b) {
+                      return a.confidence > b.confidence;
+                  });
+    }
 
     return results;
 }
@@ -453,6 +474,83 @@ auto UnifiedReasoningEngine::find_common_patterns(
         }
     }
     return patterns;
+}
+
+// ── 神经推理增强 ─────────────────────────────────────────────────
+
+auto UnifiedReasoningEngine::neural_reasoning(
+    const std::string& question) const
+    -> std::vector<ReasoningResult> {
+    if (!llm_) return {};
+
+    // 构建系统提示词，提供知识图谱上下文
+    std::ostringstream sys_prompt;
+    sys_prompt << "你是一个知识推理助手。请基于已有知识回答问题。"
+               << "知识图谱中有 " << kg_.entity_count() << " 个实体，"
+               << kg_.relation_count() << " 个关系。"
+               << "请给出简洁的回答，并标注推理依据。"
+               << "格式：回答|置信度(0-1)|推理链";
+
+    // 提取问题中的关键词，尝试从知识图谱获取相关上下文
+    auto keywords = extract_keywords(question);
+    std::ostringstream kg_context;
+    kg_context << "相关知识：\n";
+    bool has_context = false;
+    for (const auto& kw : keywords) {
+        if (!kg_.has_entity(kw)) continue;
+        auto rels = kg_.get_relations_of(kw, "out");
+        for (const auto& ref : rels) {
+            const auto& rel = ref.get();
+            kg_context << "- " << kw << " " << rel.type() << " "
+                       << rel.target_id() << "\n";
+            has_context = true;
+        }
+    }
+
+    std::string full_prompt = question;
+    if (has_context) {
+        full_prompt = kg_context.str() + "\n问题：" + question;
+    }
+
+    // 调用 LLM
+    std::string llm_output;
+    try {
+        llm_output = llm_->complete(full_prompt, sys_prompt.str());
+    } catch (...) {
+        return {};
+    }
+
+    if (llm_output.empty()) return {};
+
+    // 解析 LLM 输出
+    ReasoningResult r;
+    r.content = llm_output;
+    r.confidence = 0.55;  // 神经推理置信度略低于直接查询但高于无结果
+    r.method = "neural";
+    r.evidence = {question};
+    r.reasoning_chain = {"LLM 语义推理补充"};
+
+    // 尝试从输出中提取置信度（简单模式匹配）
+    auto pipe_pos = llm_output.find('|');
+    if (pipe_pos != std::string::npos) {
+        auto last_pipe = llm_output.rfind('|');
+        if (last_pipe != std::string::npos && last_pipe > pipe_pos) {
+            // 格式: 回答|置信度|推理链
+            r.content = llm_output.substr(0, pipe_pos);
+            try {
+                auto conf_str = llm_output.substr(
+                    pipe_pos + 1, last_pipe - pipe_pos - 1);
+                r.confidence = std::stod(conf_str);
+            } catch (...) {
+                // 解析失败保持默认值
+            }
+            r.reasoning_chain = {
+                llm_output.substr(last_pipe + 1)
+            };
+        }
+    }
+
+    return {r};
 }
 
 }  // namespace ai_learning::reasoning

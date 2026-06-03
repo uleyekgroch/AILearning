@@ -28,6 +28,10 @@ namespace ai_learning::learning {
 class StatisticalLearner;
 }
 
+namespace ai_learning::language {
+class ILLMProvider;
+}
+
 namespace ai_learning::reasoning {
 
 /// 推理结果
@@ -56,6 +60,7 @@ public:
     /// 设置外部依赖（可选）
     void set_statistical_learner(learning::StatisticalLearner* sl);
     void set_episodic_memory(memory::EpisodicMemory* em);
+    void set_llm_provider(language::ILLMProvider* llm);
 
 private:
     // 推理路径
@@ -75,6 +80,10 @@ private:
                               const std::string& question) const
         -> std::vector<ReasoningResult>;
 
+    /// 神经推理增强 — 当符号推理置信度不足时调用 LLM
+    auto neural_reasoning(const std::string& question) const
+        -> std::vector<ReasoningResult>;
+
     // 辅助
     static auto find_common_patterns(
         const std::vector<std::string>& memories) -> std::vector<std::string>;
@@ -83,6 +92,10 @@ private:
     domain::knowledge::KnowledgeGraph& kg_;
     learning::StatisticalLearner* stat_learner_ = nullptr;
     memory::EpisodicMemory* episodic_ = nullptr;
+    language::ILLMProvider* llm_ = nullptr;
+
+    /// 神经推理触发阈值（最高置信度低于此值时触发）
+    static constexpr double kNeuralThreshold = 0.5;
 };
 
 }  // namespace ai_learning::reasoning

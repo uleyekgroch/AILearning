@@ -222,6 +222,18 @@ auto learner3 = ai_learning::core::LearnerFactory::create_with_engine(
 | **mlp** | 2 | 否 | SGD 反向传播 | 标准深度学习基线 |
 | **light** | 1 | 否 | Hebbian | 快速、轻量、嵌入式 |
 
+**神经推理增强（llama.cpp，可选）：**
+
+```cpp
+// 配置本地 LLM 用于推理增强
+config.llm_model_path = "/path/to/qwen2.5-3b-instruct-q4.gguf";
+
+// UnifiedReasoningEngine 自动使用 LLM 补充符号推理
+// 当最高符号推理置信度 < 0.5 时，调用 LLM 进行语义推理
+auto results = learner.reason("为什么天空是蓝色的");
+// results[0].method == "neural" (LLM 补充)
+```
+
 **性能基准（WSL, CPU-only）：**
 
 | 引擎 | predict(ns) | learn(ns) | ops/sec (obs=128) |
