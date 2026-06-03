@@ -44,7 +44,12 @@ ai_learning::core::Learner — 统一学习体（529 行瘦编排器）
 ├── 目标系统 — GoalManager（分解 + 规划 + 追踪）
 ├── 嵌入学习 — DistributionalSemantics + EmbeddingTrainer
 ├── 社会学习 — Society + AgentHandle（多 Agent 协作）
-├── REST API — 47 端点 + WebSocket 实时推送
+├── 多模态感知 — IModalEncoder（图像 CLIP + 音频 Stub）
+├── 知识图谱可视化 — GraphML/Cytoscape/D3 导出 + 交互页面
+├── 推理优化 — KV Cache 复用 + 批量推理 + 投机解码占位
+├── 模型量化 — GGUF 量化工具（q8_0 → q2_k）
+├── 分布式集群 — InferenceCluster 轮询负载均衡
+├── REST API — 65+ 端点 + WebSocket 实时推送
 └── CUDA 加速 — 8 个内核（自动 CPU stub 回退）
 ```
 
@@ -52,11 +57,11 @@ ai_learning::core::Learner — 统一学习体（529 行瘦编排器）
 
 | 维度 | 数值 |
 |------|------|
-| C++ 源文件 | 70 .cpp |
-| C++ 头文件 | 66 .hpp |
+| C++ 源文件 | 78 .cpp |
+| C++ 头文件 | 82 .hpp |
 | CUDA 内核 | 8 .cu |
-| 测试文件 | 27 .cpp |
-| **估算总行数** | **~34,400** |
+| 测试文件 | 35 .cpp |
+| **估算总行数** | **~38,000** |
 | 核心编排器 | 529 行 (`learner.hpp`) |
 | 最大单文件 | < 800 行（全部合规） |
 | 构建系统 | CMake 3.22+ |
