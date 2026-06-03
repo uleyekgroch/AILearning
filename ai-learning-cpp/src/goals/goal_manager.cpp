@@ -11,6 +11,7 @@
 #include "ai_learning/goals/goal_manager.hpp"
 #include "ai_learning/domain/knowledge/knowledge_graph.hpp"
 #include "ai_learning/learning/metacognition.hpp"
+#include "ai_learning/utils/utf8.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -63,41 +64,7 @@ auto GoalDecomposer::identify_required_knowledge(const Goal& goal) const
     return gaps;
 }
 
-/// 获取单个 UTF-8 字符的字节长度
-static auto utf8_char_len(unsigned char c) -> size_t {
-    if (c < 0x80) return 1;
-    if ((c & 0xE0) == 0xC0) return 2;
-    if ((c & 0xF0) == 0xE0) return 3;
-    if ((c & 0xF8) == 0xF0) return 4;
-    return 1;  // 无效 UTF-8，按单字节处理
-}
-
-/// 检查一个 UTF-8 标点是否为分隔符
-static auto is_utf8_delimiter(const std::string& text, size_t pos) -> bool {
-    unsigned char c0 = static_cast<unsigned char>(text[pos]);
-
-    // ASCII 分隔符
-    if (c0 == ',' || c0 == '!' || c0 == '?' || c0 == ';'
-        || c0 == '\n' || c0 == '\r' || c0 == '\t') {
-        return true;
-    }
-
-    // 多字节 UTF-8 标点
-    size_t len = utf8_char_len(c0);
-    if (pos + len > text.size()) return false;
-
-    if (len == 3) {
-        // U+3002 = 。 (E3 80 82)
-        // U+3001 = 、 (E3 80 81)
-        // U+FF0C = ， (EF BC 8C)
-        // U+FF1B = ； (EF BC 9B)
-        unsigned char c1 = static_cast<unsigned char>(text[pos + 1]);
-        unsigned char c2 = static_cast<unsigned char>(text[pos + 2]);
-        if (c0 == 0xE3 && c1 == 0x80 && (c2 == 0x82 || c2 == 0x81)) return true;
-        if (c0 == 0xEF && c1 == 0xBC && (c2 == 0x8C || c2 == 0x9B)) return true;
-    }
-    return false;
-}
+// UTF-8 工具已迁移至 ai_learning/utils/utf8.hpp
 
 auto GoalDecomposer::fallback_decompose_(const std::string& text) const
     -> std::vector<Goal>
@@ -107,9 +74,9 @@ auto GoalDecomposer::fallback_decompose_(const std::string& text) const
     std::string segment;
 
     for (size_t i = 0; i < text.size(); ) {
-        size_t clen = utf8_char_len(static_cast<unsigned char>(text[i]));
+        size_t clen = utils::utf8_char_len(static_cast<unsigned char>(text[i]));
 
-        if (is_utf8_delimiter(text, i)) {
+        if (utils::is_utf8_delimiter(text, i)) {
             if (segment.size() > 1) {
                 Goal g;
                 g.description = segment;

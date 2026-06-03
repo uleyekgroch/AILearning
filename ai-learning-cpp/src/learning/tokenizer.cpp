@@ -4,6 +4,7 @@
  */
 
 #include "ai_learning/learning/tokenizer.hpp"
+#include "ai_learning/utils/utf8.hpp"
 
 #include <algorithm>
 #include <cctype>
@@ -77,10 +78,7 @@ static std::vector<std::string> tokenize_chinese(const std::string& text) {
         if (uc >= 0x80) {
             flush_ascii();
             // 非 ASCII 字节：收集到完整 UTF-8 字符
-            int byte_len = 1;
-            if (uc >= 0xF0) byte_len = 4;
-            else if (uc >= 0xE0) byte_len = 3;
-            else if (uc >= 0xC0) byte_len = 2;
+            auto byte_len = static_cast<int>(utils::utf8_char_len(uc));
 
             if (i + byte_len <= text.size()) {
                 auto ch = text.substr(i, byte_len);

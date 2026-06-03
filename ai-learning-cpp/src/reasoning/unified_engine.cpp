@@ -8,6 +8,7 @@
 #include "ai_learning/domain/knowledge/relation.hpp"
 #include "ai_learning/learning/statistical_learner.hpp"
 #include "ai_learning/memory/episodic_memory.hpp"
+#include "ai_learning/utils/utf8.hpp"
 
 #include <algorithm>
 #include <functional>
@@ -369,17 +370,7 @@ auto UnifiedReasoningEngine::probabilistic_reasoning(
 auto UnifiedReasoningEngine::extract_keywords(const std::string& text)
     -> std::vector<std::string> {
     // 1. 先分割为 UTF-8 字符 tokens
-    std::vector<std::string> chars;
-    for (size_t i = 0; i < text.size(); ) {
-        auto uc = static_cast<unsigned char>(text[i]);
-        int byte_len = 1;
-        if (uc >= 0xE0) byte_len = 3;       // 3-byte UTF-8 (CJK)
-        else if (uc >= 0xC0) byte_len = 2;  // 2-byte UTF-8
-        if (i + byte_len <= text.size()) {
-            chars.push_back(text.substr(i, byte_len));
-        }
-        i += byte_len;
-    }
+    auto chars = utils::utf8_chars(text);
 
     // 2. 停用词
     static const std::vector<std::string> stops = {

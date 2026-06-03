@@ -4,6 +4,7 @@
  */
 
 #include "ai_learning/learning/statistical_learner.hpp"
+#include "ai_learning/utils/utf8.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -293,7 +294,8 @@ auto StatisticalLearner::segment(const std::string& text) const
     size_t i = 0;
     while (i < text.size()) {
         auto uc = static_cast<unsigned char>(text[i]);
-        if (uc >= 0xE4 && uc <= 0xE9) {
+        auto byte_len = utils::utf8_char_len(uc);
+        if (byte_len == 3 && uc >= 0xE4 && uc <= 0xE9) {
             // CJK 字符：3 字节 UTF-8
             auto ch = text.substr(i, 3);
             tokens.push_back(ch);
