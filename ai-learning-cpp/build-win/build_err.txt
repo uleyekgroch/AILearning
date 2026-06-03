@@ -1,0 +1,4 @@
+[ 24%] Built target ai_learning
+[ 84%] Built target Catch2
+[ 85%] Built target Catch2WithMain
+[ 86%] Building CXX object CMakeFiles/ai_learning_tests.dir/tests/learning/test_phase6_integration.cpp.obj

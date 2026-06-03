@@ -1,0 +1,11 @@
+{
+	"InstallScripts" : 
+	[
+		"D:/mayAi/AILearning_v0527/ai-learning-cpp/build-win/cmake_install.cmake",
+		"D:/mayAi/AILearning_v0527/ai-learning-cpp/build-win/_deps/catch2-build/cmake_install.cmake",
+		"D:/mayAi/AILearning_v0527/ai-learning-cpp/build-win/_deps/catch2-build/src/cmake_install.cmake",
+		"D:/mayAi/AILearning_v0527/ai-learning-cpp/build-win/_deps/nlohmann_json-build/cmake_install.cmake",
+		"D:/mayAi/AILearning_v0527/ai-learning-cpp/build-win/_deps/crow-build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

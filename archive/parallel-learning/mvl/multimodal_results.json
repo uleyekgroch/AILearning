@@ -1,0 +1,84 @@
+{
+  "final_stats": {
+    "total_steps": 5100,
+    "stage": "literacy",
+    "avg_error": NaN,
+    "curiosity": 0.0,
+    "learning_progress": 0.0,
+    "avg_inference_steps": 0.0,
+    "memory_working_size": 0,
+    "memory_episodic_size": 0,
+    "memory_semantic_concepts": 0,
+    "vocabulary_size": 297,
+    "grounded_symbols": 279,
+    "perceptual_clusters": 2,
+    "comm_success_rate": 0.0,
+    "comm_games": 0,
+    "reading_accuracy": 0.42,
+    "writing_accuracy": 0.36,
+    "listening_accuracy": 0.34,
+    "grammar_accuracy": 0.38
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "stage": "literacy",
+      "vocabulary_size": 297.0,
+      "comm_success_rate": 0.0,
+      "skills": {
+        "reading": "27/88",
+        "writing": "25/68",
+        "listening": "27/68",
+        "grammar": "4/21"
+      }
+    },
+    {
+      "round": 2,
+      "stage": "literacy",
+      "vocabulary_size": 297.0,
+      "comm_success_rate": 0.0,
+      "skills": {
+        "reading": "29/88",
+        "writing": "27/68",
+        "listening": "27/68",
+        "grammar": "4/21"
+      }
+    },
+    {
+      "round": 3,
+      "stage": "literacy",
+      "vocabulary_size": 297.0,
+      "comm_success_rate": 0.0,
+      "skills": {
+        "reading": "24/88",
+        "writing": "32/68",
+        "listening": "26/68",
+        "grammar": "8/21"
+      }
+    },
+    {
+      "round": 4,
+      "stage": "literacy",
+      "vocabulary_size": 297.0,
+      "comm_success_rate": 0.0,
+      "skills": {
+        "reading": "29/88",
+        "writing": "31/68",
+        "listening": "23/68",
+        "grammar": "6/21"
+      }
+    },
+    {
+      "round": 5,
+      "stage": "literacy",
+      "vocabulary_size": 297.0,
+      "comm_success_rate": 0.0,
+      "skills": {
+        "reading": "32/88",
+        "writing": "32/68",
+        "listening": "27/68",
+        "grammar": "8/21"
+      }
+    }
+  ]
+}

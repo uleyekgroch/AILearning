@@ -1,0 +1,5 @@
+if(EXISTS "/mnt/d/mayAi/AILearning_v0527/ai-learning-cpp/build-cuda/ai_learning_tests-b12d07c_tests.cmake")
+  include("/mnt/d/mayAi/AILearning_v0527/ai-learning-cpp/build-cuda/ai_learning_tests-b12d07c_tests.cmake")
+else()
+  add_test(ai_learning_tests_NOT_BUILT-b12d07c ai_learning_tests_NOT_BUILT-b12d07c)
+endif()

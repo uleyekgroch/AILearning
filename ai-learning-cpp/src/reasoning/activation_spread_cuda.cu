@@ -607,7 +607,7 @@ auto activation_spread_from_adjacency(
         for (const auto& [dst_id, weight] : neighbors) {
             auto dst_it = id_to_idx.find(dst_id);
             if (dst_it == id_to_idx.end()) continue;
-            in_degree[dst_idx]++;
+            in_degree[dst_it->second]++;
         }
     }
 

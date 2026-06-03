@@ -19,6 +19,9 @@ if(CMAKE_CUDA_COMPILER)
     # CMake 3.22 需要显式找 CUDA 包以获得 CUDA::cudart 等目标
     find_package(CUDAToolkit REQUIRED)
 
+    # 允许在 CUDA 代码中使用 __host__/__device__ lambda（cuda_fp16_utils.cuh 需要）
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --extended-lambda")
+
     message(STATUS "✅ CUDA enabled: ${CMAKE_CUDA_COMPILER}")
 else()
     set(CUDA_FOUND FALSE)
@@ -109,6 +112,8 @@ if(CUDA_FOUND)
     )
     target_link_libraries(ai_learning_cuda
         PUBLIC CUDA::cudart CUDA::cublas)
+    target_compile_options(ai_learning_cuda PRIVATE
+        $<$<COMPILE_LANGUAGE:CUDA>:--extended-lambda>)
 else()
     # 无 CUDA 时，添加 stub 实现（cuda_available() 返回 false）
     list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/tensor_ops_cuda_stub.cpp")

@@ -37,62 +37,62 @@ struct WikiArticle {
 };
 
 /// 从单个 wiki_zh 文件中解析所有文章
-/// 格式：多个 JSON 对象拼接，text 字段含换行符，需 brace-depth 计数
+/// 格式：每行一个 JSON 对象 {id, url, title, text}
 auto parse_wiki_file(const std::string& filepath)
     -> std::vector<WikiArticle>
 {
     std::ifstream ifs(filepath, std::ios::binary);
     if (!ifs) return {};
 
-    std::string content((std::istreambuf_iterator<char>(ifs)),
-                         std::istreambuf_iterator<char>());
-    ifs.close();
-
     std::vector<WikiArticle> articles;
-    int depth = 0;
-    size_t start = std::string::npos;
+    std::string line;
 
-    for (size_t i = 0; i < content.size(); ++i) {
-        char ch = content[i];
-        if (ch == '{') {
-            if (depth == 0) start = i;
-            ++depth;
-        } else if (ch == '}') {
-            --depth;
-            if (depth == 0 && start != std::string::npos) {
-                try {
-                    auto obj = json::parse(content.substr(start, i - start + 1));
-                    WikiArticle art;
-                    art.id    = obj.value("id", "");
-                    art.title = obj.value("title", "");
-                    art.text  = obj.value("text", "");
-                    if (!art.title.empty() && !art.text.empty()) {
-                        articles.push_back(std::move(art));
-                    }
-                } catch (...) {
-                    // 跳过解析失败的条目
-                }
-                start = std::string::npos;
+    while (std::getline(ifs, line)) {
+        // 跳过空行
+        if (line.empty() || line == "\r") continue;
+        // 跳过非 JSON 行
+        if (line[0] != '{') continue;
+
+        try {
+            auto obj = json::parse(line);
+            WikiArticle art;
+            art.id    = obj.value("id", "");
+            art.title = obj.value("title", "");
+            art.text  = obj.value("text", "");
+            if (!art.title.empty() && !art.text.empty()) {
+                articles.push_back(std::move(art));
             }
+        } catch (...) {
+            // 跳过解析失败的行
         }
     }
+    ifs.close();
     return articles;
 }
 
-/// 扫描目录下所有 wiki 文件
+/// 扫描目录下所有 wiki 文件（支持一层和两层目录结构）
 auto scan_wiki_files(const std::string& base_dir)
     -> std::vector<std::string>
 {
     std::vector<std::string> files;
     if (!fs::exists(base_dir)) return files;
 
-    for (const auto& subdir : fs::directory_iterator(base_dir)) {
-        if (!subdir.is_directory()) continue;
-        for (const auto& file : fs::directory_iterator(subdir.path())) {
-            if (file.is_regular_file()) {
-                auto name = file.path().filename().string();
-                // wiki_zh 文件名如 wiki_00, wiki_01
-                if (name.substr(0, 5) == "wiki_") {
+    // 辅助：检查文件名是否为 wiki_* 格式
+    auto is_wiki_file = [](const std::string& name) -> bool {
+        return name.size() > 5 && name.substr(0, 5) == "wiki_";
+    };
+
+    for (const auto& entry : fs::directory_iterator(base_dir)) {
+        if (entry.is_regular_file()) {
+            // 直接在 base_dir 下: base_dir/wiki_00
+            if (is_wiki_file(entry.path().filename().string())) {
+                files.push_back(entry.path().string());
+            }
+        } else if (entry.is_directory()) {
+            // 一层子目录: base_dir/AA/wiki_00
+            for (const auto& file : fs::directory_iterator(entry.path())) {
+                if (file.is_regular_file() &&
+                    is_wiki_file(file.path().filename().string())) {
                     files.push_back(file.path().string());
                 }
             }
@@ -299,11 +299,6 @@ int main(int argc, char* argv[]) {
         for (const auto& art : articles) {
             // 组合标题和正文
             std::string input = art.title + "：" + art.text;
-
-            // 截断过长文本（防止处理时间过长）
-            if (input.size() > 5000) {
-                input = input.substr(0, 5000);
-            }
 
             auto result = learner.learn_from_text(input, art.title);
 

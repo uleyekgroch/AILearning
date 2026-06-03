@@ -1,0 +1,55 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "matcher_regex": "ai-learning-cpp/src/.*\\.(cpp|hpp)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -Command \"wsl -d Ubuntu-22.04 -- bash -c 'cd /mnt/d/mayAi/AILearning_v0527/ai-learning-cpp/build-cuda && cmake --build . --parallel 2>&1 | tail -5'\""
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -m py_compile \"$FILE\" 2>&1 || true"
+          },
+          {
+            "type": "command",
+            "command": "python -m ruff check \"$FILE\" --fix 2>&1 || true"
+          },
+          {
+            "type": "command",
+            "command": "python -m black \"$FILE\" 2>&1 || true"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "matcher_regex": "parallel-learning/src/.*\\.py$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -m mypy \"$FILE\" --ignore-missing-imports 2>&1 || true"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "matcher_regex": "ai-learning-cpp/build-(cuda|wsl)/.*$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '⚠️ Blocked: Cannot edit build artifacts in build-cuda/ or build-wsl/' >&2 && exit 1"
+          }
+        ]
+      }
+    ]
+  }
+}

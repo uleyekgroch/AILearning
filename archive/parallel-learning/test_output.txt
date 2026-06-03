@@ -1,0 +1,6 @@
+A1: 光合的植物利用的绿体中进行的利用阳光的二氧化碳
+A1 has leafgreen: False
+A2: 光合的植物利用的绿体中进行的光合作用的二氧化碳
+A2 non-empty: True
+A3: 光合的植物利用的绿体中进行的利用阳光的二氧化碳
+A3 no template: True

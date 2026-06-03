@@ -1,0 +1,33 @@
+         44507671 function calls (43060031 primitive calls) in 90.498 seconds
+
+   Ordered by: cumulative time
+   List reduced from 563 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.027    0.027   90.498   90.498 D:\mayAi\AILearning_v0527\parallel-learning\src\core\learner.py:1193(learn_from_text)
+        1    0.478    0.478   43.367   43.367 D:\mayAi\AILearning_v0527\parallel-learning\src\core\learner.py:3018(_extract_relations_from_repr)
+    86945    0.109    0.000   42.158    0.000 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\re\__init__.py:225(compile)
+    86964    1.432    0.000   42.060    0.000 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\re\__init__.py:272(_compile)
+        1    7.979    7.979   38.546   38.546 D:\mayAi\AILearning_v0527\parallel-learning\src\core\learner.py:2755(_train_embedding)
+    86956    0.915    0.000   37.905    0.000 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\re\_compiler.py:740(compile)
+    86956    0.612    0.000   20.041    0.000 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\re\_parser.py:979(parse)
+130453/86956    1.760    0.000   18.776    0.000 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\re\_parser.py:456(_parse_sub)
+260922/86956    7.350    0.000   17.933    0.000 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\re\_parser.py:516(_parse)
+    33546   16.558    0.000   16.558    0.000 {built-in method torch.cosine_similarity}
+    86956    0.361    0.000   16.458    0.000 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\re\_compiler.py:573(_code)
+49950/1034    0.181    0.000   11.615    0.011 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\nn\modules\module.py:1735(_wrapped_call_impl)
+49950/1034    0.394    0.000   11.609    0.011 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\nn\modules\module.py:1743(_call_impl)
+     1018    0.490    0.000   11.554    0.011 D:\mayAi\AILearning_v0527\parallel-learning\src\perception\learnable_encoder.py:331(forward)
+391364/86956    4.108    0.000   11.025    0.000 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\re\_compiler.py:37(_compile)
+     3054    0.616    0.000    9.662    0.003 D:\mayAi\AILearning_v0527\parallel-learning\src\perception\learnable_encoder.py:272(forward)
+        6    0.016    0.003    7.812    1.302 D:\mayAi\AILearning_v0527\parallel-learning\src\learning\statistical_learner.py:407(get_emergent_concepts)
+        1    0.268    0.268    7.568    7.568 D:\mayAi\AILearning_v0527\parallel-learning\src\learning\statistical_learner.py:216(_post_emergence_cleanup)
+      353    5.036    0.014    7.160    0.020 D:\mayAi\AILearning_v0527\parallel-learning\src\learning\statistical_learner.py:346(_check_ngram_parents)
+       29    0.218    0.008    6.070    0.209 D:\mayAi\AILearning_v0527\parallel-learning\src\learning\concept_space.py:358(get_related)
+     3054    0.926    0.000    5.856    0.002 D:\mayAi\AILearning_v0527\parallel-learning\src\perception\learnable_encoder.py:227(forward)
+    86956    1.066    0.000    5.013    0.000 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\re\_compiler.py:511(_compile_info)
+16545171/16023356    3.733    0.000    4.089    0.000 {built-in method builtins.len}
+    86967    2.931    0.000    3.909    0.000 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\re\_compiler.py:243(_optimize_charset)
+    18356    0.130    0.000    3.308    0.000 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\nn\modules\linear.py:124(forward)
+
+

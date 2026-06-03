@@ -1,0 +1,233 @@
+{
+  "knowledge_graph": {
+    "entity_count": 4591
+  },
+  "reasoning_tests": [
+    {
+      "answer": "\u62b1\u6b49\uff0c\u6211\u6682\u65f6\u4e0d\u77e5\u9053\u7b54\u6848",
+      "question": "\u6570\u5b66"
+    },
+    {
+      "answer": "\u62b1\u6b49\uff0c\u6211\u6682\u65f6\u4e0d\u77e5\u9053\u7b54\u6848",
+      "question": "\u7269\u7406"
+    },
+    {
+      "answer": "\u62b1\u6b49\uff0c\u6211\u6682\u65f6\u4e0d\u77e5\u9053\u7b54\u6848",
+      "question": "\u4e2d\u56fd"
+    },
+    {
+      "answer": "\u62b1\u6b49\uff0c\u6211\u6682\u65f6\u4e0d\u77e5\u9053\u7b54\u6848",
+      "question": "\u5386\u53f2"
+    },
+    {
+      "answer": "\u62b1\u6b49\uff0c\u6211\u6682\u65f6\u4e0d\u77e5\u9053\u7b54\u6848",
+      "question": "\u8ba1\u7b97\u673a"
+    },
+    {
+      "answer": "\u62b1\u6b49\uff0c\u6211\u6682\u65f6\u4e0d\u77e5\u9053\u7b54\u6848",
+      "question": "\u4eba\u5de5\u667a\u80fd"
+    },
+    {
+      "answer": "\u62b1\u6b49\uff0c\u6211\u6682\u65f6\u4e0d\u77e5\u9053\u7b54\u6848",
+      "question": "\u751f\u7269"
+    },
+    {
+      "answer": "\u62b1\u6b49\uff0c\u6211\u6682\u65f6\u4e0d\u77e5\u9053\u7b54\u6848",
+      "question": "\u5316\u5b66"
+    },
+    {
+      "answer": "\u62b1\u6b49\uff0c\u6211\u6682\u65f6\u4e0d\u77e5\u9053\u7b54\u6848",
+      "question": "\u5730\u7403"
+    },
+    {
+      "answer": "\u62b1\u6b49\uff0c\u6211\u6682\u65f6\u4e0d\u77e5\u9053\u7b54\u6848",
+      "question": "\u8bed\u8a00"
+    }
+  ],
+  "relation_distribution": [
+    {
+      "count": 701,
+      "relation": "\u662f"
+    },
+    {
+      "count": 58,
+      "relation": "\u5305\u62ec"
+    },
+    {
+      "count": 50,
+      "relation": "\u79f0\u4e3a"
+    },
+    {
+      "count": 29,
+      "relation": "\u4ea7\u751f"
+    },
+    {
+      "count": 23,
+      "relation": "\u5305\u542b"
+    },
+    {
+      "count": 17,
+      "relation": "\u5c5e\u4e8e"
+    },
+    {
+      "count": 10,
+      "relation": "\u6784\u6210"
+    },
+    {
+      "count": 8,
+      "relation": "\u5bfc\u81f4"
+    },
+    {
+      "count": 7,
+      "relation": "\u4f4d\u4e8e"
+    },
+    {
+      "count": 2,
+      "relation": "\u53eb\u505a"
+    }
+  ],
+  "stats": {
+    "elapsed_seconds": 0.8488285,
+    "failed": 0,
+    "files_processed": 2,
+    "total_articles": 87,
+    "total_causal": 27,
+    "total_entities": 3844,
+    "total_numerical": 575,
+    "total_triples": 905,
+    "verification_rate": 1.0,
+    "verified": 87
+  },
+  "system_stats": {
+    "cortical_facts": 5.0,
+    "curiosity": 1.0,
+    "entity_count": 4591.0,
+    "hippocampal_episodes": 87.0,
+    "learning_progress": 0.0,
+    "relation_count": 919.0,
+    "stage_index": 0.0,
+    "total_steps": 0.0
+  },
+  "top_entities": [
+    {
+      "count": 20,
+      "entity": "\u79d1\u5b66"
+    },
+    {
+      "count": 20,
+      "entity": "\u4e2d\u56fd"
+    },
+    {
+      "count": 19,
+      "entity": "\u4e16\u7eaa"
+    },
+    {
+      "count": 19,
+      "entity": "\u5b66\u5bb6"
+    },
+    {
+      "count": 19,
+      "entity": "\u5b66\u7684"
+    },
+    {
+      "count": 17,
+      "entity": "\u5386\u53f2"
+    },
+    {
+      "count": 14,
+      "entity": "\u4eba\u7c7b"
+    },
+    {
+      "count": 13,
+      "entity": "\u8ba1\u7b97"
+    },
+    {
+      "count": 11,
+      "entity": "\u662f\u4e00"
+    },
+    {
+      "count": 11,
+      "entity": "\u793e\u4f1a"
+    },
+    {
+      "count": 10,
+      "entity": "\u8bed\u8a00"
+    },
+    {
+      "count": 10,
+      "entity": "\u56fd\u5bb6"
+    },
+    {
+      "count": 10,
+      "entity": "\u5b9a\u4e49"
+    },
+    {
+      "count": 10,
+      "entity": "\u8ba1\u7b97\u673a"
+    },
+    {
+      "count": 10,
+      "entity": "\u7b97\u673a"
+    },
+    {
+      "count": 9,
+      "entity": "\u4f8b\u5982"
+    },
+    {
+      "count": 9,
+      "entity": "\u81ea\u7531"
+    },
+    {
+      "count": 9,
+      "entity": "\u4e2d\u534e"
+    },
+    {
+      "count": 9,
+      "entity": "\u5730\u533a"
+    },
+    {
+      "count": 8,
+      "entity": "\u534e\u4eba\u6c11"
+    },
+    {
+      "count": 8,
+      "entity": "\u6570\u5b66"
+    },
+    {
+      "count": 8,
+      "entity": "\u6587\u5316"
+    },
+    {
+      "count": 8,
+      "entity": "\u4eba\u6c11\u5171\u548c"
+    },
+    {
+      "count": 7,
+      "entity": "\u81ea\u7136"
+    },
+    {
+      "count": 7,
+      "entity": "\u4eba\u6c11"
+    },
+    {
+      "count": 7,
+      "entity": "\u4e16\u754c"
+    },
+    {
+      "count": 7,
+      "entity": "\u4e2d\u534e\u4eba\u6c11"
+    },
+    {
+      "count": 7,
+      "entity": "\u5171\u548c"
+    },
+    {
+      "count": 7,
+      "entity": "\u7535\u8111"
+    },
+    {
+      "count": 7,
+      "entity": "\u63d0\u51fa"
+    }
+  ]
+}

@@ -10,109 +10,163 @@
 
 学习的本质是**预测误差最小化**（自由能原理）。语言从交流压力中自发涌现，符号接地不限于视觉——所有感知模态都能接地。
 
-## 系统架构
+## 项目结构
 
 ```
-src/core/learner.py — 主学习体（3282行）
-├── 感知层 — BPE分词 + Transformer编码器
-├── 预测编码引擎 — Hebbian学习 + 预测编码Light
-├── 知识图谱 — 实体-关系存储
-├── 记忆系统 — 工作/情景/语义记忆 + 多时间尺度
-├── 推理引擎 — 6种推理模式（直接/因果/归纳/类比/反事实/概率）
-├── 元认知 — 自我评估/知识空白
-├── 语言接地 — 符号↔世界模型
-├── 发展阶段 — Piaget式课程
-├── 自改进 — 脚手架+权重更新
-├── 反思学习 — 经验反思+策略合成
-├── 测试时训练 — In-Place TTT (ICLR 2026)
-├── BTSP学习 — 单次学习（资格痕迹+平台电位）
-└── 认知机制 — 认知路由+GHL+学习进展+类别先于语言+元学习组合
+ai-learning-cpp/     ← C++20 生产系统（活跃开发）
+├── src/             — 70 个 .cpp 实现文件
+├── include/         — 66 个 .hpp 接口定义
+├── tests/           — 27 个 Catch2 单元测试
+└── CMakeLists.txt   — CMake 构建（CUDA 自动检测）
+
+data/                — Wiki 语料数据资产
+archive/             — 历史实验代码（已废弃）
+  ├── parallel-learning/  — Python 早期生产代码
+  └── mvl/                — Python 实验验证脚本
+```
+
+> **Python 代码已归档**：`parallel-learning/` 与 `mvl/` 为历史实验代码，于 2026-06-03 移入 `archive/`。所有生产开发已迁移至 `ai-learning-cpp/`（C++20 实现）。
+
+## 系统架构（C++20）
+
+```
+ai_learning::core::Learner — 统一学习体（529 行瘦编排器）
+├── 感知层 — MultiModalEncoder（视觉/听觉/位置）
+├── 预测编码引擎 — Hebbian 学习（无反向传播）
+├── 知识图谱 — Entity-Relation 聚合根（DDD）
+├── 记忆系统 — 海马快速 + 皮层慢速 + 睡眠巩固
+├── 推理引擎 — 6 种模式（直接/因果/归纳/类比/反事实/概率）
+├── 元认知 — 自我评估 / 知识空白检测
+├── 语言接地 — GroundingModule + DevelopmentTracker
+├── 发展阶段 — Piaget 式 5 阶段自动晋升
+├── 目标系统 — GoalManager（分解 + 规划 + 追踪）
+├── 嵌入学习 — DistributionalSemantics + EmbeddingTrainer
+├── 社会学习 — Society + AgentHandle（多 Agent 协作）
+├── REST API — 47 端点 + WebSocket 实时推送
+└── CUDA 加速 — 8 个内核（自动 CPU stub 回退）
 ```
 
 ## 项目规模
 
-- **源文件**: 135个Python文件
-- **代码量**: 36,741行
-- **主系统**: 3,282行 (learner.py)
-- **学习模块**: 21个
-- **推理模块**: 20个
-- **感知模块**: 10个
-- **Git提交**: 20次迭代
+| 维度 | 数值 |
+|------|------|
+| C++ 源文件 | 70 .cpp |
+| C++ 头文件 | 66 .hpp |
+| CUDA 内核 | 8 .cu |
+| 测试文件 | 27 .cpp |
+| **估算总行数** | **~34,400** |
+| 核心编排器 | 529 行 (`learner.hpp`) |
+| 最大单文件 | < 800 行（全部合规） |
+| 构建系统 | CMake 3.22+ |
 
 ## 核心能力
 
-### 1. BPE分词 + Transformer编码器
+### 1. C++20 预测编码引擎
 
-```python
-# 从字符级升级到子词级
-encoder = LearnableTextEncoder(d_model=128, n_heads=4, n_layers=2)
-encoder.train_tokenizer(corpus)  # 从语料学习BPE合并规则
-embedding = encoder(text)  # Transformer编码
+```cpp
+ai_learning::learning::PredictiveCodingEngine engine(config);
+
+// 从预测误差学习（Hebbian，无反向传播）
+double error = engine.learn(obs, action, actual_next_obs);
+
+// 好奇心 = 预测误差 × 可学习性
+double curiosity = engine.get_curiosity();
 ```
 
-### 2. 测试时训练 (In-Place TTT)
+### 2. 分布语义 + 稠密嵌入
 
-```python
-# 推理时原地更新快权重
-ttt = TestTimeTrainer(encoder, lr=1e-5)
-ttt.adapt_to_query(query, query_repr, relevant_entities)
-# 自适应学习率：相似度高→小更新，相似度低→大更新
+```cpp
+// 从文本统计学习概念共现
+learner.observe_text("数学是研究数量和结构的学科");
+
+// 训练 Skip-gram 嵌入（自动 CPU/CUDA）
+auto result = learner.embedding_trainer().train();
+
+// 语义相似度查询
+auto similar = learner.distributional_semantics().similarity("数学", "物理");
 ```
 
-### 3. BTSP单次学习
+### 3. 文本学习与知识图谱
 
-```python
-# 行为时间尺度突触可塑性
-btsp = BTSPLearningSystem()
-btsp.mark_eligible(entity, embedding)  # 资格痕迹
-btsp.trigger_plateau(trigger_strength=1.0)  # 平台电位
-# 差异化增强：远离其他实体中心
+```cpp
+// 从文本提取实体、关系、因果、数值
+auto result = learner.learn_from_text("牛顿发现了万有引力定律");
+
+// 知识图谱自动增长
+std::cout << learner.knowledge_graph().entity_count() << " entities\n";
+std::cout << learner.knowledge_graph().relation_count() << " relations\n";
+
+// 思考/回答
+std::string answer = learner.think("什么是人工智能");
 ```
 
-### 4. 认知预测路由
+### 4. REST API 服务
 
-```python
-# 区分低级感觉误差和高级认知误差
-router = CognitivePredictiveRouter()
-routing = router.route_error(low_error, high_error)
-# 动态调整路由权重：低级0.3, 高级0.7
+```bash
+# 启动服务
+./ai_learning_server --port 8080 --threads 4
+
+# 文本学习
+curl -X POST http://localhost:8080/api/learn/text \
+  -H "Content-Type: application/json" \
+  -d '{"text": "人工智能是计算机科学的一个分支"}'
+
+# 提问
+curl -X POST http://localhost:8080/api/think \
+  -H "Content-Type: application/json" \
+  -d '{"question": "什么是人工智能"}'
+
+# WebSocket 实时统计
+ws://localhost:8080/ws/stats
 ```
 
-### 5. GHL全局调制Hebbian学习
+### 5. 自主学习循环
 
-```python
-# 神经调质信号调制局部学习
-ghl = GlobalModulatedHebbian()
-global_signal = ghl.compute_global_signal(reward, novelty, uncertainty)
-delta = ghl.hebbian_update(pre, post, global_signal)
-# Δw = η × sign(global_signal) × pre × post
+```cpp
+// 在环境中运行完整闭环
+auto result = learner.autonomous_learn(env, 1000, 0, 100);
+std::cout << "steps: " << result.total_steps << "\n";
+std::cout << "avg_error: " << result.avg_error << "\n";
 ```
 
-### 6. 学习进展好奇心
+### 6. 多 Agent 社会
 
-```python
-# 探索甜蜜区（不太简单也不太难）
-progress = LearningProgressCuriosity()
-progress.update_progress(domain, performance)
-sweet_spot = progress.get_sweet_spot_domain()
+```cpp
+ai_learning::society::Society society(config);
+auto agent1 = society.create_agent();
+auto agent2 = society.create_agent();
+
+// 社会观察学习
+society.trigger_observation(agent2, agent1, "mathematics");
+
+// 广播知识
+society.broadcast_knowledge(agent1, "physics");
 ```
 
-### 7. 先类别后语言
+## 构建
 
-```python
-# 感知分类先于语言涌现
-categories = PerceptualCategorySystem()
-category = categories.discover_category(entity, representation)
-# 自动聚类：12个实体→1个类别
-```
+### 要求
 
-### 8. 元学习组合规则
+- CMake 3.22+
+- C++20 编译器（GCC 11+, MSVC 2022+, Clang 14+）
+- CUDA Toolkit 12.x（可选，无则自动纯 CPU 构建）
 
-```python
-# 学习如何组合，而非记住什么组合
-composition = MetaLearningComposition()
-composition.learn_rule(components, result, success)
-predicted = composition.apply_rule(new_components)
+### 快速开始
+
+```bash
+cd ai-learning-cpp
+mkdir build && cd build
+cmake ..
+cmake --build . -j$(nproc)
+
+# 运行主程序
+./ai_learning_main
+
+# 运行测试
+./ai_learning_tests
+
+# 启动 REST 服务
+./ai_learning_server --port 8080
 ```
 
 ## 测试结果

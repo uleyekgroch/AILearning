@@ -1,0 +1,8 @@
+{"file": ".trellis/tasks/06-02-ailearning-phase-7-9/prd.md", "reason": "验收标准检查 — 对照 PRD 中的 Acceptance Criteria 和 Definition of Done"}
+{"file": ".trellis/tasks/06-02-ailearning-phase-7-9/research/rest-api-frameworks.md", "reason": "验证 REST API 实现符合 crow 最佳实践"}
+{"file": ".trellis/tasks/06-02-ailearning-phase-7-9/research/visualization-options.md", "reason": "验证可视化实现符合 WebSocket + ECharts 推荐方案"}
+{"file": "ai-learning-cpp/include/ai_learning/core/learner.hpp", "reason": "检查 API 端点是否完整覆盖所有 Learner 公共方法"}
+{"file": "ai-learning-cpp/include/ai_learning/domain/domain_events.hpp", "reason": "检查事件发布是否正确接入 IEventPublisher"}
+{"file": "ai-learning-cpp/CMakeLists.txt", "reason": "检查构建配置是否正确集成新依赖（crow/json/CUDA）"}
+{"file": "CLAUDE.md", "reason": "代码质量标准 — 800行限制、DDD/TDD/SOLID 规范、代码审查清单"}
+{"file": "HANDOFF.md", "reason": "开发注意事项 — C++20 关键字冲突、CMake GLOB_RECURSE、浮点断言等"}

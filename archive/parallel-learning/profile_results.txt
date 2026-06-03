@@ -1,0 +1,28 @@
+         382199 function calls (363464 primitive calls) in 2.777 seconds
+
+   Ordered by: cumulative time
+   List reduced from 572 to 20 due to restriction <20>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.006    0.006    2.777    2.777 D:\mayAi\AILearning_v0527\parallel-learning\src\core\learner.py:1193(learn_from_text)
+        1    0.050    0.050    1.920    1.920 D:\mayAi\AILearning_v0527\parallel-learning\src\core\learner.py:2753(_train_embedding)
+ 5997/137    0.022    0.000    1.445    0.011 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\nn\modules\module.py:1735(_wrapped_call_impl)
+ 5997/137    0.048    0.000    1.444    0.011 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\nn\modules\module.py:1743(_call_impl)
+      121    0.061    0.001    1.417    0.012 D:\mayAi\AILearning_v0527\parallel-learning\src\perception\learnable_encoder.py:331(forward)
+      363    0.077    0.000    1.189    0.003 D:\mayAi\AILearning_v0527\parallel-learning\src\perception\learnable_encoder.py:272(forward)
+        1    0.003    0.003    0.985    0.985 D:\mayAi\AILearning_v0527\parallel-learning\src\learning\contrastive_trainer.py:309(train_step)
+      363    0.107    0.000    0.715    0.002 D:\mayAi\AILearning_v0527\parallel-learning\src\perception\learnable_encoder.py:227(forward)
+     2210    0.013    0.000    0.425    0.000 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\nn\modules\linear.py:124(forward)
+     1128    0.415    0.000    0.415    0.000 {built-in method torch.cosine_similarity}
+     2210    0.407    0.000    0.407    0.000 {built-in method torch._C._nn.linear}
+       23    0.000    0.000    0.337    0.015 D:\mayAi\AILearning_v0527\parallel-learning\src\learning\contrastive_trainer.py:217(_encode)
+       23    0.001    0.000    0.280    0.012 D:\mayAi\AILearning_v0527\parallel-learning\src\learning\contrastive_trainer.py:222(_encode_no_grad)
+       11    0.000    0.000    0.272    0.025 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\_tensor.py:570(backward)
+       11    0.000    0.000    0.271    0.025 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\autograd\__init__.py:242(backward)
+       11    0.000    0.000    0.270    0.025 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\autograd\graph.py:814(_engine_run_backward)
+       11    0.270    0.025    0.270    0.025 {method 'run_backward' of 'torch._C._EngineBase' objects}
+      373    0.012    0.000    0.265    0.001 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\nn\modules\container.py:248(forward)
+        9    0.010    0.001    0.262    0.029 D:\mayAi\AILearning_v0527\parallel-learning\src\learning\concept_space.py:358(get_related)
+       88    0.001    0.000    0.192    0.002 D:\mayAi\AILearning_v0527\parallel-learning\src\core\learner.py:2117(_encode_text)
+
+

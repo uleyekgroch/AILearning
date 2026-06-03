@@ -33,7 +33,7 @@
 
 namespace ai_learning::core {
 extern auto cuda_available() -> bool;
-extern struct CudaContext;
+struct CudaContext;  // forward declaration only
 }  // namespace ai_learning::core
 
 namespace ai_learning::learning {

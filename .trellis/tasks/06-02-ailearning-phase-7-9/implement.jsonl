@@ -1,0 +1,12 @@
+{"file": ".trellis/tasks/06-02-ailearning-phase-7-9/prd.md", "reason": "完整路线图 PRD — Phase 7/8/9 目标、决策、子阶段分解、验收标准、依赖关系"}
+{"file": ".trellis/tasks/06-02-ailearning-phase-7-9/research/rest-api-frameworks.md", "reason": "REST API 框架对比研究 — crow + nlohmann/json 推荐方案、端点设计、CMake 集成"}
+{"file": ".trellis/tasks/06-02-ailearning-phase-7-9/research/visualization-options.md", "reason": "可视化方案研究 — WebSocket + Vue3 + ECharts 推荐、事件流架构"}
+{"file": ".trellis/tasks/06-02-ailearning-phase-7-9/research/pybind11-patterns.md", "reason": "pybind11 绑定参考（备用） — 值语义策略、STL 映射、GIL 管理"}
+{"file": "ai-learning-cpp/include/ai_learning/core/learner.hpp", "reason": "Learner 编排器 — 26+ 子系统、~50+ 公共 API、Phase 1-6 全部方法签名"}
+{"file": "ai-learning-cpp/include/ai_learning/core/types.hpp", "reason": "核心类型定义 — Tensor、Properties、Result 类型等 API 响应映射基础"}
+{"file": "ai-learning-cpp/include/ai_learning/core/config.hpp", "reason": "配置系统 — LearnerConfig、Device 枚举、PlasticitySchedule"}
+{"file": "ai-learning-cpp/include/ai_learning/domain/domain_events.hpp", "reason": "领域事件 + IEventPublisher — WebSocket 事件流接入点"}
+{"file": "ai-learning-cpp/include/ai_learning/domain/social/i_social_agent.hpp", "reason": "社会 Agent 接口 — Phase 9.1 多 Agent 协作基础"}
+{"file": "ai-learning-cpp/include/ai_learning/domain/environment/i_environment.hpp", "reason": "环境接口 — Phase 9.1 多 Agent 共享环境"}
+{"file": "ai-learning-cpp/CMakeLists.txt", "reason": "构建配置 — FetchContent 模式、CUDA 可选、现有 target 结构"}
+{"file": "HANDOFF.md", "reason": "项目交接文档 — 完整架构、6 个 Phase 详情、构建/测试命令、开发注意事项"}

@@ -1,0 +1,38 @@
+         122445668 function calls (122001480 primitive calls) in 106.138 seconds
+
+   Ordered by: cumulative time
+   List reduced from 516 to 30 due to restriction <30>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.058    0.058  106.138  106.138 D:\mayAi\AILearning_v0527\parallel-learning\src\core\learner.py:1193(learn_from_text)
+        6    0.011    0.002   54.180    9.030 D:\mayAi\AILearning_v0527\parallel-learning\src\learning\statistical_learner.py:407(get_emergent_concepts)
+        1    2.292    2.292   53.992   53.992 D:\mayAi\AILearning_v0527\parallel-learning\src\learning\statistical_learner.py:216(_post_emergence_cleanup)
+        1   20.510   20.510   51.258   51.258 D:\mayAi\AILearning_v0527\parallel-learning\src\core\learner.py:2755(_train_embedding)
+     1120   35.568    0.032   50.605    0.045 D:\mayAi\AILearning_v0527\parallel-learning\src\learning\statistical_learner.py:346(_check_ngram_parents)
+   241464   18.113    0.000   18.113    0.000 {built-in method torch.cosine_similarity}
+117717564/117717553   16.097    0.000   16.097    0.000 {built-in method builtins.len}
+225860/4624    0.206    0.000   10.085    0.002 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\nn\modules\module.py:1735(_wrapped_call_impl)
+225860/4624    0.386    0.000   10.078    0.002 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\nn\modules\module.py:1743(_call_impl)
+     4608    0.433    0.000   10.032    0.002 D:\mayAi\AILearning_v0527\parallel-learning\src\perception\learnable_encoder.py:331(forward)
+    13824    0.496    0.000    8.101    0.001 D:\mayAi\AILearning_v0527\parallel-learning\src\perception\learnable_encoder.py:272(forward)
+    13824    0.788    0.000    4.892    0.000 D:\mayAi\AILearning_v0527\parallel-learning\src\perception\learnable_encoder.py:227(forward)
+       36    0.103    0.003    2.885    0.080 D:\mayAi\AILearning_v0527\parallel-learning\src\learning\concept_space.py:358(get_related)
+    82976    0.140    0.000    2.729    0.000 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\nn\modules\linear.py:124(forward)
+    82976    2.541    0.000    2.541    0.000 {built-in method torch._C._nn.linear}
+    13834    0.089    0.000    1.742    0.000 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\nn\modules\container.py:248(forward)
+        1    0.003    0.003    1.478    1.478 D:\mayAi\AILearning_v0527\parallel-learning\src\core\learner.py:2850(<listcomp>)
+    27649    0.877    0.000    0.877    0.000 {built-in method torch.matmul}
+    32256    0.070    0.000    0.839    0.000 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\nn\modules\normalization.py:216(forward)
+    24849    0.832    0.000    0.832    0.000 {method 'item' of 'torch._C.TensorBase' objects}
+   499899    0.761    0.000    0.761    0.000 {method 'unsqueeze' of 'torch._C.TensorBase' objects}
+    32256    0.079    0.000    0.750    0.000 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\nn\functional.py:2889(layer_norm)
+        1    0.003    0.003    0.712    0.712 D:\mayAi\AILearning_v0527\parallel-learning\src\learning\contrastive_trainer.py:309(train_step)
+       11    0.000    0.000    0.675    0.061 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\_tensor.py:570(backward)
+       11    0.000    0.000    0.675    0.061 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\autograd\__init__.py:242(backward)
+       11    0.000    0.000    0.675    0.061 C:\Users\5Call\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\autograd\graph.py:814(_engine_run_backward)
+       11    0.675    0.061    0.675    0.061 {method 'run_backward' of 'torch._C._EngineBase' objects}
+    32256    0.641    0.000    0.641    0.000 {built-in method torch.layer_norm}
+    13824    0.491    0.000    0.491    0.000 {method 'masked_fill' of 'torch._C.TensorBase' objects}
+        1    0.416    0.416    0.418    0.418 D:\mayAi\AILearning_v0527\parallel-learning\src\core\learner.py:3018(_extract_relations_from_repr)
+
+

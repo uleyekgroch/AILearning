@@ -1,0 +1,2 @@
+/mnt/d/mayAi/AILearning_v0527/ai-learning-cpp/build-cuda/CMakeFiles/CheckCUDA/CMakeFiles/edit_cache.dir
+/mnt/d/mayAi/AILearning_v0527/ai-learning-cpp/build-cuda/CMakeFiles/CheckCUDA/CMakeFiles/rebuild_cache.dir

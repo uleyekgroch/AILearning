@@ -1,0 +1,233 @@
+{
+  "knowledge_graph": {
+    "entity_count": 238920
+  },
+  "reasoning_tests": [
+    {
+      "answer": "\u6839\u636e\u8bb0\u5fc6\uff0cTeX\uff1aTeX\n\n\uff08\uff0c\u97f3\u8bd1\u201c\u6cf0\u8d6b\u201d\uff0c\u6587\u672c\u6a21\u5f0f",
+      "question": "\u6570\u5b66"
+    },
+    {
+      "answer": "\u6839\u636e\u8bb0\u5fc6\uff0cTeX\uff1aTeX\n\n\uff08\uff0c\u97f3\u8bd1\u201c\u6cf0\u8d6b\u201d\uff0c\u6587\u672c\u6a21\u5f0f",
+      "question": "\u7269\u7406"
+    },
+    {
+      "answer": "\u6839\u636e\u8bb0\u5fc6\uff0c\u975e\u6d32\u5386\u53f2\uff1a\u975e\u6d32\u5386\u53f2\n\n\u975e\u6d32\u7684\u5386\u53f2\u60a0\u4e45",
+      "question": "\u4e2d\u56fd"
+    },
+    {
+      "answer": "\u6839\u636e\u8bb0\u5fc6\uff0c\u975e\u6d32\u5386\u53f2\uff1a\u975e\u6d32\u5386\u53f2\n\n\u975e\u6d32\u7684\u5386\u53f2\u60a0\u4e45",
+      "question": "\u5386\u53f2"
+    },
+    {
+      "answer": "\u8ba1\u7b97\u4e0e\u7b97\u673a\u6709\u8f83\u5f3a\u7684\u65f6\u5e8f\u5173\u8054",
+      "question": "\u8ba1\u7b97\u673a"
+    },
+    {
+      "answer": "\u6839\u636e\u8bb0\u5fc6\uff0c\u4eba\u5de5\u667a\u80fd\uff1a\u4eba\u5de5\u667a\u80fd\n\n\u4eba\u5de5\u667a\u80fd\uff08\uff0c\u7f29",
+      "question": "\u4eba\u5de5\u667a\u80fd"
+    },
+    {
+      "answer": "\u6839\u636e\u8bb0\u5fc6\uff0c\u8ba1\u7b97\u8bed\u8a00\u5b66\uff1a\u8ba1\u7b97\u8bed\u8a00\u5b66\n\n\u8ba1\u7b97\u8bed\u8a00\u5b66",
+      "question": "\u751f\u7269"
+    },
+    {
+      "answer": "\u6839\u636e\u8bb0\u5fc6\uff0c\u8bfa\u8d1d\u5c14\u5956\uff1a\u8bfa\u8d1d\u5c14\u5956\n\n\u8bfa\u8d1d\u5c14\u5956\uff08\uff0c\uff09",
+      "question": "\u5316\u5b66"
+    },
+    {
+      "answer": "\u6839\u636e\u8bb0\u5fc6\uff0c\u519c\u4e1a\uff1a\u519c\u4e1a\n\n\u519c\u4e1a\u662f\u7b2c\u4e00\u7ea7\u4ea7\u4e1a\uff0c\u5728\u73b0",
+      "question": "\u5730\u7403"
+    },
+    {
+      "answer": "\u6839\u636e\u8bb0\u5fc6\uff0cTeX\uff1aTeX\n\n\uff08\uff0c\u97f3\u8bd1\u201c\u6cf0\u8d6b\u201d\uff0c\u6587\u672c\u6a21\u5f0f",
+      "question": "\u8bed\u8a00"
+    }
+  ],
+  "relation_distribution": [
+    {
+      "count": 701,
+      "relation": "\u662f"
+    },
+    {
+      "count": 58,
+      "relation": "\u5305\u62ec"
+    },
+    {
+      "count": 50,
+      "relation": "\u79f0\u4e3a"
+    },
+    {
+      "count": 29,
+      "relation": "\u4ea7\u751f"
+    },
+    {
+      "count": 23,
+      "relation": "\u5305\u542b"
+    },
+    {
+      "count": 17,
+      "relation": "\u5c5e\u4e8e"
+    },
+    {
+      "count": 10,
+      "relation": "\u6784\u6210"
+    },
+    {
+      "count": 8,
+      "relation": "\u5bfc\u81f4"
+    },
+    {
+      "count": 7,
+      "relation": "\u4f4d\u4e8e"
+    },
+    {
+      "count": 2,
+      "relation": "\u53eb\u505a"
+    }
+  ],
+  "stats": {
+    "elapsed_seconds": 2.1641714,
+    "failed": 0,
+    "files_processed": 2,
+    "total_articles": 87,
+    "total_causal": 27,
+    "total_entities": 279624,
+    "total_numerical": 575,
+    "total_triples": 905,
+    "verification_rate": 1.0,
+    "verified": 87
+  },
+  "system_stats": {
+    "cortical_facts": 5.0,
+    "curiosity": 1.0,
+    "entity_count": 238920.0,
+    "hippocampal_episodes": 87.0,
+    "learning_progress": 0.0,
+    "relation_count": 919.0,
+    "stage_index": 0.0,
+    "total_steps": 0.0
+  },
+  "top_entities": [
+    {
+      "count": 62,
+      "entity": "\u4e00\u4e2a"
+    },
+    {
+      "count": 57,
+      "entity": "\u662f\u4e00"
+    },
+    {
+      "count": 52,
+      "entity": "\u4ee5\u53ca"
+    },
+    {
+      "count": 49,
+      "entity": "\u4f7f\u7528"
+    },
+    {
+      "count": 49,
+      "entity": "\u53d1\u5c55"
+    },
+    {
+      "count": 49,
+      "entity": "\u5305\u62ec"
+    },
+    {
+      "count": 49,
+      "entity": "\u5f00\u59cb"
+    },
+    {
+      "count": 47,
+      "entity": "\u7684\u4e00"
+    },
+    {
+      "count": 47,
+      "entity": "\u79d1\u5b66"
+    },
+    {
+      "count": 46,
+      "entity": "\u4e3b\u8981"
+    },
+    {
+      "count": 45,
+      "entity": "\u7814\u7a76"
+    },
+    {
+      "count": 45,
+      "entity": "\u8ba4\u4e3a"
+    },
+    {
+      "count": 44,
+      "entity": "\u4e0d\u540c"
+    },
+    {
+      "count": 44,
+      "entity": "\u56e0\u6b64"
+    },
+    {
+      "count": 41,
+      "entity": "\u5176\u4ed6"
+    },
+    {
+      "count": 40,
+      "entity": "\u4e2d\u56fd"
+    },
+    {
+      "count": 40,
+      "entity": "\u6210\u4e3a"
+    },
+    {
+      "count": 40,
+      "entity": "\u8fd9\u4e9b"
+    },
+    {
+      "count": 39,
+      "entity": "\u4e2d\u7684"
+    },
+    {
+      "count": 39,
+      "entity": "\u90e8\u5206"
+    },
+    {
+      "count": 39,
+      "entity": "\u79f0\u4e3a"
+    },
+    {
+      "count": 38,
+      "entity": "\u4f8b\u5982"
+    },
+    {
+      "count": 37,
+      "entity": "\u7b2c\u4e00"
+    },
+    {
+      "count": 37,
+      "entity": "\u5176\u4e2d"
+    },
+    {
+      "count": 37,
+      "entity": "\u7531\u4e8e"
+    },
+    {
+      "count": 37,
+      "entity": "\u4e16\u754c"
+    },
+    {
+      "count": 36,
+      "entity": "\u8bb8\u591a"
+    },
+    {
+      "count": 36,
+      "entity": "\u91cd\u8981"
+    },
+    {
+      "count": 36,
+      "entity": "\u5b66\u7684"
+    },
+    {
+      "count": 36,
+      "entity": "\u5386\u53f2"
+    }
+  ]
+}
