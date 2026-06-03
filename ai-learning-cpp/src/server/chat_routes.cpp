@@ -36,7 +36,8 @@ void ai_learning::server::register_chat_routes(
 #ifdef AI_LEARNING_WITH_LLAMA_CPP
                     try {
                         state.llm_provider = std::make_unique<language::LlamaCppLLMProvider>(
-                            local_path);
+                            local_path,
+                            learner.config().n_gpu_layers);
                     } catch (const std::exception& e) {
                         std::cerr << "[Warning] Failed to load local LLM: "
                                   << e.what() << ", falling back to API/Stub\n";

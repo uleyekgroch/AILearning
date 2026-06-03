@@ -30,7 +30,8 @@ public:
     /// @param model_path .gguf 模型文件路径
     /// @param embedding_dim 期望的嵌入维度（模型输出可能不同，会截断/补零）
     explicit LlamaCppEmbeddingProvider(const std::string& model_path,
-                                        int embedding_dim = 512);
+                                        int embedding_dim = 512,
+                                        int n_gpu_layers = 0);
     ~LlamaCppEmbeddingProvider() override;
 
     // 禁止拷贝（持有 llama 上下文）

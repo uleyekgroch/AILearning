@@ -96,7 +96,8 @@ private:
 /// 适合离线部署和隐私敏感场景。
 class LlamaCppLLMProvider final : public ILLMProvider {
 public:
-    explicit LlamaCppLLMProvider(const std::string& model_path);
+    explicit LlamaCppLLMProvider(const std::string& model_path,
+                                    int n_gpu_layers = 0);
     ~LlamaCppLLMProvider() override;
 
     // 禁止拷贝

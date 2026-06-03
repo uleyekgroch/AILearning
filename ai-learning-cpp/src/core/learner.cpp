@@ -115,17 +115,19 @@ Learner::Learner(const LearnerConfig& config,
     if (!config_.embedding_model_path.empty()) {
         try {
             embedding_provider_ = std::make_unique<language::LlamaCppEmbeddingProvider>(
-                config_.embedding_model_path, config_.embedding_model_dim);
+                config_.embedding_model_path,
+                config_.embedding_model_dim,
+                config_.n_gpu_layers);
             embedding_trainer_.set_embedding_provider(embedding_provider_.get());
         } catch (const std::exception& e) {
-            // 模型加载失败时不阻塞启动，记录并继续
             (void)e;
         }
     }
     if (!config_.llm_model_path.empty()) {
         try {
             llm_provider_ = std::make_unique<language::LlamaCppLLMProvider>(
-                config_.llm_model_path);
+                config_.llm_model_path,
+                config_.n_gpu_layers);
             unified_engine_.set_llm_provider(llm_provider_.get());
         } catch (const std::exception& e) {
             (void)e;

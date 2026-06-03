@@ -195,10 +195,11 @@ auto build_chat_prompt(const std::string& user_prompt,
 
 }  // namespace
 
-LlamaCppLLMProvider::LlamaCppLLMProvider(const std::string& model_path)
+LlamaCppLLMProvider::LlamaCppLLMProvider(const std::string& model_path,
+                                             int n_gpu_layers)
     : max_tokens_(512), temperature_(0.8f) {
     auto mparams = llama_model_default_params();
-    mparams.n_gpu_layers = 0;  // CPU-only for compatibility
+    mparams.n_gpu_layers = n_gpu_layers;
 
     model_ = llama_load_model_from_file(model_path.c_str(), mparams);
     if (!model_) {

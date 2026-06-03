@@ -127,6 +127,9 @@ std::string answer = learner.think("什么是人工智能");
 # 使用 MLP 引擎 + 本地 LLM（llama.cpp）
 ./ai_learning_server --engine mlp --llm-model /path/to/qwen2.5-3b-instruct-q4.gguf
 
+# GPU offload 加速（将前 N 层卸载到 GPU，需 CUDA 环境）
+./ai_learning_server --llm-model /path/to/model.gguf --gpu-layers 20
+
 # 文本学习
 curl -X POST http://localhost:8080/api/learn/text \
   -H "Content-Type: application/json" \

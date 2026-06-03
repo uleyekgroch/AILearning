@@ -118,6 +118,7 @@ struct LearnerConfig {
     std::string embedding_model_path;   // 空 = 不使用预训练嵌入模型
     int    embedding_model_dim = 512;   // 预训练嵌入模型输出维度
     std::string llm_model_path;         // 空 = 不使用本地 LLM（llama.cpp）
+    int    n_gpu_layers = 0;            // llama.cpp GPU offload 层数（0 = CPU-only）
 
     // ── 分词 ──
     learning::Language language               = learning::Language::kAuto;

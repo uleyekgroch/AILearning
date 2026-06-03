@@ -25,13 +25,12 @@ namespace ai_learning::language {
 // ── 构造 / 析构 ─────────────────────────────────────────────────
 
 LlamaCppEmbeddingProvider::LlamaCppEmbeddingProvider(
-    const std::string& model_path, int embedding_dim)
+    const std::string& model_path, int embedding_dim, int n_gpu_layers)
     : embedding_dim_(embedding_dim) {
 
     // 模型参数
     auto mparams = llama_model_default_params();
-    // embedding 模型通常不需要 GPU offload，保持 CPU 推理
-    mparams.n_gpu_layers = 0;
+    mparams.n_gpu_layers = n_gpu_layers;
 
     model_ = llama_load_model_from_file(model_path.c_str(), mparams);
     if (!model_) {

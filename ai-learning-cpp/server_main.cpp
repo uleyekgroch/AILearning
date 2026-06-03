@@ -52,6 +52,7 @@ auto main(int argc, char* argv[]) -> int {
     server_config.threads = parse_int_arg(argc, argv, "--threads", 4);
     auto engine_name = parse_str_arg(argc, argv, "--engine", "pc");
     auto llm_model = parse_str_arg(argc, argv, "--llm-model", "");
+    auto gpu_layers = parse_int_arg(argc, argv, "--gpu-layers", 0);
 
     std::cout << "=== AILearning REST Server ===\n";
     std::cout << "  Port: " << server_config.port << "\n";
@@ -59,6 +60,9 @@ auto main(int argc, char* argv[]) -> int {
     std::cout << "  Engine: " << engine_name << "\n";
     if (!llm_model.empty()) {
         std::cout << "  LLM Model: " << llm_model << "\n";
+        if (gpu_layers > 0) {
+            std::cout << "  GPU Layers: " << gpu_layers << "\n";
+        }
     }
     std::cout << "\n";
 
@@ -67,6 +71,7 @@ auto main(int argc, char* argv[]) -> int {
     learner_config.obs_dim = 128;
     learner_config.action_dim = 8;
     learner_config.llm_model_path = llm_model;
+    learner_config.n_gpu_layers = gpu_layers;
 
     auto learner = core::LearnerFactory::create_with_engine(
         learner_config,
