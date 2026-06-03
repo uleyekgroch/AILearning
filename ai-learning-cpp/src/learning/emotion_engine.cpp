@@ -58,6 +58,25 @@ auto EmotionEngine::process_event(const EmotionEvent& event)
     // Step 5: 推断情绪标签
     current_.label = infer_label_(current_.valence, current_.arousal);
 
+    // ★v2: 填充离散情感强度
+    current_.intensities.clear();
+    double sig = event.magnitude;
+    double surprise = std::abs(rpe.magnitude());
+    if (rpe.is_positive() && rpe.magnitude() > 0.3) {
+        current_.intensities[BasicEmotion::kJoy] = sig * 0.8;
+        current_.intensities[BasicEmotion::kPride] = sig * 0.5;
+    } else if (!rpe.is_positive() && rpe.magnitude() > 0.3) {
+        current_.intensities[BasicEmotion::kFrustration] = sig * 0.7;
+        current_.intensities[BasicEmotion::kSadness] = sig * 0.3;
+    }
+    current_.intensities[BasicEmotion::kSurprise] = surprise;
+    if (sig > 0.2 && sig < 0.7) {
+        current_.intensities[BasicEmotion::kCuriosity] = sig * 0.7;
+    }
+    if (sig > 0.5 && surprise > 0.5) {
+        current_.intensities[BasicEmotion::kConfusion] = sig * 0.5;
+    }
+
     // 记录历史
     emotion_history_.push_back(current_);
     while (static_cast<int>(emotion_history_.size()) > config_.emotion_history_size) {
@@ -212,6 +231,40 @@ auto EmotionEngine::regulate() -> EmotionState
     current_.dominance = current_.dominance * 0.8 + 0.5 * 0.2;
     current_.label = infer_label_(current_.valence, current_.arousal);
 
+    emotion_history_.push_back(current_);
+    return current_;
+}
+
+// ★v2: 指定策略的情绪调节
+auto EmotionEngine::regulate_with(RegulationStrategy strategy) -> EmotionState
+{
+    switch (strategy) {
+        case RegulationStrategy::kSuppression:
+            for (auto& [_, intensity] : current_.intensities) {
+                intensity *= 0.5;
+            }
+            current_.arousal *= 0.7;
+            break;
+        case RegulationStrategy::kReappraisal:
+            current_.valence = std::clamp(current_.valence + 0.3, -1.0, 1.0);
+            for (auto& [e, intensity] : current_.intensities) {
+                if (e == BasicEmotion::kFear || e == BasicEmotion::kAnger
+                    || e == BasicEmotion::kSadness) {
+                    intensity *= 0.6;
+                }
+            }
+            break;
+        case RegulationStrategy::kDistraction:
+            for (auto& [_, intensity] : current_.intensities) {
+                intensity *= 0.4;
+            }
+            current_.arousal *= 0.5;
+            break;
+        case RegulationStrategy::kAcceptance:
+            current_.arousal *= 0.8;
+            break;
+    }
+    current_.label = infer_label_(current_.valence, current_.arousal);
     emotion_history_.push_back(current_);
     return current_;
 }

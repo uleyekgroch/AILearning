@@ -55,6 +55,14 @@
 #include "ai_learning/assessment/mastery_assessor.hpp"
 #include "ai_learning/goals/goal_manager.hpp"
 
+// ── 仿人类学习增强模块 (v2) ──────────────────────────────────────
+#include "ai_learning/reasoning/active_inference.hpp"
+#include "ai_learning/consciousness/self_model.hpp"
+#include "ai_learning/creativity/creative_engine.hpp"
+#include "ai_learning/social/tutoring_system.hpp"
+#include "ai_learning/learning/mirror_neuron.hpp"
+#include "ai_learning/perception/haptic_encoder.hpp"
+
 #include <chrono>
 #include <deque>
 #include <map>
@@ -431,6 +439,19 @@ public:
     [[nodiscard]] auto integrated()
         -> learning::IntegratedLearner& { return integrated_; }
 
+    // ── ★v2: 仿人类学习增强模块访问器 ─────────────────────────
+
+    [[nodiscard]] auto active_inference()
+        -> reasoning::ActiveInferenceEngine& { return active_inference_; }
+    [[nodiscard]] auto self_model()
+        -> consciousness::SelfModel& { return self_model_; }
+    [[nodiscard]] auto creative_engine()
+        -> creativity::CreativeEngine& { return creative_engine_; }
+    [[nodiscard]] auto tutoring_system()
+        -> social::TutoringSystem& { return tutoring_system_; }
+    [[nodiscard]] auto mirror_neurons()
+        -> learning::MirrorNeuronSystem& { return mirror_neurons_; }
+
     // ── 目标系统 ──────────────────────────────────────────────────
 
     /// 访问目标管理器
@@ -518,6 +539,13 @@ private:
 
     // Phase 6：深度整合
     learning::IntegratedLearner         integrated_;
+
+    // ★v2: 仿人类学习增强模块
+    reasoning::ActiveInferenceEngine    active_inference_;
+    consciousness::SelfModel            self_model_;
+    creativity::CreativeEngine          creative_engine_;
+    social::TutoringSystem              tutoring_system_;
+    learning::MirrorNeuronSystem        mirror_neurons_;
 
     // 目标系统
     goals::GoalManager                  goal_manager_;

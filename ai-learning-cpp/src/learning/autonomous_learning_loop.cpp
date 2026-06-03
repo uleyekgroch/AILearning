@@ -69,6 +69,11 @@ auto AutonomousLearningLoop::one_iteration(
     // Phase 2: 课程规划 → 怎么学
     result.plan = plan_learning_(result.goal);
 
+    // Phase 3 ★v2: 主动推理 → 预期自由能评估 + 策略选择
+    auto policy = active_infer_(result.plan);
+    result.selected_policy = policy.name;
+    result.expected_free_energy = policy.expected_free_energy;
+
     // 可选：从资源提供者获取材料
     if (resource_provider) {
         auto resources = resource_provider->search(result.goal.topic);
@@ -77,13 +82,13 @@ auto AutonomousLearningLoop::one_iteration(
         }
     }
 
-    // Phase 3: 学习执行 → 动手学
+    // Phase 4: 学习执行 → 动手学
     auto outcome = execute_learning_(result.plan, strategy);
 
-    // Phase 4: 反思 → 学到了什么
+    // Phase 5: 反思 → 学到了什么
     result.reflection = reflect_(outcome, result.goal);
 
-    // Phase 5: 整合 → 更新技能/动机
+    // Phase 6: 整合 → 更新技能/动机
     integrate_(outcome, result.goal);
 
     result.progress = outcome.progress;
@@ -194,6 +199,18 @@ void AutonomousLearningLoop::integrate_(
 
     // 更新好奇心信号
     curiosity_signal_ = outcome.surprise * 0.3 + curiosity_signal_ * 0.7;
+}
+
+// ★v2: 主动推理步骤实现
+auto AutonomousLearningLoop::active_infer_(const LearningPlan& plan)
+    -> reasoning::Policy {
+    if (!active_inference_) {
+        return reasoning::Policy{"passive", {}, 0.0, 0.0, 0.0};
+    }
+
+    auto belief = active_inference_->current_belief();
+    auto policies = active_inference_->generate_policies(belief, 3);
+    return active_inference_->select_policy(policies, belief, plan.goal.topic);
 }
 
 }  // namespace ai_learning::learning

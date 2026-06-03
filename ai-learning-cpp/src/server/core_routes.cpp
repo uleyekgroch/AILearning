@@ -428,4 +428,100 @@ void ai_learning::server::register_core_routes(
             return ok_resp(resp);
         } catch (const std::exception& e) { return err_resp(400, e.what()); }
     });
+
+    // ═══════════════════════════════════════════════════════════
+    // ★v2: 仿人类学习增强端点
+    // ═══════════════════════════════════════════════════════════
+
+    // POST /api/self/reflect — 自我反思
+    CROW_ROUTE(app, "/api/self/reflect").methods("POST"_method)
+    ([&]() -> crow::response {
+        auto reflection = learner.self_model().reflect_on_self();
+        json resp;
+        resp["status"] = "ok";
+        resp["reflection"] = reflection;
+        resp["self_efficacy"] = learner.self_model().self_efficacy();
+        resp["self_continuity"] = learner.self_model().self_continuity();
+        return ok_resp(resp);
+    });
+
+    // GET /api/self/whoami — 自我认知
+    CROW_ROUTE(app, "/api/self/whoami").methods("GET"_method)
+    ([&]() -> crow::response {
+        json resp;
+        resp["status"] = "ok";
+        resp["identity"] = learner.self_model().who_am_i_now();
+        resp["narrative"] = learner.self_model().life_narrative();
+        resp["self_beliefs"] = learner.self_model().self_concept().size();
+        resp["memories"] = learner.self_model().stats().autobiographical_memories;
+        return ok_resp(resp);
+    });
+
+    // POST /api/creativity/diverge — 发散思维
+    CROW_ROUTE(app, "/api/creativity/diverge").methods("POST"_method)
+    ([&](const crow::request& req) -> crow::response {
+        auto body = json::parse(req.body);
+        std::string problem = body.value("problem", "如何学习");
+        auto result = learner.creative_engine().brainstorm(problem, 5);
+        json resp;
+        resp["status"] = "ok";
+        resp["problem"] = problem;
+        resp["ideas"] = result;
+        return ok_resp(resp);
+    });
+
+    // POST /api/tutor/teach — 教学相长
+    CROW_ROUTE(app, "/api/tutor/teach").methods("POST"_method)
+    ([&](const crow::request& req) -> crow::response {
+        auto body = json::parse(req.body);
+        social::KnowledgeUnit topic;
+        topic.topic = body.value("topic", "math");
+        topic.explanation = body.value("explanation", "basic concepts");
+        topic.mastery = body.value("mastery", 0.5);
+
+        social::LearnerModel student;
+        student.learner_id = body.value("student_id", "peer");
+        student.knowledge[topic.topic] = body.value("student_mastery", 0.3);
+
+        auto result = learner.tutoring_system().teach(topic, student, "self");
+        json resp;
+        resp["status"] = "ok";
+        resp["tutor_gain"] = result.tutor_gain;
+        resp["student_gain"] = result.knowledge_gain;
+        resp["tutor_reflection"] = result.tutor_reflection;
+        return ok_resp(resp);
+    });
+
+    // POST /api/mirror/observe — 镜像神经元观察
+    CROW_ROUTE(app, "/api/mirror/observe").methods("POST"_method)
+    ([&](const crow::request& req) -> crow::response {
+        auto body = json::parse(req.body);
+        learning::ObservedAction action;
+        action.action_name = body.value("action", "observe");
+        action.actor_id = body.value("actor", "other");
+        action.confidence = body.value("confidence", 0.8);
+
+        auto motor = learner.mirror_neurons().observe_action(action);
+        json resp;
+        resp["status"] = "ok";
+        resp["motor_activation"] = motor.activation;
+        resp["mastered"] = motor.mastered;
+        resp["total_observations"] = learner.mirror_neurons().total_observations();
+        return ok_resp(resp);
+    });
+
+    // POST /api/autonomous/run — 运行自主学习循环（v2: 集成主动推理）
+    CROW_ROUTE(app, "/api/autonomous/run").methods("POST"_method)
+    ([&](const crow::request& req) -> crow::response {
+        auto body = json::parse(req.body);
+        int iterations = body.value("iterations", 10);
+        auto report = learner.autonomous_learning_run(iterations);
+        json resp;
+        resp["status"] = "ok";
+        resp["iterations"] = report.total_iterations;
+        resp["goals_attempted"] = report.goals_attempted;
+        resp["goals_completed"] = report.goals_completed;
+        resp["avg_motivation"] = report.avg_motivation;
+        return ok_resp(resp);
+    });
 }

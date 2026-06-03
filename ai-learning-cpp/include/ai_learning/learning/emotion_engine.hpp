@@ -1,29 +1,25 @@
 /**
  * @file emotion_engine.hpp
- * @brief 情感驱动学习 — 情绪调制记忆编码与学习策略
+ * @brief 情感驱动学习 — 情绪调制记忆编码与学习策略（v2: 离散情感 + 调节策略增强）
  *
  * 参考：
+ *   - Ekman (1972) 6种基本情感 + Plutchik (1980) 情感轮
  *   - McGaugh 情绪与记忆巩固 (2004)：情绪唤醒增强记忆编码
  *   - 多巴胺学习信号 (Schultz, 1997)：奖励预测误差 (RPE)
- *   - 杏仁核-海马体交互 (Phelps, 2004)：情绪调节记忆强度
  *   - Yerkes-Dodson 定律 (1908)：唤醒水平与绩效的倒 U 型关系
- *   - 情绪调节理论 (Gross, 1998)：认知重评、表达抑制
+ *   - Gross (1998) 情绪调节理论：认知重评、表达抑制
  *
  * 核心能力：
- *   1. 情绪状态建模 — 维度模型（效价 × 唤醒度 × 支配度）
+ *   1. 情绪状态建模 — 维度模型（效价 × 唤醒度） + ★v2 离散情感强度
  *   2. 记忆调制 — 情绪唤醒越强，记忆编码越深
  *   3. 多巴胺 RPE — 预测误差驱动学习动力
  *   4. 学习策略适配 — 根据情绪状态调整学习方式
- *   5. 情绪调节 — 过度情绪时的自我调节机制
- *
- * 人类情感学习机制：
- *   紧张/兴奋时学得更牢（高唤醒 → 强编码）
- *   无聊时记不住（低唤醒 → 弱编码）
- *   快乐时更有创造力（正效价 → 发散思维）
- *   恐惧时更保守（负效价 → 规避风险）
+ *   5. ★v2 情绪调节策略 — 抑制/重评/分心/接纳
  */
 #pragma once
 
+#include <algorithm>
+#include <cmath>
 #include <map>
 #include <optional>
 #include <string>
@@ -32,11 +28,65 @@
 
 namespace ai_learning::learning {
 
-/// 情绪维度（Russell 环状模型 + 支配度）
+/// ★v2: 离散基本情感 (Ekman 6 + Plutchik 8 扩展)
+enum class BasicEmotion {
+    kJoy, kSadness, kAnger, kFear, kDisgust, kSurprise,
+    kTrust, kAnticipation, kCuriosity, kConfusion,
+    kPride, kShame, kFrustration, kBoredom
+};
+
+/// 情感基础值
+inline auto emotion_base(BasicEmotion e) -> std::pair<double, double> {
+    switch (e) {
+        case BasicEmotion::kJoy:          return { 0.8, 0.7};
+        case BasicEmotion::kSadness:      return {-0.7, 0.2};
+        case BasicEmotion::kAnger:        return {-0.5, 0.8};
+        case BasicEmotion::kFear:         return {-0.6, 0.9};
+        case BasicEmotion::kDisgust:      return {-0.4, 0.5};
+        case BasicEmotion::kSurprise:     return { 0.0, 0.8};
+        case BasicEmotion::kTrust:        return { 0.6, 0.3};
+        case BasicEmotion::kAnticipation: return { 0.4, 0.6};
+        case BasicEmotion::kCuriosity:    return { 0.5, 0.6};
+        case BasicEmotion::kConfusion:    return {-0.1, 0.6};
+        case BasicEmotion::kPride:        return { 0.7, 0.5};
+        case BasicEmotion::kShame:        return {-0.5, 0.5};
+        case BasicEmotion::kFrustration:  return {-0.4, 0.7};
+        case BasicEmotion::kBoredom:      return {-0.2, 0.1};
+    }
+    return {0.0, 0.5};
+}
+
+inline auto emotion_name(BasicEmotion e) -> std::string {
+    switch (e) {
+        case BasicEmotion::kJoy:          return "快乐";
+        case BasicEmotion::kSadness:      return "悲伤";
+        case BasicEmotion::kAnger:        return "愤怒";
+        case BasicEmotion::kFear:         return "恐惧";
+        case BasicEmotion::kDisgust:      return "厌恶";
+        case BasicEmotion::kSurprise:     return "惊讶";
+        case BasicEmotion::kTrust:        return "信任";
+        case BasicEmotion::kAnticipation: return "期待";
+        case BasicEmotion::kCuriosity:    return "好奇";
+        case BasicEmotion::kConfusion:    return "困惑";
+        case BasicEmotion::kPride:        return "自豪";
+        case BasicEmotion::kShame:        return "羞耻";
+        case BasicEmotion::kFrustration:  return "挫折";
+        case BasicEmotion::kBoredom:      return "无聊";
+    }
+    return "未知";
+}
+
+/// ★v2: 情绪调节策略
+enum class RegulationStrategy { kSuppression, kReappraisal, kDistraction, kAcceptance };
+
+/// 情绪维度（Russell 环状模型 + 支配度 + ★v2 离散情感）
 struct EmotionState {
     double valence = 0.0;        ///< 效价 -1~1（负→正）
     double arousal = 0.0;        ///< 唤醒度 0~1（平静→兴奋）
     double dominance = 0.5;      ///< 支配度 0~1（被动→主动）
+
+    /// ★v2: 离散情感强度
+    std::map<BasicEmotion, double> intensities;
 
     /// 离散情绪标签
     std::string label;           ///< "curious" / "frustrated" / "confident" / "bored" / "surprised"
@@ -44,6 +94,16 @@ struct EmotionState {
     /// 强度（综合评分）
     [[nodiscard]] auto intensity() const -> double {
         return std::abs(valence) * 0.4 + arousal * 0.4 + std::abs(dominance - 0.5) * 0.2;
+    }
+
+    /// ★v2: 获取主导情感
+    [[nodiscard]] auto dominant_emotion() const -> BasicEmotion {
+        BasicEmotion dom = BasicEmotion::kCuriosity;
+        double max_i = 0.0;
+        for (const auto& [e, i] : intensities) {
+            if (i > max_i) { max_i = i; dom = e; }
+        }
+        return dom;
     }
 };
 
@@ -151,6 +211,9 @@ public:
 
     /// 执行情绪调节（认知重评）
     auto regulate() -> EmotionState;
+
+    /// ★v2: 指定策略的情绪调节
+    auto regulate_with(RegulationStrategy strategy) -> EmotionState;
 
     // ── 查询 ──────────────────────────────────────────
 

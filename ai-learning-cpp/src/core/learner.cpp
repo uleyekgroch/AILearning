@@ -97,6 +97,12 @@ Learner::Learner(const LearnerConfig& config,
        integrated_(meta_learner_, experimenter_, emotion_engine_,
                    social_engine_, analogy_engine_, insight_engine_,
                    motivation_, continual_, concept_engine_),
+       // ★v2: 仿人类学习增强模块
+       active_inference_(),
+       self_model_(),
+       creative_engine_(),
+       tutoring_system_(),
+       mirror_neurons_(),
        goal_manager_(kg_, &metacognition_),
        mastery_assessor_(),
        proficiency_tester_(),
@@ -779,6 +785,38 @@ auto Learner::assess_proficiency(const std::string& entity_type) const
     -> assessment::ProficiencyReport
 {
     return proficiency_tester_.assess(entity_type, kg_);
+}
+
+// ★v2: 自主学习循环（集成主动推理）
+auto Learner::autonomous_learning_run(int iterations)
+    -> learning::AutonomousLoopReport
+{
+    learning::AutonomousLearningLoop loop(motivation_, skill_tree_);
+    loop.set_active_inference(&active_inference_);  // 注入主动推理
+
+    learning::AutonomousLoopConfig loop_config;
+    loop_config.max_iterations = iterations;
+    loop_config.verbose = true;
+
+    // 内置简单策略
+    struct DefaultStrategy : learning::ILearningStrategy {
+        auto execute(const learning::LearningGoal& goal,
+                     const learning::LearningPlan& plan)
+            -> learning::LearningOutcome override {
+            learning::LearningOutcome outcome;
+            outcome.topic = goal.topic;
+            outcome.progress = 0.3;
+            outcome.surprise = 0.2;
+            outcome.mastery_improved = true;
+            return outcome;
+        }
+        [[nodiscard]] auto name() const -> std::string override {
+            return "default_exploration";
+        }
+    };
+
+    DefaultStrategy strategy;
+    return loop.run(loop_config, {}, strategy, nullptr);
 }
 
 }  // namespace ai_learning::core

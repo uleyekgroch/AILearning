@@ -10,14 +10,16 @@
  * 核心闭环（每轮）：
  *   1. 动机产生 → "我想学什么？"
  *   2. 课程规划 → "怎么学？"
- *   3. 学习执行 → "动手学"
- *   4. 反思整合 → "学到了什么？"
- *   5. 动机更新 → 正/负反馈驱动下一轮
+ *   3. 主动推理 ★v2增强 → 预期自由能评估 + 策略选择
+ *   4. 学习执行 → "动手学"
+ *   5. 反思整合 → "学到了什么？"
+ *   6. 动机更新 → 正/负反馈驱动下一轮
  */
 #pragma once
 
 #include "ai_learning/learning/intrinsic_motivation.hpp"
 #include "ai_learning/learning/skill_tree.hpp"
+#include "ai_learning/reasoning/active_inference.hpp"  // ★v2: 主动推理集成
 
 #include <functional>
 #include <map>
@@ -48,6 +50,11 @@ struct LearningStepResult {
     std::vector<std::string> learned;    ///< 学到的知识
     std::string reflection;              ///< 反思文本
     bool completed = false;              ///< 目标是否完成
+
+    // ★v2: 主动推理指标
+    double expected_free_energy = 0.0;   ///< 预期自由能
+    double information_gain = 0.0;       ///< 信息增益
+    std::string selected_policy;          ///< 选择的策略
 };
 
 /// 自主学习循环的整体报告
@@ -97,11 +104,16 @@ struct AutonomousLoopConfig {
     bool verbose = false;                ///< 是否打印进度
 };
 
-/// 自主学习循环 — 核心整合模块
+/// 自主学习循环 — 核心整合模块（v2: 集成主动推理）
 class AutonomousLearningLoop {
 public:
     AutonomousLearningLoop(IntrinsicMotivationEngine& motivation,
                            SkillTree& skill_tree);
+
+    /// ★v2: 注入主动推理引擎
+    void set_active_inference(reasoning::ActiveInferenceEngine* ai) {
+        active_inference_ = ai;
+    }
 
     // ── 执行接口 ──────────────────────────────────────────
 
@@ -136,10 +148,11 @@ public:
 private:
     IntrinsicMotivationEngine& motivation_;
     SkillTree& skill_tree_;
+    reasoning::ActiveInferenceEngine* active_inference_ = nullptr;  // ★v2
     AutonomousLoopReport report_;
     double curiosity_signal_ = 0.5;
 
-    // ── 五步闭环 ──────────────────────────────────────────
+    // ── 六步闭环 (v2: 5步→6步) ─────────────────────────
 
     /// Phase 1: 动机产生 → 选择学什么
     auto select_goal_(const std::vector<std::string>& known_topics)
@@ -149,16 +162,20 @@ private:
     auto plan_learning_(const LearningGoal& goal)
         -> LearningPlan;
 
-    /// Phase 3: 学习执行 → 动手学
+    /// Phase 3 ★v2: 主动推理 → 预期自由能评估 + 策略选择
+    auto active_infer_(const LearningPlan& plan)
+        -> reasoning::Policy;
+
+    /// Phase 4: 学习执行 → 动手学
     auto execute_learning_(const LearningPlan& plan,
                            ILearningStrategy& strategy)
         -> LearningOutcome;
 
-    /// Phase 4: 反思 → 学到了什么
+    /// Phase 5: 反思 → 学到了什么
     auto reflect_(const LearningOutcome& outcome,
                   const LearningGoal& goal) -> std::string;
 
-    /// Phase 5: 整合 → 更新技能/动机
+    /// Phase 6: 整合 → 更新技能/动机
     void integrate_(const LearningOutcome& outcome,
                     const LearningGoal& goal);
 };
