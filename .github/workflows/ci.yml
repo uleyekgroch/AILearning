@@ -1,0 +1,146 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+  pull_request:
+    branches: [main, master]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Linux builds ─────────────────────────────────────────────────
+  build-linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Full build with llama.cpp (CPU-only, no GPU on GH runners)
+          - name: "Ubuntu / llama.cpp ON"
+            os: ubuntu-22.04
+            cmake_args: "-DAI_LEARNING_WITH_LLAMA_CPP=ON"
+            build_type: Release
+          # Minimal build without optional deps
+          - name: "Ubuntu / llama.cpp OFF"
+            os: ubuntu-22.04
+            cmake_args: "-DAI_LEARNING_WITH_LLAMA_CPP=OFF"
+            build_type: Release
+
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential ninja-build
+
+      - name: Cache CMake build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ai-learning-cpp/build-ci
+            ai-learning-cpp/build-ci/_deps
+          key: ${{ runner.os }}-${{ matrix.name }}-${{ hashFiles('ai-learning-cpp/CMakeLists.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.name }}-
+
+      - name: Configure
+        run: |
+          mkdir -p ai-learning-cpp/build-ci
+          cd ai-learning-cpp/build-ci
+          cmake .. -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            ${{ matrix.cmake_args }} \
+            -DGGML_CCACHE=OFF
+
+      - name: Build
+        run: |
+          cd ai-learning-cpp/build-ci
+          cmake --build . --target ai_learning ai_learning_tests --parallel $(nproc)
+
+      - name: Run tests
+        run: |
+          cd ai-learning-cpp/build-ci
+          ./ai_learning_tests --colour-mode ansi
+
+  # ── Windows build ────────────────────────────────────────────────
+  build-windows:
+    name: "Windows / llama.cpp ON"
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Cache CMake build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ai-learning-cpp/build-ci
+            ai-learning-cpp/build-ci/_deps
+          key: windows-llama-cpp-${{ hashFiles('ai-learning-cpp/CMakeLists.txt') }}
+          restore-keys: |
+            windows-llama-cpp-
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path ai-learning-cpp/build-ci
+          cd ai-learning-cpp/build-ci
+          cmake .. -G "Ninja Multi-Config" `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DAI_LEARNING_WITH_LLAMA_CPP=ON
+
+      - name: Build
+        shell: pwsh
+        run: |
+          cd ai-learning-cpp/build-ci
+          cmake --build . --config Release --target ai_learning ai_learning_tests
+
+      - name: Run tests
+        shell: pwsh
+        run: |
+          cd ai-learning-cpp/build-ci
+          .\ai_learning_tests.exe --colour-mode ansi
+
+  # ── Code quality ─────────────────────────────────────────────────
+  lint:
+    name: "Format / Lint"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check file size limits
+        run: |
+          cd ai-learning-cpp
+          oversized=$(find src include tests -name "*.cpp" -o -name "*.hpp" | while read f; do
+            lines=$(wc -l < "$f")
+            if [ "$lines" -gt 800 ]; then
+              echo "$f: $lines lines (limit 800)"
+            fi
+          done)
+          if [ -n "$oversized" ]; then
+            echo "Files exceeding 800 line limit:"
+            echo "$oversized"
+            exit 1
+          else
+            echo "All source files within 800 line limit."
+          fi

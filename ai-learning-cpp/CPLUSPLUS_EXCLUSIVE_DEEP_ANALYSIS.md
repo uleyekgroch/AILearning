@@ -591,7 +591,8 @@ inline void mat_vec(...) {
 | **H.6** | GPU offload (`--gpu-layers`) | `87d3db2` `n_gpu_layers` 配置传递到 LlamaCpp providers |
 | **H.7** | 线程安全（mutex 保护） | `c8a78e7` `LlamaCppLLMProvider` + `LlamaCppEmbeddingProvider` 加锁串行化 |
 | **H.8** | CUDA 后端修复（WSL + RTX 4060） | `ece703d` 修复 CMake CUDA 检测，llama.cpp GGML_CUDA=ON，sm_89 架构 |
-| **I.3** | 模型自动下载脚本 | `NEW` `download_models.sh` + `download_models.ps1`，镜像回退 + 断点续传 |
+| **I.1** | CI/CD 自动化 (GitHub Actions) | `NEW` Linux/Windows 构建矩阵 + 缓存 + 代码行数限制检查 |
+| **I.3** | 模型自动下载脚本 | `496b11c` `download_models.sh` + `download_models.ps1`，镜像回退 + 断点续传 |
 
 ### 8.4 技术债务修复状态
 

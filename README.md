@@ -1,5 +1,7 @@
 # 从学习的本源出发的人工智能
 
+[![CI](https://github.com/5Call/AILearning_v0527/actions/workflows/ci.yml/badge.svg)](https://github.com/5Call/AILearning_v0527/actions/workflows/ci.yml)
+
 > 不是靠堆参数和数据的"假智能"，而是真正理解"学习"本身是什么。
 
 ## 项目愿景
