@@ -83,3 +83,60 @@ TEST_CASE("TensorOps: clamp") {
     auto result = tensor_clamp(a, -3.0f, 3.0f);
     REQUIRE(result == Tensor{-3.0f, -1.0f, 0.0f, 1.0f, 3.0f});
 }
+
+// ── Matrix 类型安全测试 ────────────────────────────────────────
+
+TEST_CASE("Matrix: 构造和元素访问") {
+    Matrix m(2, 3);
+    REQUIRE(m.rows == 2);
+    REQUIRE(m.cols == 3);
+    REQUIRE(m.size() == 6);
+
+    m(0, 0) = 1.0f;
+    m(0, 1) = 2.0f;
+    m(0, 2) = 3.0f;
+    m(1, 0) = 4.0f;
+    m(1, 1) = 5.0f;
+    m(1, 2) = 6.0f;
+
+    REQUIRE(m(0, 0) == 1.0f);
+    REQUIRE(m(1, 2) == 6.0f);
+    REQUIRE(m.data[0] == 1.0f);  // row-major flat
+    REQUIRE(m.data[5] == 6.0f);
+}
+
+TEST_CASE("Matrix: mat_vec 类型安全重载") {
+    // 2×3 矩阵: [[1,2,3], [4,5,6]]
+    Matrix mat(2, 3);
+    mat(0, 0) = 1.0f; mat(0, 1) = 2.0f; mat(0, 2) = 3.0f;
+    mat(1, 0) = 4.0f; mat(1, 1) = 5.0f; mat(1, 2) = 6.0f;
+
+    Tensor vec = {1.0f, 0.0f, 0.0f};
+    auto result = mat_vec(mat, vec);
+
+    REQUIRE(result.size() == 2);
+    REQUIRE(result[0] == 1.0f);
+    REQUIRE(result[1] == 4.0f);
+}
+
+TEST_CASE("Matrix: mat_vec_bias 类型安全重载") {
+    // 2×3 矩阵: [[1,0,0], [0,1,0]]
+    Matrix mat(2, 3);
+    mat(0, 0) = 1.0f; mat(0, 1) = 0.0f; mat(0, 2) = 0.0f;
+    mat(1, 0) = 0.0f; mat(1, 1) = 1.0f; mat(1, 2) = 0.0f;
+
+    Tensor vec = {3.0f, 4.0f, 0.0f};
+    Tensor bias = {10.0f, 20.0f};
+    auto result = mat_vec_bias(mat, vec, bias);
+
+    REQUIRE(result.size() == 2);
+    REQUIRE(result[0] == 13.0f);  // 1*3 + 10
+    REQUIRE(result[1] == 24.0f);  // 1*4 + 20
+}
+
+TEST_CASE("Matrix: 空矩阵") {
+    Matrix m;
+    REQUIRE(m.rows == 0);
+    REQUIRE(m.cols == 0);
+    REQUIRE(m.empty());
+}

@@ -16,8 +16,9 @@ using namespace domain::knowledge;
 
 // ── 构造 ────────────────────────────────────────────────────────
 
-TextLearner::TextLearner(KnowledgeGraph& kg)
-    : kg_(kg) {
+TextLearner::TextLearner(KnowledgeGraph& kg,
+                         domain::IEventPublisher* publisher)
+    : kg_(kg), publisher_(publisher) {
     stats_["total_learned"] = 0;
     stats_["verified"] = 0;
     stats_["failed"] = 0;

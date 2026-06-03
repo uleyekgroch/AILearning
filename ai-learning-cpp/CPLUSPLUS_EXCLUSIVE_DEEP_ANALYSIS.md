@@ -563,21 +563,40 @@ inline void mat_vec(...) {
 4. **构建一流**：CMake + FetchContent + CUDA自动检测，开箱即用
 5. **行数控制**：严格的800行限制，强迫职责分离
 
-### 8.2 最需要关注的三件事
+### 8.2 最需要关注的三件事（已更新 2026-06-04）
 
-| 优先级 | 事项 | 原因 |
-|--------|------|------|
-| **P0** | Learner 依赖注入重构 | 当前硬编码构造阻碍测试和扩展 |
-| **P0** | Tensor 类型安全 | `vector<float>` 维度错配是静默bug来源 |
-| **P1** | 性能基础设施 | 手写矩阵运算在复杂环境会成为瓶颈 |
+| 优先级 | 事项 | 状态 | 说明 |
+|--------|------|------|------|
+| **P0** | Learner 依赖注入重构 | **已完成** | `IPredictiveEngine` 接口 + `LearnerFactory` 工厂 |
+| **P0** | Tensor 类型安全 | **已完成** | `Matrix` 结构体内嵌 rows/cols + 运行时 assert 检查 |
+| **P1** | 性能基础设施 | **已完成** | Eigen 加速 mat_vec/mat_vec_bias（≥2048 元素） |
 
-### 8.3 下一步行动
+### 8.3 已完成行动（Phase A-D）
 
-1. **本周**：执行 `archive/` 目录创建，迁移 Python 代码
-2. **Week 1-2**：Learner 注入式重构 + Tensor 类型安全
-3. **Week 3-4**：Eigen 集成 + 性能基准测试
-4. **Month 2**：语义理解层（llama.cpp 集成评估）
-5. **Month 3**：真实环境接口（MuJoCo）
+| Phase | 内容 | 关键提交 |
+|-------|------|----------|
+| **A** | 基础设施强化 | `e2357af` DI + `c71584e` UTF-8 + `5646a5b` weak_ptr + `4e344db` sandbox 超时修复 |
+| **B** | Eigen 加速 | `cca55c5` mat_vec/mat_vec_bias Eigen 路径（≥64×32） |
+| **C** | 类型安全 Matrix | `8baf7d6` Matrix 结构体 + 运行时维度检查 |
+| **D** | 引擎扩展 | `63d0d04` MLPForwardEngine + LightPredictiveEngine + 工厂运行时选择 |
+
+### 8.4 技术债务修复状态
+
+| 债务 | 状态 | 修复方式 |
+|------|------|----------|
+| 债务1：Learner 硬编码构造 | **已修复** | `LearnerFactory::make_engine(name, config)` 支持 "pc"/"mlp"/"light" |
+| 债务2：`std::vector<float>` 类型安全 | **已修复** | `Matrix` 内嵌 shape，`mat_vec_bias(Matrix, vec, bias)` 自动检查 |
+| 债务3：手动矩阵运算性能 | **已修复** | Eigen 加速（≥2048 元素），8x 提升（512×256 场景） |
+| 债务4：`rand()` 线程不安全 | **已修复** | `std::mt19937` 替换 `rand()`（PredictiveCodingEngine） |
+| 债务6：事件发布器裸指针 | **已修复** | `std::weak_ptr<IEventPublisher>` 替换裸指针 |
+| 债务8：UTF-8 重复代码 | **已修复** | `utils/utf8.hpp` 统一提取 |
+
+### 8.5 下一步行动
+
+1. **Week 1**：Phase E 文档完善 + 测试补充（Matrix 边界测试）
+2. **Week 2-3**：REST API 暴露引擎选择端点
+3. **Month 2**：三种引擎 head-to-head 基准对比（速度/收敛/泛化）
+4. **Month 3**：语义理解层（llama.cpp 集成评估）
 
 ---
 

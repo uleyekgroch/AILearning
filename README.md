@@ -164,7 +164,7 @@ make -j$(nproc)
 # 运行主程序
 ./ai_learning_main
 
-# 运行测试（143 个测试用例）
+# 运行测试（422 个测试用例，1775 断言）
 ./ai_learning_tests
 
 # 启动 REST 服务
@@ -172,6 +172,31 @@ make -j$(nproc)
 ```
 
 > **WSL 已知问题**：`wsl: A localhost proxy configuration was detected but not mirrored into WSL.` 为 WSL NAT 模式代理警告，不影响编译和运行。
+
+## 引擎选择
+
+系统支持三种预测引擎，可通过 `LearnerFactory` 运行时切换：
+
+```cpp
+#include "ai_learning/core/learner_factory.hpp"
+
+// 完整预测编码（默认）— 迭代推理 + Hebbian 更新
+auto learner1 = ai_learning::core::LearnerFactory::create_default(config);
+
+// 标准 MLP — SGD 反向传播，无迭代推理
+auto learner2 = ai_learning::core::LearnerFactory::create_with_engine(
+    config, ai_learning::core::LearnerFactory::make_engine("mlp", config));
+
+// 轻量 PC — 单层隐藏层，最快
+auto learner3 = ai_learning::core::LearnerFactory::create_with_engine(
+    config, ai_learning::core::LearnerFactory::make_engine("light", config));
+```
+
+| 引擎 | 隐藏层 | 迭代推理 | 学习算法 | 适用场景 |
+|------|--------|----------|----------|----------|
+| **pc** | 2 | 是 | Hebbian | 生物启发、好奇心驱动 |
+| **mlp** | 2 | 否 | SGD 反向传播 | 标准深度学习基线 |
+| **light** | 1 | 否 | Hebbian | 快速、轻量、嵌入式 |
 
 #### Windows (MinGW)
 

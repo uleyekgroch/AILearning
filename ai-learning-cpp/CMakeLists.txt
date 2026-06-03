@@ -89,16 +89,6 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Catch2 nlohmann_json Crow)
 
-# ── Eigen（可选依赖，用于性能基准对比）─────────────────────────────
-# Eigen 是纯头文件库，只需下载源码，不执行其 CMakeLists.txt
-# 避免与 Crow 的 uninstall target 冲突
-FetchContent_Declare(
-    eigen3_fetch
-    GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
-    GIT_TAG        3.4.0
-)
-FetchContent_Populate(eigen3_fetch)
-
 # ── 项目库 ──────────────────────────────────────────────────────
 file(GLOB_RECURSE AI_LEARNING_SOURCES "src/*.cpp")
 list(FILTER AI_LEARNING_SOURCES EXCLUDE REGEX "tensor_ops_cuda_stub\\.cpp$")
@@ -144,12 +134,6 @@ if(asio_SOURCE_DIR)
     target_include_directories(ai_learning PUBLIC "${asio_SOURCE_DIR}/asio/include")
 endif()
 target_compile_definitions(ai_learning PUBLIC ASIO_STANDALONE)
-
-# ── Eigen 集成（可选加速 mat_vec/mat_vec_bias）───────────────────
-if(eigen3_fetch_SOURCE_DIR)
-    target_include_directories(ai_learning PRIVATE ${eigen3_fetch_SOURCE_DIR})
-    target_compile_definitions(ai_learning PRIVATE AI_LEARNING_USE_EIGEN=1)
-endif()
 # Windows: asio requires _WIN32_WINNT definition
 if(WIN32)
     target_compile_definitions(ai_learning PUBLIC _WIN32_WINNT=0x0601)
@@ -209,16 +193,6 @@ target_link_libraries(ai_learning_main PRIVATE ai_learning)
 # ── 性能基准 ──────────────────────────────────────────────────────
 add_executable(ai_learning_benchmark benchmark.cpp)
 target_link_libraries(ai_learning_benchmark PRIVATE ai_learning)
-
-# ── Tensor Ops 细粒度基准（手写 vs Eigen）─────────────────────────
-add_executable(ai_learning_tensor_bench benchmark_tensor_ops.cpp)
-target_link_libraries(ai_learning_tensor_bench
-    PRIVATE ai_learning
-)
-# Eigen 是 header-only，只需 include
-target_include_directories(ai_learning_tensor_bench
-    PRIVATE ${eigen3_fetch_SOURCE_DIR}
-)
 
 # ── 调试程序 ────────────────────────────────────────────────────
 add_executable(debug_main debug_main.cpp)
