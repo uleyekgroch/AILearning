@@ -42,6 +42,11 @@ public:
     /// 创建默认预测编码引擎
     static auto make_default_engine(const LearnerConfig& config)
         -> std::unique_ptr<learning::IPredictiveEngine>;
+
+    /// 按名称创建引擎（"pc" / "mlp" / "light"）
+    static auto make_engine(const std::string& name,
+                            const LearnerConfig& config)
+        -> std::unique_ptr<learning::IPredictiveEngine>;
 };
 
 }  // namespace ai_learning::core
