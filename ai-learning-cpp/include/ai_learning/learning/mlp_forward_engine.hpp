@@ -51,6 +51,9 @@ public:
     [[nodiscard]] auto save_state() const
         -> PredictiveEngineState override;
     void load_state(const PredictiveEngineState& state) override;
+    [[nodiscard]] auto engine_type() const -> std::string override {
+        return "mlp";
+    }
 
 private:
     /// 编码动作为 one-hot/连续向量

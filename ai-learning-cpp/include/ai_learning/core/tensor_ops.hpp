@@ -10,6 +10,7 @@
 #include "ai_learning/core/types.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <numeric>
 #include <vector>

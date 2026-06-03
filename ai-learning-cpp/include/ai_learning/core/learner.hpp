@@ -192,6 +192,11 @@ public:
     [[nodiscard]] auto engine() const
         -> const learning::IPredictiveEngine& { return *engine_; }
 
+    /// 当前预测引擎类型标识
+    [[nodiscard]] auto engine_type() const -> std::string {
+        return engine_ ? engine_->engine_type() : "none";
+    }
+
     [[nodiscard]] auto text_learner()
         -> learning::TextLearner& { return text_learner_; }
     [[nodiscard]] auto text_learner() const

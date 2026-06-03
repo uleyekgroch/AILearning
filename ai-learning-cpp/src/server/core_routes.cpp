@@ -46,6 +46,8 @@ void ai_learning::server::register_core_routes(
         body["status"] = "ok";
         body["version"] = config.version;
         body["stage"] = learner.stage();
+        body["engine_type"] = learner.engine_type();
+        body["avg_inference_steps"] = learner.engine().get_avg_inference_steps();
         auto stats = learner.get_stats();
         body["total_steps"] = stats.count("total_steps")
             ? static_cast<int>(stats.at("total_steps")) : 0;

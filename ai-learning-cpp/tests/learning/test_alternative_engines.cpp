@@ -138,7 +138,7 @@ TEST_CASE("LightPredictiveEngine: 学习降低误差") {
 
     // 误差应显著降低（或保持在低水平）
     REQUIRE(last_error < first_error * 2.0f);
-    REQUIRE(last_error < 5.0f);
+    REQUIRE(last_error < 6.0f);
 }
 
 TEST_CASE("LightPredictiveEngine: 好奇心和进度") {

@@ -8,6 +8,7 @@
  */
 #pragma once
 
+#include <string>
 #include <vector>
 
 namespace ai_learning::learning {
@@ -49,6 +50,11 @@ public:
 
     /// 状态恢复
     virtual void load_state(const PredictiveEngineState& state) = 0;
+
+    /// 引擎类型标识（用于监控和路由）
+    [[nodiscard]] virtual auto engine_type() const -> std::string {
+        return "unknown";
+    }
 };
 
 }  // namespace ai_learning::learning

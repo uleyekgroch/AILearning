@@ -92,6 +92,9 @@ public:
     [[nodiscard]] auto save_state() const
         -> PredictiveEngineState override;
     void load_state(const PredictiveEngineState& state) override;
+    [[nodiscard]] auto engine_type() const -> std::string override {
+        return "pc";
+    }
 
 private:
     /// 编码动作为向量

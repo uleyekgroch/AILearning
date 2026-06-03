@@ -123,6 +123,8 @@ TEST_CASE("Server Core: 健康检查返回 200 + 正确结构",
     CHECK(body["version"] == "0.2.0");
     CHECK(body.contains("stage"));
     CHECK(body.contains("total_steps"));
+    CHECK(body["engine_type"] == "pc");
+    CHECK(body.contains("avg_inference_steps"));
 }
 
 TEST_CASE("Server Core: 统计端点返回 learner 统计",
@@ -1034,4 +1036,48 @@ TEST_CASE("Server: HeartbeatManager 初始无连接",
     // 初始无连接，超时检查应返回空列表
     auto expired = hb.check_timeouts(std::chrono::seconds{60});
     CHECK(expired.empty());
+}
+
+// ═══════════════════════════════════════════════════════════
+// 引擎选择测试 (Phase F)
+// ═══════════════════════════════════════════════════════════
+
+TEST_CASE("Server Engine: MLP 引擎健康检查",
+          "[server][engine][mlp]") {
+    core::LearnerConfig config;
+    config.initial_stage = "literacy";
+    auto learner = core::LearnerFactory::create_with_engine(
+        config, core::LearnerFactory::make_engine("mlp", config));
+
+    crow::SimpleApp app;
+    ServerConfig srv_config;
+    SharedState state;
+    register_all_routes(app, *learner, srv_config, state);
+
+    auto req = make_get("/api/health");
+    auto [code, body] = dispatch(app, req);
+
+    CHECK(code == 200);
+    CHECK(body["engine_type"] == "mlp");
+    CHECK(body["avg_inference_steps"] == 1.0);
+}
+
+TEST_CASE("Server Engine: Light 引擎健康检查",
+          "[server][engine][light]") {
+    core::LearnerConfig config;
+    config.initial_stage = "literacy";
+    auto learner = core::LearnerFactory::create_with_engine(
+        config, core::LearnerFactory::make_engine("light", config));
+
+    crow::SimpleApp app;
+    ServerConfig srv_config;
+    SharedState state;
+    register_all_routes(app, *learner, srv_config, state);
+
+    auto req = make_get("/api/health");
+    auto [code, body] = dispatch(app, req);
+
+    CHECK(code == 200);
+    CHECK(body["engine_type"] == "light");
+    CHECK(body["avg_inference_steps"] == 1.0);
 }

@@ -48,6 +48,9 @@ public:
     [[nodiscard]] auto save_state() const
         -> PredictiveEngineState override;
     void load_state(const PredictiveEngineState& state) override;
+    [[nodiscard]] auto engine_type() const -> std::string override {
+        return "light";
+    }
 
 private:
     auto encode_action_(const std::vector<float>& action) const
