@@ -594,7 +594,8 @@ inline void mat_vec(...) {
 | **I.1** | CI/CD 自动化 (GitHub Actions) | `7c9af2e` Linux/Windows 构建矩阵 + 缓存 + 代码行数限制检查 |
 | **I.3** | 模型自动下载脚本 | `496b11c` `download_models.sh` + `download_models.ps1`，镜像回退 + 断点续传 |
 | **J.2** | REST API 完善 | `396a929` 健康检查(/health/live/ready) + OpenAPI + RateLimiter 中间件类 |
-| **J.3** | 监控与可观测性 | `NEW` 延迟百分位(P50/P95/P99) + GPU显存监控 + 结构化日志 + Prometheus指标 |
+| **J.3** | 监控与可观测性 | `463d3d5` 延迟百分位(P50/P95/P99) + GPU显存监控 + 结构化日志 + Prometheus指标 |
+| **K.1** | 多模态扩展（图像感知） | `NEW` IImageEncoder接口 + Stub实现 + /api/perceive/image端点 |
 
 ### 8.4 技术债务修复状态
 
@@ -641,7 +642,8 @@ inline void mat_vec(...) {
 5. **I.3**：模型自动下载脚本 — **已完成** (`496b11c`)
 6. **I.1**：CI/CD 自动化 — **已完成** (`7c9af2e`)
 7. **J.2**：REST API 完善 — **已完成** (`396a929`)
-8. **J.3**：监控与可观测性 — **已完成** (延迟百分位 + GPU监控 + 结构化日志 + Prometheus)
+8. **J.3**：监控与可观测性 — **已完成** (`463d3d5`)
+9. **K.1**：多模态扩展（图像感知） — **已完成** (IImageEncoder + Stub + /api/perceive/image)
 
 ---
 

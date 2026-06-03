@@ -149,6 +149,11 @@ curl http://localhost:8080/api/openapi.json
 curl http://localhost:8080/api/metrics
 curl http://localhost:8080/api/metrics/json  # JSON 摘要（P50/P95/P99 + GPU）
 
+# 图像感知（多模态 K.1 — Stub 编码器，生产环境替换为 CLIP）
+curl -X POST http://localhost:8080/api/perceive/image \
+  -H "Content-Type: application/json" \
+  -d '{"image_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "width": 1, "height": 1}'
+
 # 设置日志级别（DEBUG/INFO/WARN/ERROR）
 LOG_LEVEL=DEBUG ./ai_learning_server --port 8080
 

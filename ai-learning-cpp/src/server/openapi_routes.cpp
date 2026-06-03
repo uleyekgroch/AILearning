@@ -131,6 +131,44 @@ static auto make_openapi_spec_(const ai_learning::server::ServerConfig& config) 
         }}
     };
 
+    // Perception
+    paths["/api/perceive"] = {
+        {"post", {
+            {"tags", json::array({"Learning"})},
+            {"summary", "多模态感知（通用）"},
+            {"requestBody", {
+                {"required", true},
+                {"content", {{"application/json", {
+                    {"schema", {{"type", "object"}, {"properties", {
+                        {"raw_input", {{"type", "object"}}}
+                    }}, {"required", json::array({"raw_input"})}}}
+                }}}}
+            }},
+            {"responses", {{"200", {{"description", "感知向量"}}}}}
+        }}
+    };
+    paths["/api/perceive/image"] = {
+        {"post", {
+            {"tags", json::array({"Learning"})},
+            {"summary", "图像感知（多模态 K.1）"},
+            {"description", "接收 base64 编码图像，生成视觉嵌入并注入知识图谱。当前使用 Stub 编码器，生产环境可替换为 CLIP。"},
+            {"requestBody", {
+                {"required", true},
+                {"content", {{"application/json", {
+                    {"schema", {{"type", "object"}, {"properties", {
+                        {"image_base64", {{"type", "string"}, {"description", "Base64 编码图像（支持 data:image/...;base64, 前缀）"}}},
+                        {"width", {{"type", "integer"}, {"description", "图像宽度（可选）"}}},
+                        {"height", {{"type", "integer"}, {"description", "图像高度（可选）"}}}
+                    }}, {"required", json::array({"image_base64"})}}}
+                }}}}
+            }},
+            {"responses", {
+                {"200", {{"description", "感知成功"}}},
+                {"400", {{"description", "无效请求"}}}
+            }}
+        }}
+    };
+
     // Reasoning
     paths["/api/reason"] = {
         {"post", {

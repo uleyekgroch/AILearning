@@ -9,11 +9,13 @@
 #include "route_groups.hpp"
 #include "dto.hpp"
 #include "ai_learning/server/metrics_collector.hpp"
+#include "ai_learning/perception/image_encoder.hpp"
 
 #include <nlohmann/json.hpp>
 
 #include <atomic>
 #include <chrono>
+#include <cmath>
 #include <thread>
 
 using json = nlohmann::json;
@@ -288,5 +290,65 @@ void ai_learning::server::register_core_routes(
             learner.load(path);
             return ok_resp(json{{"status", "ok"}, {"path", path}});
         } catch (const std::exception& e) { return err_resp(500, e.what()); }
+    });
+
+    // ── K.1: 多模态图像感知 ─────────────────────────────────────────
+
+    // POST /api/perceive/image — 接收 base64 图像，编码为嵌入，注入知识图谱
+    CROW_ROUTE(app, "/api/perceive/image").methods("POST"_method)
+    ([&](const crow::request& req) -> crow::response {
+        ScopedTimer timer(state.metrics, "perceive_image");
+        try {
+            auto body = json::parse(req.body);
+            if (!body.contains("image_base64")) {
+                return err_resp(400, "missing 'image_base64' field");
+            }
+
+            std::string b64 = body["image_base64"].get<std::string>();
+            // 移除 data:image/...;base64, 前缀（如果存在）
+            auto pos = b64.find(',');
+            if (pos != std::string::npos) b64 = b64.substr(pos + 1);
+
+            // 简单 base64 解码
+            static const std::string base64_chars =
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+            std::vector<uint8_t> image_data;
+            int val = 0, valb = -8;
+            for (uint8_t c : b64) {
+                if (c == '=') break;
+                auto p = base64_chars.find(c);
+                if (p == std::string::npos) continue;
+                val = (val << 6) + static_cast<int>(p);
+                valb += 6;
+                if (valb >= 0) {
+                    image_data.push_back(static_cast<uint8_t>((val >> valb) & 0xFF));
+                    valb -= 8;
+                }
+            }
+            if (image_data.empty()) {
+                return err_resp(400, "invalid base64 image data");
+            }
+
+            // 使用 StubImageEncoder 生成嵌入（生产环境替换为 CLIP）
+            perception::StubImageEncoder encoder(128);  // 128-dim 嵌入
+            auto result = encoder.encode(image_data,
+                body.value("width", 0), body.value("height", 0));
+            if (!result.success) {
+                return err_resp(500, result.error);
+            }
+
+            // 将图像嵌入注入感知系统（视为 "visual" 模态）
+            std::map<std::string, std::vector<float>> raw_input;
+            raw_input["visual"] = result.embedding;
+            auto perception = learner.perceive(raw_input);
+
+            json resp;
+            resp["status"] = "ok";
+            resp["encoder"] = encoder.name();
+            resp["embedding_dim"] = result.embedding.size();
+            resp["image_size"] = image_data.size();
+            resp["perception_dim"] = perception.size();
+            return ok_resp(resp);
+        } catch (const std::exception& e) { return err_resp(400, e.what()); }
     });
 }
