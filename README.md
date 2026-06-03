@@ -124,12 +124,16 @@ std::string answer = learner.think("什么是人工智能");
 # 启动服务（默认 PC 引擎）
 ./ai_learning_server --port 8080 --threads 4
 
+# 快速下载推荐模型（自动镜像回退 + 断点续传）
+cd scripts && ./download_models.sh              # 下载所有推荐模型到 ../models/
+cd scripts && ./download_models.sh --model llm   # 仅下载对话模型
+
 # 使用 MLP 引擎 + 本地 LLM（llama.cpp）
-./ai_learning_server --engine mlp --llm-model /path/to/qwen2.5-3b-instruct-q4.gguf
+./ai_learning_server --engine mlp --llm-model ../models/qwen2.5-3b-instruct-q4_k_m.gguf
 
 # GPU offload 加速（将前 N 层卸载到 GPU，需 CUDA 环境）
 # RTX 4060 Laptop 8GB 推荐 10-15 层，可获得 3.5x 加速
-./ai_learning_server --llm-model /path/to/model.gguf --gpu-layers 15
+./ai_learning_server --llm-model ../models/qwen2.5-3b-instruct-q4_k_m.gguf --gpu-layers 15
 
 # 文本学习
 curl -X POST http://localhost:8080/api/learn/text \

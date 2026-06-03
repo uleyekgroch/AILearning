@@ -590,7 +590,8 @@ inline void mat_vec(...) {
 | **H.5** | bge-small-zh-v1.5 embedding 模型 | `aa2e2a2` 15MB Q4_K_M，判别能力 gap +0.26 vs Qwen -0.02 |
 | **H.6** | GPU offload (`--gpu-layers`) | `87d3db2` `n_gpu_layers` 配置传递到 LlamaCpp providers |
 | **H.7** | 线程安全（mutex 保护） | `c8a78e7` `LlamaCppLLMProvider` + `LlamaCppEmbeddingProvider` 加锁串行化 |
-| **H.8** | CUDA 后端修复（WSL + RTX 4060） | `NEW` 修复 CMake CUDA 检测，llama.cpp GGML_CUDA=ON，sm_89 架构 |
+| **H.8** | CUDA 后端修复（WSL + RTX 4060） | `ece703d` 修复 CMake CUDA 检测，llama.cpp GGML_CUDA=ON，sm_89 架构 |
+| **I.3** | 模型自动下载脚本 | `NEW` `download_models.sh` + `download_models.ps1`，镜像回退 + 断点续传 |
 
 ### 8.4 技术债务修复状态
 
@@ -630,10 +631,14 @@ inline void mat_vec(...) {
 
 ### 8.6 下一步行动
 
-1. **Week 2-3**：llama.cpp 三阶段验证 — 下载 Qwen2.5-3B / bge-small-zh 模型，验证嵌入质量、对话能力、推理增强
-2. **Month 2**：多线程推理并行化
-3. **Month 3**：CUDA 加速 MLP/Light 前向路径
-4. **Q3**：llama.cpp GPU offload（n_gpu_layers）性能优化
+1. ~~Week 2-3：llama.cpp 三阶段验证~~ — **已完成** (`3e382fe`)
+2. ~~Month 2：多线程推理并行化~~ — **已完成** (`c8a78e7` mutex 保护)
+3. ~~Month 3：CUDA 加速~~ — **已完成** (`ece703d` GGML_CUDA=ON)
+4. ~~Q3：llama.cpp GPU offload~~ — **已完成** (`87d3db2` + `ece703d`)
+5. **I.3**：模型自动下载脚本 — **已完成** (镜像回退 + 断点续传)
+6. **I.1**：CI/CD 自动化 — GitHub Actions 构建矩阵 (Linux/Windows/CUDA)
+7. **J.2**：REST API 完善 — 健康检查 + OpenAPI 文档
+8. **J.3**：监控与可观测性 — 推理延迟指标 + 显存监控
 
 ---
 
