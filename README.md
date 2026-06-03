@@ -128,7 +128,8 @@ std::string answer = learner.think("什么是人工智能");
 ./ai_learning_server --engine mlp --llm-model /path/to/qwen2.5-3b-instruct-q4.gguf
 
 # GPU offload 加速（将前 N 层卸载到 GPU，需 CUDA 环境）
-./ai_learning_server --llm-model /path/to/model.gguf --gpu-layers 20
+# RTX 4060 Laptop 8GB 推荐 10-15 层，可获得 3.5x 加速
+./ai_learning_server --llm-model /path/to/model.gguf --gpu-layers 15
 
 # 文本学习
 curl -X POST http://localhost:8080/api/learn/text \

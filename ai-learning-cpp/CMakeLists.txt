@@ -273,4 +273,8 @@ if(AI_LEARNING_WITH_LLAMA_CPP)
     add_executable(compare_embeddings compare_embeddings.cpp)
     target_link_libraries(compare_embeddings PRIVATE ai_learning)
     target_include_directories(compare_embeddings PRIVATE include)
+
+    add_executable(test_gpu_offload test_gpu_offload.cpp)
+    target_link_libraries(test_gpu_offload PRIVATE ai_learning)
+    target_include_directories(test_gpu_offload PRIVATE include)
 endif()

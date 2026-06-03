@@ -133,6 +133,20 @@ make -j$(nproc)
 3. **Embedding 质量**: Qwen 非专门 embedding 模型，效果弱于 bge-small-zh。
 4. **内存占用**: Qwen2.5-3B Q4 加载后约 2.2GB RAM。
 
+## GPU Offload 测试
+
+**环境**: WSL2, RTX 4060 Laptop (8GB VRAM), CUDA 12.6
+
+| 层数 | 时间 | 速度比 |
+|------|------|--------|
+| CPU (0 layers) | 160635 ms | 1.0x |
+| 5 layers | 44699 ms | 3.6x |
+| 10 layers | 42886 ms | 3.7x |
+| 15 layers | 45604 ms | 3.5x |
+| 20 layers | 86264 ms | 1.9x |
+
+**结论**: RTX 4060 Laptop 8GB 显存适合 10-15 层 offload，可获得 3.5x 加速。超过 20 层后显存带宽成为瓶颈，性能反而下降。
+
 ---
 
 ## 结论

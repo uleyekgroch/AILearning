@@ -589,7 +589,8 @@ inline void mat_vec(...) {
 | **H.4** | 三阶段验证（Qwen2.5-3B）| `3e382fe` Embedding + Dialog + Reasoning 实测通过 |
 | **H.5** | bge-small-zh-v1.5 embedding 模型 | `aa2e2a2` 15MB Q4_K_M，判别能力 gap +0.26 vs Qwen -0.02 |
 | **H.6** | GPU offload (`--gpu-layers`) | `87d3db2` `n_gpu_layers` 配置传递到 LlamaCpp providers |
-| **H.7** | 线程安全（mutex 保护） | `NEW` `LlamaCppLLMProvider` + `LlamaCppEmbeddingProvider` 加锁串行化 |
+| **H.7** | 线程安全（mutex 保护） | `c8a78e7` `LlamaCppLLMProvider` + `LlamaCppEmbeddingProvider` 加锁串行化 |
+| **H.8** | CUDA 后端修复（WSL + RTX 4060） | `NEW` 修复 CMake CUDA 检测，llama.cpp GGML_CUDA=ON，sm_89 架构 |
 
 ### 8.4 技术债务修复状态
 
