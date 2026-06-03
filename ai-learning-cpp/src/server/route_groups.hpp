@@ -19,6 +19,7 @@
 #include "ai_learning/language/dialog_manager.hpp"
 #include "ai_learning/language/llm_provider.hpp"
 #include "ai_learning/learning/continuous_loop.hpp"
+#include "ai_learning/server/metrics_collector.hpp"
 
 #include <crow.h>
 
@@ -50,6 +51,9 @@ struct SharedState {
     std::unique_ptr<language::DialogManager> dialog;
     std::unique_ptr<learning::ContinuousLearningLoop> continuous_loop;
     std::unique_ptr<language::ILLMProvider> llm_provider;
+
+    /// J.3: 可观测性 — 指标收集器
+    MetricsCollector metrics;
 };
 
 /// 注册系统 + 核心路由（健康检查、统计、阶段、任务、学习、推理、记忆、持久化）
@@ -93,6 +97,11 @@ void register_goals_routes(
 void register_openapi_routes(
     crow::SimpleApp& app,
     const ServerConfig& config);
+
+/// 注册指标路由（/api/metrics — Prometheus 格式）
+void register_metrics_routes(
+    crow::SimpleApp& app,
+    const SharedState& state);
 
 /// 生成唯一 task_id
 auto generate_task_id() -> std::string;

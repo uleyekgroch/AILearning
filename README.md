@@ -145,6 +145,13 @@ curl http://localhost:8080/api/health/ready   # Kubernetes readiness
 # OpenAPI 文档
 curl http://localhost:8080/api/openapi.json
 
+# 指标监控（Prometheus 格式）
+curl http://localhost:8080/api/metrics
+curl http://localhost:8080/api/metrics/json  # JSON 摘要（P50/P95/P99 + GPU）
+
+# 设置日志级别（DEBUG/INFO/WARN/ERROR）
+LOG_LEVEL=DEBUG ./ai_learning_server --port 8080
+
 # 文本学习
 curl -X POST http://localhost:8080/api/learn/text \
   -H "Content-Type: application/json" \

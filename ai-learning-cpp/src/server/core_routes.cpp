@@ -8,6 +8,7 @@
 
 #include "route_groups.hpp"
 #include "dto.hpp"
+#include "ai_learning/server/metrics_collector.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -135,6 +136,7 @@ void ai_learning::server::register_core_routes(
     // POST /api/learn/text
     CROW_ROUTE(app, "/api/learn/text").methods("POST"_method)
     ([&](const crow::request& req) -> crow::response {
+        ScopedTimer timer(state.metrics, "learn_text");
         try {
             auto body = json::parse(req.body);
             if (!body.contains("text")) return err_resp(400, "missing 'text' field");
@@ -160,6 +162,7 @@ void ai_learning::server::register_core_routes(
     // POST /api/reason
     CROW_ROUTE(app, "/api/reason").methods("POST"_method)
     ([&](const crow::request& req) -> crow::response {
+        ScopedTimer timer(state.metrics, "reason");
         try {
             auto body = json::parse(req.body);
             if (!body.contains("question")) return err_resp(400, "missing 'question' field");
@@ -173,6 +176,7 @@ void ai_learning::server::register_core_routes(
     // POST /api/think
     CROW_ROUTE(app, "/api/think").methods("POST"_method)
     ([&](const crow::request& req) -> crow::response {
+        ScopedTimer timer(state.metrics, "think");
         try {
             auto body = json::parse(req.body);
             if (!body.contains("question")) return err_resp(400, "missing 'question' field");
@@ -183,6 +187,7 @@ void ai_learning::server::register_core_routes(
     // POST /api/perceive
     CROW_ROUTE(app, "/api/perceive").methods("POST"_method)
     ([&](const crow::request& req) -> crow::response {
+        ScopedTimer timer(state.metrics, "perceive");
         try {
             auto body = json::parse(req.body);
             if (!body.contains("raw_input")) return err_resp(400, "missing 'raw_input' field");
@@ -193,6 +198,7 @@ void ai_learning::server::register_core_routes(
     // POST /api/remember
     CROW_ROUTE(app, "/api/remember").methods("POST"_method)
     ([&](const crow::request& req) -> crow::response {
+        ScopedTimer timer(state.metrics, "remember");
         try {
             auto body = json::parse(req.body);
             if (!body.contains("obs") || !body.contains("action")
@@ -210,6 +216,7 @@ void ai_learning::server::register_core_routes(
     // POST /api/recall
     CROW_ROUTE(app, "/api/recall").methods("POST"_method)
     ([&](const crow::request& req) -> crow::response {
+        ScopedTimer timer(state.metrics, "recall");
         try {
             auto body = json::parse(req.body);
             if (!body.contains("cue")) return err_resp(400, "missing 'cue' field");
@@ -223,6 +230,7 @@ void ai_learning::server::register_core_routes(
     // POST /api/consolidate
     CROW_ROUTE(app, "/api/consolidate").methods("POST"_method)
     ([&](const crow::request&) -> crow::response {
+        ScopedTimer timer(state.metrics, "consolidate");
         try { return ok_resp(learner.consolidate()); }
         catch (const std::exception& e) { return err_resp(500, e.what()); }
     });

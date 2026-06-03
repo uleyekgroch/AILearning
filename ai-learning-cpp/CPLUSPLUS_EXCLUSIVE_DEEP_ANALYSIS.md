@@ -593,7 +593,8 @@ inline void mat_vec(...) {
 | **H.8** | CUDA 后端修复（WSL + RTX 4060） | `ece703d` 修复 CMake CUDA 检测，llama.cpp GGML_CUDA=ON，sm_89 架构 |
 | **I.1** | CI/CD 自动化 (GitHub Actions) | `7c9af2e` Linux/Windows 构建矩阵 + 缓存 + 代码行数限制检查 |
 | **I.3** | 模型自动下载脚本 | `496b11c` `download_models.sh` + `download_models.ps1`，镜像回退 + 断点续传 |
-| **J.2** | REST API 完善 | `NEW` 健康检查(/health/live/ready) + OpenAPI + RateLimiter 中间件类 |
+| **J.2** | REST API 完善 | `396a929` 健康检查(/health/live/ready) + OpenAPI + RateLimiter 中间件类 |
+| **J.3** | 监控与可观测性 | `NEW` 延迟百分位(P50/P95/P99) + GPU显存监控 + 结构化日志 + Prometheus指标 |
 
 ### 8.4 技术债务修复状态
 
@@ -639,8 +640,8 @@ inline void mat_vec(...) {
 4. ~~Q3：llama.cpp GPU offload~~ — **已完成** (`87d3db2` + `ece703d`)
 5. **I.3**：模型自动下载脚本 — **已完成** (`496b11c`)
 6. **I.1**：CI/CD 自动化 — **已完成** (`7c9af2e`)
-7. **J.2**：REST API 完善 — **已完成** (健康检查 + OpenAPI + RateLimiter)
-8. **J.3**：监控与可观测性 — 推理延迟指标 + 显存监控
+7. **J.2**：REST API 完善 — **已完成** (`396a929`)
+8. **J.3**：监控与可观测性 — **已完成** (延迟百分位 + GPU监控 + 结构化日志 + Prometheus)
 
 ---
 
