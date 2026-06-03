@@ -38,6 +38,7 @@ static auto make_openapi_spec_(const ai_learning::server::ServerConfig& config) 
         {{"name", "Reasoning"}, {"description", "推理与思考"}},
         {{"name", "Memory"}, {"description", "记忆系统"}},
         {{"name", "Dialog"}, {"description", "对话与聊天"}},
+        {{"name", "Knowledge"}, {"description", "知识图谱可视化（K.2）"}},
         {{"name", "Goals"}, {"description", "目标管理"}},
         {{"name", "Society"}, {"description", "多 Agent 社会"}},
         {{"name", "Runtime"}, {"description", "运行时控制"}},
@@ -252,6 +253,57 @@ static auto make_openapi_spec_(const ai_learning::server::ServerConfig& config) 
                 }}}}
             }},
             {"responses", {{"200", {{"description", "回复"}}}}}
+        }}
+    };
+
+    // Knowledge Graph (K.2)
+    paths["/api/knowledge/graph"] = {
+        {"get", {
+            {"tags", json::array({"Knowledge"})},
+            {"summary", "导出知识图谱"},
+            {"description", "支持 D3 JSON (默认)、Cytoscape JSON、GraphML XML 格式"},
+            {"parameters", json::array({
+                {{"name", "format"}, {"in", "query"}, {"schema", {{"type", "string"}, {"enum", json::array({"d3", "cytoscape", "graphml"})}}}, {"description", "导出格式"}}
+            })},
+            {"responses", {
+                {"200", {{"description", "图谱数据"}}},
+                {"400", {{"description", "无效格式"}}}
+            }}
+        }}
+    };
+    paths["/api/knowledge/stats"] = {
+        {"get", {
+            {"tags", json::array({"Knowledge"})},
+            {"summary", "知识图谱统计"},
+            {"responses", {{"200", {{"description", "统计信息"}}}}}
+        }}
+    };
+    paths["/api/knowledge/search"] = {
+        {"get", {
+            {"tags", json::array({"Knowledge"})},
+            {"summary", "搜索知识图谱实体"},
+            {"parameters", json::array({
+                {{"name", "q"}, {"in", "query"}, {"required", true}, {"schema", {{"type", "string"}}}, {"description", "搜索关键词"}},
+                {{"name", "type"}, {"in", "query"}, {"schema", {{"type", "string"}}}, {"description", "实体类型过滤"}}
+            })},
+            {"responses", {{"200", {{"description", "搜索结果"}}}}}
+        }}
+    };
+    paths["/api/knowledge/path"] = {
+        {"post", {
+            {"tags", json::array({"Knowledge"})},
+            {"summary", "查找实体间最短路径"},
+            {"requestBody", {
+                {"required", true},
+                {"content", {{"application/json", {
+                    {"schema", {{"type", "object"}, {"properties", {
+                        {"source", {{"type", "string"}}},
+                        {"target", {{"type", "string"}}},
+                        {"max_depth", {{"type", "integer"}, {"default", 3}}}
+                    }}, {"required", json::array({"source", "target"})}}}
+                }}}}
+            }},
+            {"responses", {{"200", {{"description", "路径结果"}}}}}
         }}
     };
 

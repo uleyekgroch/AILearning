@@ -103,6 +103,13 @@ void register_metrics_routes(
     crow::SimpleApp& app,
     const SharedState& state);
 
+/// 注册知识图谱路由（K.2：导出、统计、搜索、路径）
+void register_knowledge_routes(
+    crow::SimpleApp& app,
+    core::Learner& learner,
+    const ServerConfig& config,
+    SharedState& state);
+
 /// 生成唯一 task_id
 auto generate_task_id() -> std::string;
 

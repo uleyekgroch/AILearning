@@ -149,6 +149,25 @@ curl http://localhost:8080/api/openapi.json
 curl http://localhost:8080/api/metrics
 curl http://localhost:8080/api/metrics/json  # JSON 摘要（P50/P95/P99 + GPU）
 
+# 知识图谱可视化（K.2）
+# 打开浏览器访问 http://localhost:8080/web/graph.html
+
+# 导出图谱（D3 JSON / Cytoscape JSON / GraphML XML）
+curl "http://localhost:8080/api/knowledge/graph?format=d3"
+curl "http://localhost:8080/api/knowledge/graph?format=cytoscape"
+curl "http://localhost:8080/api/knowledge/graph?format=graphml"
+
+# 图谱统计
+curl http://localhost:8080/api/knowledge/stats
+
+# 搜索实体
+curl "http://localhost:8080/api/knowledge/search?q=人工智能"
+
+# 查找实体间最短路径
+curl -X POST http://localhost:8080/api/knowledge/path \
+  -H "Content-Type: application/json" \
+  -d '{"source": "人工智能", "target": "机器学习", "max_depth": 3}'
+
 # 图像感知（多模态 K.1 — Stub 编码器，生产环境替换为 CLIP）
 curl -X POST http://localhost:8080/api/perceive/image \
   -H "Content-Type: application/json" \

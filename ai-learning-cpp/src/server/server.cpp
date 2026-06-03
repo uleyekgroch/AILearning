@@ -77,6 +77,7 @@ auto ai_learning::server::LearningServer::register_routes_(::crow::SimpleApp& ap
     register_goals_routes(app, learner_, *shared_state_);
     register_openapi_routes(app, config_);
     register_metrics_routes(app, *shared_state_);
+    register_knowledge_routes(app, learner_, config_, *shared_state_);
     register_static_routes_(app);
     register_ws_routes_(app);
 }

@@ -249,6 +249,7 @@ add_executable(ai_learning_server
     src/server/goals_routes.cpp
     src/server/openapi_routes.cpp
     src/server/metrics_routes.cpp
+    src/server/knowledge_routes.cpp
 )
 target_link_libraries(ai_learning_server
     PRIVATE ai_learning Crow::Crow nlohmann_json::nlohmann_json
