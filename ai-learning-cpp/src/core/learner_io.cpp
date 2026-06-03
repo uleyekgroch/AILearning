@@ -36,8 +36,8 @@ void Learner::save(const std::string& path) const {
     out << "[statistics]\n";
     out << "hippocampal_episodes=" << hippocampal_.size() << "\n";
     out << "cortical_facts=" << cortical_.size() << "\n";
-    out << "learning_progress=" << engine_.get_learning_progress() << "\n";
-    out << "curiosity=" << engine_.get_curiosity() << "\n";
+    out << "learning_progress=" << engine_->get_learning_progress() << "\n";
+    out << "curiosity=" << engine_->get_curiosity() << "\n";
 
     // -- 误差历史 --
     out << "[error_history]\n";

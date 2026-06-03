@@ -5,6 +5,7 @@
 
 #include "ai_learning/core/learner.hpp"
 #include "ai_learning/core/tensor_ops.hpp"
+#include "ai_learning/learning/predictive_coding_engine.hpp"
 #include "ai_learning/learning/tokenizer.hpp"
 
 #include <algorithm>
@@ -19,18 +20,24 @@ using namespace domain::knowledge;
 // ── 构造 ────────────────────────────────────────────────────────
 
 Learner::Learner(const LearnerConfig& config)
+    : Learner(config,
+              std::make_unique<PredictiveCodingEngine>(
+                  PredictiveCodingConfig{
+                      config.obs_dim,
+                      config.action_dim,
+                      config.hidden_dims.size() > 0 ? config.hidden_dims[0] : 64,
+                      config.hidden_dims.size() > 1 ? config.hidden_dims[1] : 32,
+                      config.learning_rate,
+                      config.inference_lr,
+                      config.max_inference_steps,
+                      config.convergence_threshold,
+                  })) {}
+
+Learner::Learner(const LearnerConfig& config,
+                 std::unique_ptr<learning::IPredictiveEngine> engine)
     : config_(config),
       kg_(),
-      engine_(PredictiveCodingConfig{
-          config.obs_dim,
-          config.action_dim,
-          config.hidden_dims.size() > 0 ? config.hidden_dims[0] : 64,
-          config.hidden_dims.size() > 1 ? config.hidden_dims[1] : 32,
-          config.learning_rate,
-          config.inference_lr,
-          config.max_inference_steps,
-          config.convergence_threshold,
-      }),
+      engine_(std::move(engine)),
       text_learner_(kg_),
       episodic_memory_(config.episodic_memory_capacity),
       stdp_(),
@@ -144,7 +151,7 @@ void Learner::learn_predictive_(const std::vector<std::string>& tokens) {
     int steps = 0;
     for (size_t i = 0; i + 1 < embeddings.size() && steps < config_.pc_max_steps_per_text; ++i) {
         auto action = std::vector<float>{1.0f};  // 固定 "预测下一个"
-        engine_.learn(embeddings[i], action, embeddings[i + 1]);
+        engine_->learn(embeddings[i], action, embeddings[i + 1]);
         ++steps;
     }
     pc_steps_ += steps;
@@ -198,7 +205,7 @@ auto Learner::perceive(
 }
 
 auto Learner::choose_action(const std::vector<float>& obs) -> int {
-    auto curiosity = engine_.get_curiosity();
+    auto curiosity = engine_->get_curiosity();
 
     // ε-贪心：高好奇心时更多探索
     auto epsilon = static_cast<float>(config_.motivation_epsilon);
@@ -220,7 +227,7 @@ auto Learner::choose_action(const std::vector<float>& obs) -> int {
     for (int a = 0; a < config_.action_dim; ++a) {
         auto action_vec = std::vector<float>(config_.action_dim, 0.0f);
         action_vec[a] = 1.0f;
-        auto pred = engine_.predict(obs, action_vec);
+        auto pred = engine_->predict(obs, action_vec);
 
         float uncertainty = 0.0f;
         for (auto v : pred) uncertainty += v * v;
@@ -244,7 +251,7 @@ auto Learner::learn_from_experience(const std::vector<float>& obs,
         action_vec[action] = 1.0f;
     }
 
-    auto error = engine_.learn(obs, action_vec, next_obs);
+    auto error = engine_->learn(obs, action_vec, next_obs);
     error_history_.push_back(static_cast<float>(error));
     ++total_steps_;
 
@@ -476,8 +483,8 @@ auto Learner::get_stats() const -> std::map<std::string, double> {
         {"entity_count", static_cast<double>(kg_.entity_count())},
         {"relation_count", static_cast<double>(kg_.relation_count())},
         {"stage_index", static_cast<double>(stage_index_)},
-        {"learning_progress", engine_.get_learning_progress()},
-        {"curiosity", engine_.get_curiosity()},
+        {"learning_progress", engine_->get_learning_progress()},
+        {"curiosity", engine_->get_curiosity()},
         {"hippocampal_episodes", static_cast<double>(hippocampal_.size())},
         {"cortical_facts", static_cast<double>(cortical_.size())},
     };

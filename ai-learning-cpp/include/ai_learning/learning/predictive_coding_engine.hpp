@@ -11,6 +11,8 @@
  */
 #pragma once
 
+#include "ai_learning/learning/ipredictive_engine.hpp"
+
 #include <vector>
 #include <deque>
 
@@ -49,41 +51,46 @@ struct InferenceResult {
 /// 架构：input(obs+action) → hidden1 → hidden2 → output(obs')
 /// 激活：ReLU
 /// 学习：预测编码 + 局部 Hebbian 更新
-class PredictiveCodingEngine {
+class PredictiveCodingEngine : public IPredictiveEngine {
 public:
     explicit PredictiveCodingEngine(const PredictiveCodingConfig& cfg);
 
     /// 前向传播：预测下一个状态
     auto predict(const std::vector<float>& state,
                  const std::vector<float>& action) const
-        -> std::vector<float>;
+        -> std::vector<float> override;
 
     /// 从预测误差中学习（预测编码核心）
     /// @return 预测误差 (MSE)
     auto learn(const std::vector<float>& obs,
                const std::vector<float>& action,
                const std::vector<float>& actual)
-        -> double;
+        -> double override;
 
     /// 计算好奇心值
-    [[nodiscard]] auto get_curiosity() const -> double;
+    [[nodiscard]] auto get_curiosity() const -> double override;
 
     /// 获取学习进度
-    [[nodiscard]] auto get_learning_progress() const -> double;
+    [[nodiscard]] auto get_learning_progress() const -> double override;
 
     /// 获取平均推理步数
-    [[nodiscard]] auto get_avg_inference_steps() const -> double;
+    [[nodiscard]] auto get_avg_inference_steps() const -> double override;
 
     // ── 状态访问 ──
     [[nodiscard]] auto error_history() const
         -> const std::deque<float>& { return error_history_; }
 
-    /// 状态序列化（用于 save/load）
-    struct State {
+    /// 详细状态（内部结构，保留完整权重/偏置）
+    struct DetailedState {
         std::vector<float> w1, b1, w2, b2, w3, b3;
     };
-    [[nodiscard]] auto save_state() const -> State;
-    void load_state(const State& state);
+    [[nodiscard]] auto save_detailed_state() const -> DetailedState;
+    void load_detailed_state(const DetailedState& state);
+
+    // ── IPredictiveEngine 接口实现 ──
+    [[nodiscard]] auto save_state() const
+        -> PredictiveEngineState override;
+    void load_state(const PredictiveEngineState& state) override;
 
 private:
     /// 编码动作为向量

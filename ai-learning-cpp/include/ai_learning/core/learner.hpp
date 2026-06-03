@@ -17,7 +17,7 @@
 #include "ai_learning/core/config.hpp"
 #include "ai_learning/core/module_registry.hpp"
 #include "ai_learning/domain/knowledge/knowledge_graph.hpp"
-#include "ai_learning/learning/predictive_coding_engine.hpp"
+#include "ai_learning/learning/ipredictive_engine.hpp"
 #include "ai_learning/learning/text_learner.hpp"
 #include "ai_learning/learning/stdp_learning.hpp"
 #include "ai_learning/learning/verification.hpp"
@@ -82,7 +82,12 @@ struct AutonomousLearnResult {
 /// 统一学习体
 class Learner {
 public:
+    /// 默认构造：使用标准预测编码引擎
     explicit Learner(const LearnerConfig& config);
+
+    /// 注入式构造：允许替换预测引擎（测试、性能优化、算法实验）
+    Learner(const LearnerConfig& config,
+            std::unique_ptr<learning::IPredictiveEngine> engine);
 
     // ── 文本学习 ─────────────────────────────────────────────────
 
@@ -183,9 +188,9 @@ public:
         -> const domain::knowledge::KnowledgeGraph& { return kg_; }
 
     [[nodiscard]] auto engine()
-        -> learning::PredictiveCodingEngine& { return engine_; }
+        -> learning::IPredictiveEngine& { return *engine_; }
     [[nodiscard]] auto engine() const
-        -> const learning::PredictiveCodingEngine& { return engine_; }
+        -> const learning::IPredictiveEngine& { return *engine_; }
 
     [[nodiscard]] auto text_learner()
         -> learning::TextLearner& { return text_learner_; }
@@ -457,7 +462,7 @@ private:
 
     // 核心子系统（值语义，不使用指针）
     domain::knowledge::KnowledgeGraph kg_;
-    learning::PredictiveCodingEngine engine_;
+    std::unique_ptr<learning::IPredictiveEngine> engine_;
     learning::TextLearner text_learner_;
     memory::EpisodicMemory           episodic_memory_;
     learning::STDP                   stdp_;

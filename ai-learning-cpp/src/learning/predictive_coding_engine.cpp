@@ -8,7 +8,7 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstdlib>
+#include <random>
 
 namespace ai_learning::learning {
 
@@ -26,9 +26,12 @@ PredictiveCodingEngine::PredictiveCodingEngine(
     auto inp = input_dim_;
     auto out = cfg.obs_dim;
 
-    auto he_init = [](int fan_in) -> float {
+    std::mt19937 rng(42);
+    std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
+
+    auto he_init = [&](int fan_in) -> float {
         float std = std::sqrt(2.0f / static_cast<float>(fan_in));
-        return (static_cast<float>(rand()) / RAND_MAX - 0.5f) * 2.0f * std;
+        return dist(rng) * std;
     };
 
     w1_.resize(inp * h1);
@@ -147,14 +150,48 @@ auto PredictiveCodingEngine::get_avg_inference_steps() const -> double {
 
 // ── 序列化 ──────────────────────────────────────────────────────
 
-auto PredictiveCodingEngine::save_state() const -> State {
+auto PredictiveCodingEngine::save_detailed_state() const -> DetailedState {
     return {w1_, b1_, w2_, b2_, w3_, b3_};
 }
 
-void PredictiveCodingEngine::load_state(const State& state) {
+void PredictiveCodingEngine::load_detailed_state(const DetailedState& state) {
     w1_ = state.w1; b1_ = state.b1;
     w2_ = state.w2; b2_ = state.b2;
     w3_ = state.w3; b3_ = state.b3;
+}
+
+auto PredictiveCodingEngine::save_state() const -> PredictiveEngineState {
+    PredictiveEngineState s;
+    s.weights.reserve(w1_.size() + b1_.size() + w2_.size() + b2_.size() +
+                        w3_.size() + b3_.size());
+    s.weights.insert(s.weights.end(), w1_.begin(), w1_.end());
+    s.weights.insert(s.weights.end(), b1_.begin(), b1_.end());
+    s.weights.insert(s.weights.end(), w2_.begin(), w2_.end());
+    s.weights.insert(s.weights.end(), b2_.begin(), b2_.end());
+    s.weights.insert(s.weights.end(), w3_.begin(), w3_.end());
+    s.weights.insert(s.weights.end(), b3_.begin(), b3_.end());
+    s.shape = {static_cast<int>(w1_.size()), static_cast<int>(b1_.size()),
+               static_cast<int>(w2_.size()), static_cast<int>(b2_.size()),
+               static_cast<int>(w3_.size()), static_cast<int>(b3_.size())};
+    return s;
+}
+
+void PredictiveCodingEngine::load_state(const PredictiveEngineState& state) {
+    if (state.shape.size() != 6) return;
+    size_t off = 0;
+    auto copy = [&](std::vector<float>& dst, int sz) {
+        if (off + static_cast<size_t>(sz) <= state.weights.size()) {
+            dst.assign(state.weights.begin() + off,
+                       state.weights.begin() + off + sz);
+        }
+        off += sz;
+    };
+    copy(w1_, state.shape[0]);
+    copy(b1_, state.shape[1]);
+    copy(w2_, state.shape[2]);
+    copy(b2_, state.shape[3]);
+    copy(w3_, state.shape[4]);
+    copy(b3_, state.shape[5]);
 }
 
 // ── 内部方法 ─────────────────────────────────────────────────────

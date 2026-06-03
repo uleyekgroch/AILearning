@@ -153,20 +153,33 @@ society.broadcast_knowledge(agent1, "physics");
 
 ### 快速开始
 
+#### Linux / WSL (Ubuntu 22.04)
+
 ```bash
 cd ai-learning-cpp
-mkdir build && cd build
+mkdir build-wsl && cd build-wsl
 cmake ..
-cmake --build . -j$(nproc)
+make -j$(nproc)
 
 # 运行主程序
 ./ai_learning_main
 
-# 运行测试
+# 运行测试（143 个测试用例）
 ./ai_learning_tests
 
 # 启动 REST 服务
 ./ai_learning_server --port 8080
+```
+
+> **WSL 已知问题**：`wsl: A localhost proxy configuration was detected but not mirrored into WSL.` 为 WSL NAT 模式代理警告，不影响编译和运行。
+
+#### Windows (MinGW)
+
+```powershell
+cd ai-learning-cpp
+mkdir build && cd build
+cmake .. -G "MinGW Makefiles"
+cmake --build . -j4
 ```
 
 ## 测试结果

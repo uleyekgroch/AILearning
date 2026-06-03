@@ -5,6 +5,11 @@ __pycache__/
 *.egg-info/
 dist/
 build/
+build-wsl/
+build-win/
+build-cuda/
+build-server/
+build-test/
 .env
 *.log
 .claude/

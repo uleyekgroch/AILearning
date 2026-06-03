@@ -67,7 +67,7 @@ auto Learner::generate_learning_goal()
         mastery[id] = skill.mastery;
     }
 
-    double curiosity = engine_.get_curiosity();
+    double curiosity = engine_->get_curiosity();
     return motivation_.generate_goal(topics, curiosity, mastery);
 }
 
