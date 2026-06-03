@@ -221,4 +221,37 @@ void ai_learning::server::register_advanced_routes(
         try { return ok_resp(dto::to_json_emotion_modulated_params(learner.emotion_modulated_params())); }
         catch (const std::exception& e) { return err_resp(500, e.what()); }
     });
+
+    // ── Assessment：Bloom 掌握度评估 ─────────────────────────────────
+
+    // GET /api/assess/<domain> — 评估指定领域
+    CROW_ROUTE(app, "/api/assess/<string>").methods("GET"_method)
+    ([&](const crow::request&, const std::string& domain) -> crow::response {
+        try {
+            auto report = learner.assess_domain(domain);
+            return ok_resp(dto::to_json_domain_report(report));
+        } catch (const std::exception& e) { return err_resp(500, e.what()); }
+    });
+
+    // GET /api/assess — 评估所有领域
+    CROW_ROUTE(app, "/api/assess").methods("GET"_method)
+    ([&](const crow::request&) -> crow::response {
+        try {
+            auto reports = learner.assess_all();
+            json result = json::object();
+            for (const auto& [domain, report] : reports) {
+                result[domain] = dto::to_json_domain_report(report);
+            }
+            return ok_resp(result);
+        } catch (const std::exception& e) { return err_resp(500, e.what()); }
+    });
+
+    // GET /api/assess/proficiency — CEFR 语言熟练度评估
+    CROW_ROUTE(app, "/api/assess/proficiency").methods("GET"_method)
+    ([&](const crow::request&) -> crow::response {
+        try {
+            return ok_resp(dto::to_json_proficiency_report(
+                learner.assess_proficiency("word")));
+        } catch (const std::exception& e) { return err_resp(500, e.what()); }
+    });
 }

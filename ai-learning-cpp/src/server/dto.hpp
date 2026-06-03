@@ -23,6 +23,7 @@
 #include "ai_learning/learning/meta_learner.hpp"
 #include "ai_learning/learning/active_experimenter.hpp"
 #include "ai_learning/learning/integrated_learner.hpp"
+#include "ai_learning/assessment/mastery_assessor.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -522,6 +523,50 @@ inline auto to_json_emotion_modulated_params(const learning::EmotionModulatedPar
         {"risk_tolerance", p.risk_tolerance},
         {"emotion_label", p.emotion_label}
     };
+}
+
+// ── Assessment：Bloom 掌握度 → JSON ────────────────────────────────
+
+inline auto to_json_assessment_result(const assessment::AssessmentResult& r) -> json {
+    json j;
+    j["entity_id"]      = r.entity_id;
+    j["entity_name"]    = r.entity_name;
+    j["domain"]         = r.domain;
+    j["overall_mastery"] = r.overall_mastery;
+    j["mastery_level"]  = assessment::mastery_level_to_string(r.mastery_level);
+    j["dimensions"]     = r.dimensions;
+    j["strengths"]      = r.strengths;
+    j["weaknesses"]     = r.weaknesses;
+    j["recommendations"] = r.recommendations;
+    return j;
+}
+
+inline auto to_json_domain_report(const assessment::DomainReport& r) -> json {
+    json j;
+    j["domain"]            = r.domain;
+    j["total_units"]       = r.total_units;
+    j["avg_mastery"]       = r.avg_mastery;
+    j["level_distribution"] = r.level_distribution;
+    j["coverage"]          = r.coverage;
+    j["avg_relations"]     = r.avg_relations;
+    j["strongest_units"]   = r.strongest_units;
+    j["weakest_units"]     = r.weakest_units;
+    return j;
+}
+
+inline auto to_json_proficiency_report(const assessment::ProficiencyReport& r) -> json {
+    json j;
+    j["level"]                 = r.level;
+    j["score"]                 = r.score;
+    j["receptive_vocab"]       = r.receptive_vocab;
+    j["productive_vocab"]      = r.productive_vocab;
+    j["semantic_depth"]        = r.semantic_depth;
+    j["collocation_knowledge"] = r.collocation_knowledge;
+    j["word_family_coverage"]  = r.word_family_coverage;
+    j["dimensions"]            = r.dimensions;
+    j["recommendations"]       = r.recommendations;
+    j["level_distribution"]    = r.level_distribution;
+    return j;
 }
 
 }  // namespace ai_learning::server::dto

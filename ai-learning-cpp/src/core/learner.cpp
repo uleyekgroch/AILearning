@@ -85,6 +85,8 @@ Learner::Learner(const LearnerConfig& config)
                    social_engine_, analogy_engine_, insight_engine_,
                    motivation_, continual_, concept_engine_),
        goal_manager_(kg_, &metacognition_),
+       mastery_assessor_(),
+       proficiency_tester_(),
        stage_(config.initial_stage) {
 
     // 设置阶段索引
@@ -491,6 +493,11 @@ auto Learner::get_stats() const -> std::map<std::string, double> {
         stats["pc_steps"] = static_cast<double>(pc_steps_);
     }
 
+    // 评估摘要
+    if (kg_.entity_count() > 0) {
+        stats["assessment_entity_count"] = static_cast<double>(kg_.entity_count());
+    }
+
     return stats;
 }
 
@@ -671,6 +678,48 @@ auto Learner::social_accelerated_transfer(
 {
     return integrated_.social_analogical_transfer(
         source_domain, target_domain, target_concepts);
+}
+
+// ── Bloom 掌握度评估 ────────────────────────────────────────────
+
+auto Learner::assess(const std::string& domain) const
+    -> assessment::AssessmentResult
+{
+    // If domain specified, find first entity of that type
+    if (!domain.empty()) {
+        auto entities = kg_.query(domain);
+        if (!entities.empty()) {
+            return mastery_assessor_.assess(entities.front(), kg_);
+        }
+    }
+    // Otherwise, find the first entity in the KG
+    auto ids = kg_.get_all_entity_ids();
+    if (ids.empty()) {
+        return assessment::AssessmentResult{};
+    }
+    auto opt = kg_.get_entity(ids.front());
+    if (opt.has_value()) {
+        return mastery_assessor_.assess(opt->get(), kg_);
+    }
+    return assessment::AssessmentResult{};
+}
+
+auto Learner::assess_domain(const std::string& domain) const
+    -> assessment::DomainReport
+{
+    return mastery_assessor_.assess_domain(domain, kg_);
+}
+
+auto Learner::assess_all() const
+    -> std::map<std::string, assessment::DomainReport>
+{
+    return mastery_assessor_.assess_all_domains(kg_);
+}
+
+auto Learner::assess_proficiency(const std::string& entity_type) const
+    -> assessment::ProficiencyReport
+{
+    return proficiency_tester_.assess(entity_type, kg_);
 }
 
 }  // namespace ai_learning::core

@@ -52,6 +52,7 @@
 #include "ai_learning/learning/meta_learner.hpp"
 #include "ai_learning/learning/active_experimenter.hpp"
 #include "ai_learning/learning/integrated_learner.hpp"
+#include "ai_learning/assessment/mastery_assessor.hpp"
 #include "ai_learning/goals/goal_manager.hpp"
 
 #include <chrono>
@@ -425,6 +426,24 @@ public:
     [[nodiscard]] auto goal_manager() const
         -> const goals::GoalManager& { return goal_manager_; }
 
+    // ── Bloom 掌握度评估 ──────────────────────────────────────────
+
+    /// 评估单个实体（指定领域时取该类型第一个实体，否则取 KG 第一个实体）
+    [[nodiscard]] auto assess(const std::string& domain = "") const
+        -> assessment::AssessmentResult;
+
+    /// 评估指定领域所有实体
+    [[nodiscard]] auto assess_domain(const std::string& domain) const
+        -> assessment::DomainReport;
+
+    /// 评估知识图谱中所有领域
+    [[nodiscard]] auto assess_all() const
+        -> std::map<std::string, assessment::DomainReport>;
+
+    /// CEFR 语言熟练度评估
+    [[nodiscard]] auto assess_proficiency(const std::string& entity_type = "word") const
+        -> assessment::ProficiencyReport;
+
 private:
     /// 检查晋升条件
     [[nodiscard]] auto check_promotion_(
@@ -489,6 +508,10 @@ private:
 
     // 目标系统
     goals::GoalManager                  goal_manager_;
+
+    // Bloom 掌握度评估
+    assessment::MasteryAssessor         mastery_assessor_;
+    assessment::ProficiencyTester       proficiency_tester_;
 
     // 发展状态
     std::string stage_;
