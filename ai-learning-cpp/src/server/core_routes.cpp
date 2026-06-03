@@ -10,12 +10,14 @@
 #include "dto.hpp"
 #include "ai_learning/server/metrics_collector.hpp"
 #include "ai_learning/perception/image_encoder.hpp"
+#include "ai_learning/perception/onnx_clip_encoder.hpp"
 
 #include <nlohmann/json.hpp>
 
 #include <atomic>
 #include <chrono>
 #include <cmath>
+#include <filesystem>
 #include <thread>
 
 using json = nlohmann::json;
@@ -329,10 +331,25 @@ void ai_learning::server::register_core_routes(
                 return err_resp(400, "invalid base64 image data");
             }
 
-            // 使用 StubImageEncoder 生成嵌入（生产环境替换为 CLIP）
-            perception::StubImageEncoder encoder(128);  // 128-dim 嵌入
-            auto result = encoder.encode(image_data,
-                body.value("width", 0), body.value("height", 0));
+            // 优先尝试 ONNX CLIP（如果模型存在且编译时启用了 ONNX）
+            ImageEncodeResult result;
+            std::string encoder_name;
+#ifdef AI_LEARNING_WITH_ONNX
+            std::string clip_model = "models/clip-vit-base-patch32.onnx";
+            if (std::filesystem::exists(clip_model)) {
+                perception::OnnxClipImageEncoder encoder(clip_model, 512);
+                result = encoder.encode(image_data,
+                    body.value("width", 0), body.value("height", 0));
+                encoder_name = encoder.name();
+            } else
+#endif
+            {
+                // 回退到 StubImageEncoder
+                perception::StubImageEncoder encoder(128);
+                result = encoder.encode(image_data,
+                    body.value("width", 0), body.value("height", 0));
+                encoder_name = encoder.name();
+            }
             if (!result.success) {
                 return err_resp(500, result.error);
             }

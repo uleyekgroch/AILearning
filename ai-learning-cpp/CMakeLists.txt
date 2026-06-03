@@ -53,6 +53,10 @@ else()
                         $<$<COMPILE_LANGUAGE:CXX>:-std=c++20>)
 endif()
 
+# ── ONNX Runtime 可选集成 ─────────────────────────────────────────
+option(AI_LEARNING_WITH_ONNX
+    "Enable ONNX Runtime for CLIP image encoder" OFF)
+
 # ── llama.cpp 可选集成 ────────────────────────────────────────────
 option(AI_LEARNING_WITH_LLAMA_CPP
     "Enable llama.cpp integration for pre-trained embeddings" OFF)
@@ -171,6 +175,18 @@ endif()
 if(AI_LEARNING_WITH_LLAMA_CPP)
     target_compile_definitions(ai_learning PUBLIC AI_LEARNING_WITH_LLAMA_CPP)
     target_link_libraries(ai_learning PUBLIC llama)
+endif()
+
+# ONNX Runtime — 可选 CLIP 图像编码器后端
+if(AI_LEARNING_WITH_ONNX)
+    find_package(onnxruntime REQUIRED)
+    if(onnxruntime_FOUND)
+        message(STATUS "✅ ONNX Runtime found — CLIP image encoder enabled")
+        target_compile_definitions(ai_learning PUBLIC AI_LEARNING_WITH_ONNX)
+        target_link_libraries(ai_learning PUBLIC onnxruntime)
+    else()
+        message(WARNING "ONNX Runtime not found. Install from https://onnxruntime.ai/docs/install/")
+    endif()
 endif()
 
 if(CUDA_FOUND)

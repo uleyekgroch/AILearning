@@ -168,10 +168,17 @@ curl -X POST http://localhost:8080/api/knowledge/path \
   -H "Content-Type: application/json" \
   -d '{"source": "人工智能", "target": "机器学习", "max_depth": 3}'
 
-# 图像感知（多模态 K.1 — Stub 编码器，生产环境替换为 CLIP）
+# 图像感知（多模态 K.1 — 自动选择 CLIP ONNX / Stub）
+# 默认使用 StubImageEncoder
+# 如果 models/clip-vit-base-patch32.onnx 存在且编译时启用了 ONNX，自动使用真实 CLIP
 curl -X POST http://localhost:8080/api/perceive/image \
   -H "Content-Type: application/json" \
   -d '{"image_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "width": 1, "height": 1}'
+
+# 启用 ONNX CLIP 编码器（需要安装 ONNX Runtime）
+# 1. 安装 ONNX Runtime: https://onnxruntime.ai/docs/install/
+# 2. 下载 CLIP 模型: ./scripts/download_models.sh --model clip
+# 3. 编译: cmake -DAI_LEARNING_WITH_ONNX=ON .. && make
 
 # 设置日志级别（DEBUG/INFO/WARN/ERROR）
 LOG_LEVEL=DEBUG ./ai_learning_server --port 8080

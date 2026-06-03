@@ -7,6 +7,7 @@
 #   ./download_models.sh --dir /custom/path # 指定下载目录
 #   ./download_models.sh --model embedding  # 仅下载 embedding 模型
 #   ./download_models.sh --model llm        # 仅下载对话模型
+#   ./download_models.sh --model clip       # 仅下载 CLIP ONNX 图像编码器
 #
 # 支持的镜像（自动回退）:
 #   1. hf-mirror.com      (国内加速)
@@ -15,6 +16,7 @@
 # 模型清单:
 #   • bge-small-zh-v1.5-q4_k_m.gguf    (~15 MB)  — 中文 Embedding
 #   • qwen2.5-3b-instruct-q4_k_m.gguf  (~2.0 GB) — 中文对话/推理
+#   • clip-vit-base-patch32.onnx       (~330 MB) — CLIP 图像编码器 (ONNX)
 #
 
 set -euo pipefail
@@ -46,6 +48,11 @@ MODEL_SIZES[embedding]=15728640  # 15 MB approx
 # Qwen2.5-3B-Instruct Q4_K_M (~2GB)
 MODEL_URLS[llm]="https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q4_k_m.gguf"
 MODEL_SIZES[llm]=2147483648  # 2 GB approx
+
+# CLIP ViT-B/32 image encoder ONNX (~330MB)
+# 来源: https://huggingface.co/openai/clip-vit-base-patch32
+MODEL_URLS[clip]="https://huggingface.co/openai/clip-vit-base-patch32/resolve/main/onnx/model.onnx"
+MODEL_SIZES[clip]=346030080  # ~330 MB
 
 # 备用镜像
 MIRRORS=(
@@ -141,12 +148,13 @@ Usage: $(basename "$0") [OPTIONS]
 
 Options:
   --dir PATH       指定模型下载目录 (默认: ../models)
-  --model TYPE     仅下载指定类型: embedding | llm | all (默认: all)
+  --model TYPE     仅下载指定类型: embedding | llm | clip | all (默认: all)
   --help           显示此帮助
 
 Examples:
   $(basename "$0")                           # 下载所有模型
   $(basename "$0") --model embedding         # 仅下载 bge-small-zh
+  $(basename "$0") --model clip              # 仅下载 CLIP ONNX
   $(basename "$0") --dir ~/my-models       # 下载到自定义目录
 EOF
 }
@@ -211,13 +219,29 @@ main() {
         echo ""
     fi
 
+    # ── CLIP ONNX 模型 ────────────────────────────────────────────
+    if [[ "${model_filter}" == "all" || "${model_filter}" == "clip" ]]; then
+        info "========================================"
+        info "Model: CLIP ViT-B/32 Image Encoder ONNX"
+        info "Purpose: Vision encoding for multimodal perception (~330MB)"
+        info "========================================"
+        warn "Requires: cmake -DAI_LEARNING_WITH_ONNX=ON"
+        warn "This is a large file (~330MB). Download may take a few minutes."
+
+        local clip_path="${MODEL_DIR}/clip-vit-base-patch32.onnx"
+        if ! download_with_fallback "${MODEL_URLS[clip]}" "${clip_path}" "CLIP-ViT-B32"; then
+            ((failed++)) || true
+        fi
+        echo ""
+    fi
+
     # ── 摘要 ──────────────────────────────────────────────────────
     echo ""
     info "========================================"
     info "Download Summary"
     info "========================================"
 
-    ls -lh "${MODEL_DIR}"/*.gguf 2>/dev/null || true
+    ls -lh "${MODEL_DIR}"/*.gguf "${MODEL_DIR}"/*.onnx 2>/dev/null || true
 
     echo ""
     if [[ ${failed} -eq 0 ]]; then
@@ -226,12 +250,17 @@ main() {
         info "Next steps:"
         echo "  ./verify_llama_cpp ${MODEL_DIR}/qwen2.5-3b-instruct-q4_k_m.gguf"
         echo "  ./ai_learning_server --llm-model ${MODEL_DIR}/qwen2.5-3b-instruct-q4_k_m.gguf"
+        if [[ -f "${MODEL_DIR}/clip-vit-base-patch32.onnx" ]]; then
+            echo "  cmake -DAI_LEARNING_WITH_ONNX=ON .. && make"
+            echo "  ./ai_learning_server  # auto-detects CLIP model"
+        fi
         exit 0
     else
         err "${failed} download(s) failed."
         err "Check your network connection or try manually from:"
         err "  https://huggingface.co/CompendiumLabs/bge-small-zh-v1.5-gguf"
         err "  https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF"
+        err "  https://huggingface.co/openai/clip-vit-base-patch32"
         exit 1
     fi
 }
