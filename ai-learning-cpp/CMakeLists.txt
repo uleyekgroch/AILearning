@@ -49,6 +49,10 @@ else()
                         $<$<COMPILE_LANGUAGE:CXX>:-std=c++20>)
 endif()
 
+# ── llama.cpp 可选集成 ────────────────────────────────────────────
+option(AI_LEARNING_WITH_LLAMA_CPP
+    "Enable llama.cpp integration for pre-trained embeddings" OFF)
+
 # ── 外部依赖 ─────────────────────────────────────────────────────
 include(FetchContent)
 
@@ -87,7 +91,21 @@ FetchContent_Declare(
     GIT_TAG        v1.2.0
 )
 
-FetchContent_MakeAvailable(Catch2 nlohmann_json Crow)
+# llama.cpp — 可选预训练模型后端
+if(AI_LEARNING_WITH_LLAMA_CPP)
+    set(LLAMA_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    set(LLAMA_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
+    set(LLAMA_BUILD_SERVER   OFF CACHE BOOL "" FORCE)
+    set(LLAMA_BUILD_COMMON   ON  CACHE BOOL "" FORCE)
+    FetchContent_Declare(
+        llama_cpp
+        GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
+        GIT_TAG        b4419
+    )
+    FetchContent_MakeAvailable(Catch2 nlohmann_json Crow llama_cpp)
+else()
+    FetchContent_MakeAvailable(Catch2 nlohmann_json Crow)
+endif()
 
 # ── 项目库 ──────────────────────────────────────────────────────
 file(GLOB_RECURSE AI_LEARNING_SOURCES "src/*.cpp")
@@ -137,6 +155,11 @@ target_compile_definitions(ai_learning PUBLIC ASIO_STANDALONE)
 # Windows: asio requires _WIN32_WINNT definition
 if(WIN32)
     target_compile_definitions(ai_learning PUBLIC _WIN32_WINNT=0x0601)
+endif()
+
+if(AI_LEARNING_WITH_LLAMA_CPP)
+    target_compile_definitions(ai_learning PUBLIC AI_LEARNING_WITH_LLAMA_CPP)
+    target_link_libraries(ai_learning PUBLIC llama)
 endif()
 
 if(CUDA_FOUND)

@@ -349,6 +349,10 @@ void EmbeddingTrainer::set_progress_callback(ProgressCallback cb) {
 auto EmbeddingTrainer::get_embedding(const std::string& word) const
     -> std::optional<std::vector<float>>
 {
+    if (provider_) {
+        auto vec = provider_->embed(word);
+        return vec.empty() ? std::nullopt : std::optional(vec);
+    }
     auto it = word2idx_.find(word);
     if (it == word2idx_.end() || !trained_) return std::nullopt;
 
@@ -361,6 +365,48 @@ auto EmbeddingTrainer::get_embedding(const std::string& word) const
 auto EmbeddingTrainer::most_similar(const std::string& word, int top_k) const
     -> std::vector<EmbeddingQuery>
 {
+    // ── provider 路径 ──────────────────────────────────────────
+    if (provider_) {
+        auto src_opt = get_embedding(word);
+        if (!src_opt) return {};
+        const auto& src = *src_opt;
+        if (src.empty()) return {};
+        int D = provider_->dim();
+
+        float src_norm = 0.0f;
+        for (auto v : src) src_norm += v * v;
+        src_norm = std::sqrt(src_norm);
+        if (src_norm < 1e-9f) return {};
+
+        std::vector<EmbeddingQuery> results;
+        for (const auto& [w, _] : word2idx_) {
+            if (w == word) continue;
+            auto tgt_opt = get_embedding(w);
+            if (!tgt_opt) continue;
+            const auto& tgt = *tgt_opt;
+            if (tgt.size() != static_cast<size_t>(D)) continue;
+
+            float dot = 0.0f, tgt_norm = 0.0f;
+            for (int d = 0; d < D; ++d) {
+                dot += src[d] * tgt[d];
+                tgt_norm += tgt[d] * tgt[d];
+            }
+            tgt_norm = std::sqrt(tgt_norm);
+            float sim = (tgt_norm < 1e-9f) ? 0.0f : dot / (src_norm * tgt_norm);
+
+            results.push_back({w, tgt, sim});
+        }
+        std::partial_sort(results.begin(),
+                           results.begin() + std::min(top_k, static_cast<int>(results.size())),
+                           results.end(),
+                           [](const auto& a, const auto& b) {
+                               return a.similarity > b.similarity;
+                           });
+        results.resize(std::min(top_k, static_cast<int>(results.size())));
+        return results;
+    }
+
+    // ── SGNS 路径 ────────────────────────────────────────────────
     if (!trained_) return {};
 
     auto it = word2idx_.find(word);
@@ -412,6 +458,58 @@ auto EmbeddingTrainer::analogy(const std::string& a, const std::string& b,
                                 const std::string& c, int top_k) const
     -> std::vector<EmbeddingQuery>
 {
+    // ── provider 路径 ──────────────────────────────────────────
+    if (provider_) {
+        auto va_opt = get_embedding(a);
+        auto vb_opt = get_embedding(b);
+        auto vc_opt = get_embedding(c);
+        if (!va_opt || !vb_opt || !vc_opt) return {};
+        const auto& va = *va_opt;
+        const auto& vb = *vb_opt;
+        const auto& vc = *vc_opt;
+        int D = provider_->dim();
+        if (static_cast<int>(va.size()) != D ||
+            static_cast<int>(vb.size()) != D ||
+            static_cast<int>(vc.size()) != D) return {};
+
+        // target = b - a + c
+        std::vector<float> target(D, 0.0f);
+        for (int d = 0; d < D; ++d) {
+            target[d] = vb[d] - va[d] + vc[d];
+        }
+        float target_norm = 0.0f;
+        for (int d = 0; d < D; ++d) target_norm += target[d] * target[d];
+        target_norm = std::sqrt(target_norm);
+
+        std::vector<EmbeddingQuery> results;
+        for (const auto& [w, _] : word2idx_) {
+            if (w == a || w == b || w == c) continue;
+            auto tgt_opt = get_embedding(w);
+            if (!tgt_opt) continue;
+            const auto& tgt = *tgt_opt;
+            if (tgt.size() != static_cast<size_t>(D)) continue;
+
+            float dot = 0.0f, tgt_norm = 0.0f;
+            for (int d = 0; d < D; ++d) {
+                dot += target[d] * tgt[d];
+                tgt_norm += tgt[d] * tgt[d];
+            }
+            tgt_norm = std::sqrt(tgt_norm);
+            float denom = target_norm * tgt_norm;
+            float sim = (denom < 1e-9f) ? 0.0f : dot / denom;
+            results.push_back({w, tgt, sim});
+        }
+        std::partial_sort(results.begin(),
+                           results.begin() + std::min(top_k, static_cast<int>(results.size())),
+                           results.end(),
+                           [](const auto& a, const auto& b) {
+                               return a.similarity > b.similarity;
+                           });
+        results.resize(std::min(top_k, static_cast<int>(results.size())));
+        return results;
+    }
+
+    // ── SGNS 路径 ────────────────────────────────────────────────
     if (!trained_) return {};
 
     auto it_a = word2idx_.find(a);
@@ -472,7 +570,13 @@ auto EmbeddingTrainer::analogy(const std::string& a, const std::string& b,
 }
 
 auto EmbeddingTrainer::has_word(const std::string& word) const -> bool {
+    if (provider_) return true;  // 外部模型支持任意文本
     return word2idx_.count(word) > 0;
+}
+
+void EmbeddingTrainer::set_embedding_provider(
+    language::IEmbeddingProvider* provider) {
+    provider_ = provider;
 }
 
 auto EmbeddingTrainer::vocabulary() const -> std::vector<std::string> {

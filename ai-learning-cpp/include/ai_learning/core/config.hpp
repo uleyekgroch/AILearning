@@ -114,6 +114,10 @@ struct LearnerConfig {
     double embedding_learning_rate    = 0.025;   // SGNS 初始学习率
     int    ds_min_freq                = 3;       // DS 最低概念频率
 
+    // ── 预训练模型（llama.cpp 等）──
+    std::string embedding_model_path;   // 空 = 不使用预训练模型
+    int    embedding_model_dim = 512;   // 预训练模型输出维度
+
     // ── 分词 ──
     learning::Language language               = learning::Language::kAuto;
 

@@ -8,9 +8,15 @@
 #include "ai_learning/learning/predictive_coding_engine.hpp"
 #include "ai_learning/learning/tokenizer.hpp"
 
+#ifdef AI_LEARNING_WITH_LLAMA_CPP
+#include "ai_learning/language/llama_cpp_embedding_provider.hpp"
+#endif
+
 #include <algorithm>
 #include <cmath>
 #include <random>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace ai_learning::core {
 
@@ -103,6 +109,20 @@ Learner::Learner(const LearnerConfig& config,
             break;
         }
     }
+
+    // 初始化预训练嵌入提供者（llama.cpp）
+    #ifdef AI_LEARNING_WITH_LLAMA_CPP
+    if (!config_.embedding_model_path.empty()) {
+        try {
+            embedding_provider_ = std::make_unique<language::LlamaCppEmbeddingProvider>(
+                config_.embedding_model_path, config_.embedding_model_dim);
+            embedding_trainer_.set_embedding_provider(embedding_provider_.get());
+        } catch (const std::exception& e) {
+            // 模型加载失败时不阻塞启动，记录并继续
+            (void)e;  // 静默处理，生产环境可加入日志
+        }
+    }
+    #endif
 }
 
 // ── 文本学习 ─────────────────────────────────────────────────────
@@ -138,16 +158,37 @@ auto Learner::learn_from_text(const std::string& text,
 }
 
 void Learner::learn_predictive_(const std::vector<std::string>& tokens) {
-    // 从 DS 获取有 PPMI 向量的概念
-    std::vector<std::vector<float>> embeddings;
+    // 去重获取唯一 tokens（保持首次出现顺序）
+    std::vector<std::string> unique_tokens;
+    std::unordered_set<std::string> seen;
     for (const auto& t : tokens) {
-        auto vec = ds_.get_dense_vector(t, config_.obs_dim);
-        if (vec) {
-            embeddings.push_back(std::move(*vec));
+        if (seen.insert(t).second) {
+            unique_tokens.push_back(t);
         }
     }
 
-    // 连续概念嵌入对送入 PC engine
+    // 批量获取向量（利用缓存）
+    auto vecs = ds_.get_dense_vectors_batch(unique_tokens, config_.obs_dim);
+
+    // 构建 token -> vector 映射
+    std::unordered_map<std::string, std::vector<float>> vec_map;
+    for (size_t i = 0; i < unique_tokens.size(); ++i) {
+        if (vecs[i]) {
+            vec_map[unique_tokens[i]] = std::move(*vecs[i]);
+        }
+    }
+
+    // 用原始 token 顺序构建 embeddings
+    std::vector<std::vector<float>> embeddings;
+    embeddings.reserve(tokens.size());
+    for (const auto& t : tokens) {
+        auto it = vec_map.find(t);
+        if (it != vec_map.end()) {
+            embeddings.push_back(it->second);  // 复制，因为可能多次使用同一向量
+        }
+    }
+
+    // 连续概念嵌入对送入 PC engine（与原逻辑完全一致）
     int steps = 0;
     for (size_t i = 0; i + 1 < embeddings.size() && steps < config_.pc_max_steps_per_text; ++i) {
         auto action = std::vector<float>{1.0f};  // 固定 "预测下一个"

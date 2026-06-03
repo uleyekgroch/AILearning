@@ -282,9 +282,35 @@ auto DistributionalSemantics::get_dense_vector(
     const std::string& cpt, int dims) const
     -> std::optional<std::vector<float>>
 {
+    // 1. 查缓存（相同 dims 时直接返回）
+    auto cache_it = dense_cache_.find(cpt);
+    if (cache_it != dense_cache_.end()) {
+        if (static_cast<int>(cache_it->second.size()) == dims) {
+            return cache_it->second;
+        }
+    }
+
+    // 2. 查原始向量
     auto it = vectors_.find(cpt);
     if (it == vectors_.end()) return std::nullopt;
-    return it->second.to_dense(dims);
+
+    // 3. 计算并缓存
+    auto dense = it->second.to_dense(dims);
+    dense_cache_[cpt] = dense;
+    return dense;
+}
+
+auto DistributionalSemantics::get_dense_vectors_batch(
+    const std::vector<std::string>& cpts, int dims) const
+    -> std::vector<std::optional<std::vector<float>>>
+{
+    std::vector<std::optional<std::vector<float>>> results;
+    results.reserve(cpts.size());
+
+    for (const auto& cpt : cpts) {
+        results.push_back(get_dense_vector(cpt, dims));  // 利用缓存
+    }
+    return results;
 }
 
 auto DistributionalSemantics::has_cpt(const std::string& cpt) const
@@ -606,6 +632,9 @@ void DistributionalSemantics::rebuild_vectors_()
             }
         }
     }
+
+    // 向量已重建，清空稠密缓存
+    invalidate_dense_cache_();
 }
 
 auto DistributionalSemantics::compute_ppmi_(
@@ -670,6 +699,10 @@ auto DistributionalSemantics::is_stopword_(const std::string& token) const
         "and", "or", "but", "not", "no", "if", "then", "that", "this",
     };
     return stopwords.count(token) > 0;
+}
+
+void DistributionalSemantics::invalidate_dense_cache_() {
+    dense_cache_.clear();
 }
 
 }  // namespace ai_learning::learning

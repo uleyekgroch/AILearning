@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+#include "ai_learning/language/embedding_provider.hpp"
+
 namespace ai_learning::learning {
 
 /// 训练配置
@@ -99,9 +101,17 @@ public:
     using ProgressCallback = std::function<void(const TrainingProgress&)>;
     void set_progress_callback(ProgressCallback cb);
 
+    // ── 外部嵌入提供者（可选）───────────────────────
+
+    /// 设置预训练嵌入提供者（如 llama.cpp）。
+    /// 设置后，get_embedding / most_similar / analogy 优先使用提供者，
+    /// 跳过 SGNS 训练。
+    void set_embedding_provider(language::IEmbeddingProvider* provider);
+
     // ── 查询 ────────────────────────────────────────
 
     /// 获取词向量
+    /// 若设置了外部提供者，直接调用提供者；否则使用 SGNS 训练结果。
     auto get_embedding(const std::string& word) const
         -> std::optional<std::vector<float>>;
 
@@ -115,6 +125,7 @@ public:
         -> std::vector<EmbeddingQuery>;
 
     /// 词是否存在
+    /// 若设置了外部提供者，总是返回 true（外部模型通常支持任意文本）。
     [[nodiscard]] auto has_word(const std::string& word) const -> bool;
 
     /// 获取所有词
@@ -169,6 +180,9 @@ private:
     bool trained_ = false;
     std::mt19937 rng_;
     ProgressCallback progress_cb_;
+
+    // ── 外部嵌入提供者（可选）───────────────────────
+    language::IEmbeddingProvider* provider_ = nullptr;
 
     // ── 内部方法 ──────────────────────────────────
 

@@ -571,7 +571,7 @@ inline void mat_vec(...) {
 | **P0** | Tensor 类型安全 | **已完成** | `Matrix` 结构体内嵌 rows/cols + 运行时 assert 检查 |
 | **P1** | 性能基础设施 | **已完成** | Eigen 加速 mat_vec/mat_vec_bias（≥2048 元素） |
 
-### 8.3 已完成行动（Phase A-G）
+### 8.3 已完成行动（Phase A-H + Phase 1）
 
 | Phase | 内容 | 关键提交 |
 |-------|------|----------|
@@ -581,7 +581,9 @@ inline void mat_vec(...) {
 | **D** | 引擎扩展 | `63d0d04` MLPForwardEngine + LightPredictiveEngine + 工厂运行时选择 |
 | **E** | 测试补充 + 文档 | `7899548` Matrix 边界测试 + README 引擎选择 |
 | **F** | REST API 引擎暴露 | `aff8f1a` `--engine` CLI + `/api/health` `engine_type` |
-| **G** | 性能基准对比 | `aff8f1a+` benchmark_engines + `vec_mat` 维度 bug 修复 |
+| **G** | 性能基准对比 | `0ebf788` benchmark_engines + `vec_mat` 维度 bug 修复 |
+| **H** | llama.cpp 集成评估 | `49ef724` LLAMA_CPP_INTEGRATION_ASSESSMENT.md 三阶段路线图 |
+| **H.1** | Embedding 接口 + LlamaCppEmbeddingProvider | `NEW` IEmbeddingProvider + Learner 条件加载 |
 
 ### 8.4 技术债务修复状态
 
@@ -621,9 +623,10 @@ inline void mat_vec(...) {
 
 ### 8.6 下一步行动
 
-1. **Month 2**：语义理解层（llama.cpp 集成评估）
-2. **Month 3**：多线程推理并行化
-3. **Q3**：CUDA 加速 MLP/Light 前向路径
+1. **Week 2-3**：Phase 1 验证 — 下载 bge-small-zh-v1.5 模型，验证嵌入质量
+2. **Month 2**：Phase 2 对话后端（LlamaCppLLMProvider）
+3. **Month 3**：多线程推理并行化
+4. **Q3**：CUDA 加速 MLP/Light 前向路径
 
 ---
 

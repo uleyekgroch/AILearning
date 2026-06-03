@@ -26,6 +26,7 @@
 #include <optional>
 #include <set>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace ai_learning::learning {
@@ -137,10 +138,16 @@ public:
     auto get_vector(const std::string& cpt) const
         -> std::optional<ConceptVector>;
 
-    /// 获取概念的稠密向量表示
+    /// 获取概念的稠密向量表示（带缓存）
     auto get_dense_vector(const std::string& cpt,
                           int dims = 128) const
         -> std::optional<std::vector<float>>;
+
+    /// 批量获取概念稠密向量（利用缓存，减少重复排序）
+    auto get_dense_vectors_batch(
+        const std::vector<std::string>& cpts,
+        int dims = 128) const
+        -> std::vector<std::optional<std::vector<float>>>;
 
     /// 概念是否存在
     [[nodiscard]] auto has_cpt(const std::string& cpt) const
@@ -194,6 +201,9 @@ private:
     /// 全局维度表（所有出现过的上下文概念）
     std::set<std::string> all_dimensions_;
 
+    /// 稠密向量缓存（concept -> dense vector），mutable 因为 get_dense_vector 是 const
+    mutable std::unordered_map<std::string, std::vector<float>> dense_cache_;
+
     /// 统计
     int texts_processed_ = 0;
     int total_tokens_ = 0;
@@ -222,6 +232,9 @@ private:
 
     /// 停用词检查
     [[nodiscard]] auto is_stopword_(const std::string& token) const -> bool;
+
+    /// 清空稠密向量缓存（在 rebuild_vectors_ 后调用）
+    void invalidate_dense_cache_();
 };
 
 }  // namespace ai_learning::learning

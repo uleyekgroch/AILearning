@@ -62,6 +62,8 @@
 #include <string>
 #include <vector>
 
+#include "ai_learning/language/embedding_provider.hpp"
+
 namespace ai_learning::core {
 
 /// 发展阶段序列
@@ -534,6 +536,9 @@ private:
 
     // 能力评估
     std::map<std::string, std::map<std::string, double>> capabilities_;
+
+    // 可选预训练嵌入提供者（llama.cpp）
+    std::unique_ptr<language::IEmbeddingProvider> embedding_provider_;
 };
 
 }  // namespace ai_learning::core
