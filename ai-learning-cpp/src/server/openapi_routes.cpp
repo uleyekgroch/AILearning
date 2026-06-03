@@ -152,7 +152,7 @@ static auto make_openapi_spec_(const ai_learning::server::ServerConfig& config) 
         {"post", {
             {"tags", json::array({"Learning"})},
             {"summary", "图像感知（多模态 K.1）"},
-            {"description", "接收 base64 编码图像，生成视觉嵌入并注入知识图谱。当前使用 Stub 编码器，生产环境可替换为 CLIP。"},
+            {"description", "接收 base64 编码图像，生成视觉嵌入并注入知识图谱。自动检测 ONNX CLIP 模型，否则回退到 Stub。"},
             {"requestBody", {
                 {"required", true},
                 {"content", {{"application/json", {
@@ -161,6 +161,27 @@ static auto make_openapi_spec_(const ai_learning::server::ServerConfig& config) 
                         {"width", {{"type", "integer"}, {"description", "图像宽度（可选）"}}},
                         {"height", {{"type", "integer"}, {"description", "图像高度（可选）"}}}
                     }}, {"required", json::array({"image_base64"})}}}
+                }}}}
+            }},
+            {"responses", {
+                {"200", {{"description", "感知成功"}}},
+                {"400", {{"description", "无效请求"}}}
+            }}
+        }}
+    };
+    paths["/api/perceive/audio"] = {
+        {"post", {
+            {"tags", json::array({"Learning"})},
+            {"summary", "音频感知（多模态 K.1++）"},
+            {"description", "接收 base64 编码音频，生成听觉嵌入并注入知识图谱。当前使用 Stub 编码器，未来可接入 Whisper / Wav2Vec2 ONNX。"},
+            {"requestBody", {
+                {"required", true},
+                {"content", {{"application/json", {
+                    {"schema", {{"type", "object"}, {"properties", {
+                        {"audio_base64", {{"type", "string"}, {"description", "Base64 编码音频（支持 data:audio/...;base64, 前缀）"}}},
+                        {"sample_rate", {{"type", "integer"}, {"description", "采样率（默认 16000）"}, {"default", 16000}}},
+                        {"channels", {{"type", "integer"}, {"description", "声道数（默认 1）"}, {"default", 1}}}
+                    }}, {"required", json::array({"audio_base64"})}}}
                 }}}}
             }},
             {"responses", {

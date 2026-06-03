@@ -175,6 +175,11 @@ curl -X POST http://localhost:8080/api/perceive/image \
   -H "Content-Type: application/json" \
   -d '{"image_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "width": 1, "height": 1}'
 
+# 音频感知（多模态 K.1++ — 当前 Stub，未来 Whisper / Wav2Vec2）
+curl -X POST http://localhost:8080/api/perceive/audio \
+  -H "Content-Type: application/json" \
+  -d '{"audio_base64": "UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=", "sample_rate": 16000, "channels": 1}'
+
 # 启用 ONNX CLIP 编码器（需要安装 ONNX Runtime）
 # 1. 安装 ONNX Runtime: https://onnxruntime.ai/docs/install/
 # 2. 下载 CLIP 模型: ./scripts/download_models.sh --model clip

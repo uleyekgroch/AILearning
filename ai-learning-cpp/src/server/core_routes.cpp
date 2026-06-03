@@ -10,6 +10,7 @@
 #include "dto.hpp"
 #include "ai_learning/server/metrics_collector.hpp"
 #include "ai_learning/perception/image_encoder.hpp"
+#include "ai_learning/perception/imodal_encoder.hpp"
 #include "ai_learning/perception/onnx_clip_encoder.hpp"
 
 #include <nlohmann/json.hpp>
@@ -19,6 +20,30 @@
 #include <cmath>
 #include <filesystem>
 #include <thread>
+
+// ── 工具函数：base64 解码 ──────────────────────────────────────────
+static auto decode_base64_(const std::string& b64_input) -> std::vector<uint8_t> {
+    static const std::string base64_chars =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    std::vector<uint8_t> out;
+    std::string b64 = b64_input;
+    auto pos = b64.find(',');
+    if (pos != std::string::npos) b64 = b64.substr(pos + 1);
+
+    int val = 0, valb = -8;
+    for (uint8_t c : b64) {
+        if (c == '=') break;
+        auto p = base64_chars.find(c);
+        if (p == std::string::npos) continue;
+        val = (val << 6) + static_cast<int>(p);
+        valb += 6;
+        if (valb >= 0) {
+            out.push_back(static_cast<uint8_t>((val >> valb) & 0xFF));
+            valb -= 8;
+        }
+    }
+    return out;
+}
 
 using json = nlohmann::json;
 namespace dto = ai_learning::server::dto;
@@ -294,7 +319,29 @@ void ai_learning::server::register_core_routes(
         } catch (const std::exception& e) { return err_resp(500, e.what()); }
     });
 
-    // ── K.1: 多模态图像感知 ─────────────────────────────────────────
+    // ── K.1+K.1++: 多模态感知（图像 + 音频）──────────────────────────
+
+    // 辅助：构建多模态编码器（图像优先 ONNX CLIP，否则 Stub）
+    auto build_multimodal_encoder = []() -> perception::MultiModalEncoder {
+        perception::MultiModalEncoder mme;
+
+        // 注册图像编码器
+#ifdef AI_LEARNING_WITH_ONNX
+        std::string clip_model = "models/clip-vit-base-patch32.onnx";
+        if (std::filesystem::exists(clip_model)) {
+            mme.register_image(std::make_shared<perception::OnnxClipImageEncoder>(
+                clip_model, 512));
+        } else
+#endif
+        {
+            mme.register_image(std::make_shared<perception::StubImageEncoder>(128));
+        }
+
+        // 注册音频编码器（当前仅 Stub，未来可接入 Whisper / Wav2Vec2 ONNX）
+        mme.register_audio(std::make_shared<perception::StubAudioEncoder>(128));
+
+        return mme;
+    };
 
     // POST /api/perceive/image — 接收 base64 图像，编码为嵌入，注入知识图谱
     CROW_ROUTE(app, "/api/perceive/image").methods("POST"_method)
@@ -306,50 +353,17 @@ void ai_learning::server::register_core_routes(
                 return err_resp(400, "missing 'image_base64' field");
             }
 
-            std::string b64 = body["image_base64"].get<std::string>();
-            // 移除 data:image/...;base64, 前缀（如果存在）
-            auto pos = b64.find(',');
-            if (pos != std::string::npos) b64 = b64.substr(pos + 1);
-
-            // 简单 base64 解码
-            static const std::string base64_chars =
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-            std::vector<uint8_t> image_data;
-            int val = 0, valb = -8;
-            for (uint8_t c : b64) {
-                if (c == '=') break;
-                auto p = base64_chars.find(c);
-                if (p == std::string::npos) continue;
-                val = (val << 6) + static_cast<int>(p);
-                valb += 6;
-                if (valb >= 0) {
-                    image_data.push_back(static_cast<uint8_t>((val >> valb) & 0xFF));
-                    valb -= 8;
-                }
-            }
+            auto image_data = decode_base64_(body["image_base64"].get<std::string>());
             if (image_data.empty()) {
                 return err_resp(400, "invalid base64 image data");
             }
 
-            // 优先尝试 ONNX CLIP（如果模型存在且编译时启用了 ONNX）
-            ImageEncodeResult result;
-            std::string encoder_name;
-#ifdef AI_LEARNING_WITH_ONNX
-            std::string clip_model = "models/clip-vit-base-patch32.onnx";
-            if (std::filesystem::exists(clip_model)) {
-                perception::OnnxClipImageEncoder encoder(clip_model, 512);
-                result = encoder.encode(image_data,
-                    body.value("width", 0), body.value("height", 0));
-                encoder_name = encoder.name();
-            } else
-#endif
-            {
-                // 回退到 StubImageEncoder
-                perception::StubImageEncoder encoder(128);
-                result = encoder.encode(image_data,
-                    body.value("width", 0), body.value("height", 0));
-                encoder_name = encoder.name();
-            }
+            auto mme = build_multimodal_encoder();
+            std::map<std::string, int> params;
+            params["width"] = body.value("width", 0);
+            params["height"] = body.value("height", 0);
+            auto result = mme.encode(image_data, perception::ModalityType::Image, params);
+
             if (!result.success) {
                 return err_resp(500, result.error);
             }
@@ -361,9 +375,55 @@ void ai_learning::server::register_core_routes(
 
             json resp;
             resp["status"] = "ok";
-            resp["encoder"] = encoder.name();
+            resp["encoder"] = mme.name();
+            resp["modality"] = perception::modality_name(result.modality);
             resp["embedding_dim"] = result.embedding.size();
             resp["image_size"] = image_data.size();
+            resp["perception_dim"] = perception.size();
+            return ok_resp(resp);
+        } catch (const std::exception& e) { return err_resp(400, e.what()); }
+    });
+
+    // POST /api/perceive/audio — 接收 base64 音频，编码为嵌入，注入知识图谱
+    CROW_ROUTE(app, "/api/perceive/audio").methods("POST"_method)
+    ([&](const crow::request& req) -> crow::response {
+        ScopedTimer timer(state.metrics, "perceive_audio");
+        try {
+            auto body = json::parse(req.body);
+            if (!body.contains("audio_base64")) {
+                return err_resp(400, "missing 'audio_base64' field");
+            }
+
+            auto audio_data = decode_base64_(body["audio_base64"].get<std::string>());
+            if (audio_data.empty()) {
+                return err_resp(400, "invalid base64 audio data");
+            }
+
+            auto mme = build_multimodal_encoder();
+            std::map<std::string, int> params;
+            params["sample_rate"] = body.value("sample_rate", 16000);
+            params["channels"] = body.value("channels", 1);
+            auto result = mme.encode(audio_data, perception::ModalityType::Audio, params);
+
+            if (!result.success) {
+                return err_resp(500, result.error);
+            }
+
+            // 将音频嵌入注入感知系统（视为 "auditory" 模态）
+            std::map<std::string, std::vector<float>> raw_input;
+            raw_input["auditory"] = result.embedding;
+            auto perception = learner.perceive(raw_input);
+
+            json resp;
+            resp["status"] = "ok";
+            resp["encoder"] = mme.name();
+            resp["modality"] = perception::modality_name(result.modality);
+            resp["embedding_dim"] = result.embedding.size();
+            resp["audio_size"] = audio_data.size();
+            resp["sample_rate"] = result.meta.count("sample_rate") ?
+                std::stoi(result.meta.at("sample_rate")) : 0;
+            resp["channels"] = result.meta.count("channels") ?
+                std::stoi(result.meta.at("channels")) : 0;
             resp["perception_dim"] = perception.size();
             return ok_resp(resp);
         } catch (const std::exception& e) { return err_resp(400, e.what()); }
