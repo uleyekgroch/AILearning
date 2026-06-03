@@ -349,7 +349,9 @@ void KnowledgeGraph::rebuild_indices_() {
 }
 
 void KnowledgeGraph::publish_event_(DomainEvent event) const {
-    if (publisher_) publisher_->publish(std::move(event));
+    if (auto pub = publisher_.lock()) {
+        pub->publish(std::move(event));
+    }
 }
 
 }  // namespace ai_learning::domain::knowledge

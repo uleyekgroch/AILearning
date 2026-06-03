@@ -43,8 +43,8 @@ struct PathResult {
 class KnowledgeGraph {
 public:
     explicit KnowledgeGraph(
-        domain::IEventPublisher* publisher = nullptr)
-        : publisher_(publisher) {}
+        std::shared_ptr<domain::IEventPublisher> publisher = nullptr)
+        : publisher_(std::move(publisher)) {}
 
     // ── 增删（发布事件） ────────────────────────────────────────
 
@@ -158,7 +158,7 @@ private:
     std::unordered_map<std::string, std::unordered_set<std::string>> tag_index_;
 
     // 事件发布器（可选，不拥有）
-    domain::IEventPublisher* publisher_;
+    std::weak_ptr<domain::IEventPublisher> publisher_;
 };
 
 }  // namespace ai_learning::domain::knowledge

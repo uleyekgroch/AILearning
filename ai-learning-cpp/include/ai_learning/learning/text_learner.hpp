@@ -33,9 +33,7 @@ struct TextLearnerConfig {
 /// 不持有编码器状态（无状态变换），专注于提取逻辑。
 class TextLearner {
 public:
-    explicit TextLearner(
-        domain::knowledge::KnowledgeGraph& kg,
-        domain::IEventPublisher* publisher = nullptr);
+    explicit TextLearner(domain::knowledge::KnowledgeGraph& kg);
 
     /// 从文本学习 — 核心入口
     auto learn_from_text(const std::string& text,
@@ -98,7 +96,6 @@ private:
 
     // 依赖
     domain::knowledge::KnowledgeGraph& kg_;
-    domain::IEventPublisher* publisher_;
 
     // STDP 连接: (pre, post) → weight
     std::map<std::pair<std::string, std::string>, float> stdp_connections_;
