@@ -20,6 +20,34 @@ namespace ai_learning::core {
 /// 一维浮点张量（替代 torch::Tensor 的轻量实现）
 using Tensor = std::vector<float>;
 
+/// 二维矩阵 — 扁平行主序，内嵌形状信息
+/// 用于消除 mat_vec/mat_vec_bias 传错 rows/cols 的风险
+struct Matrix {
+    std::vector<float> data;
+    int rows = 0;
+    int cols = 0;
+
+    Matrix() = default;
+    explicit Matrix(int r, int c) : data(r * c, 0.0f), rows(r), cols(c) {}
+    Matrix(std::vector<float> d, int r, int c)
+        : data(std::move(d)), rows(r), cols(c) {}
+
+    [[nodiscard]] auto operator()(int r, int c) const -> float {
+        return data[r * cols + c];
+    }
+    auto operator()(int r, int c) -> float& {
+        return data[r * cols + c];
+    }
+
+    [[nodiscard]] auto size() const -> size_t { return data.size(); }
+    [[nodiscard]] auto empty() const -> bool { return data.empty(); }
+
+    auto begin() -> auto { return data.begin(); }
+    auto end() -> auto { return data.end(); }
+    [[nodiscard]] auto begin() const -> auto { return data.begin(); }
+    [[nodiscard]] auto end() const -> auto { return data.end(); }
+};
+
 /// 属性字典
 using Properties = std::map<std::string, std::string>;
 

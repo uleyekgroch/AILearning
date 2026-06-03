@@ -7,6 +7,8 @@
  */
 #pragma once
 
+#include "ai_learning/core/types.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <numeric>
@@ -242,22 +244,6 @@ inline auto outer(const Tensor& a, const Tensor& b) -> std::vector<float> {
     return result;
 }
 
-/// 矩阵 + 外积更新: mat += lr * outer(a, b)
-inline void mat_add_outer(std::vector<float>& mat,
-                           float lr,
-                           const Tensor& a,
-                           const Tensor& b) {
-    if (a.size() * b.size() < 4096 || !cuda_available()) {
-        for (size_t i = 0; i < a.size(); ++i) {
-            for (size_t j = 0; j < b.size(); ++j) {
-                mat[i * b.size() + j] += lr * a[i] * b[j];
-            }
-        }
-        return;
-    }
-    cuda_mat_add_outer(mat, lr, a, b);
-}
-
 /// 矩阵 × 向量 + 偏置
 inline auto mat_vec_bias(const std::vector<float>& mat,
                           int rows, int cols,
@@ -282,6 +268,42 @@ inline auto mat_vec_bias(const std::vector<float>& mat,
         return result;
     }
     return cuda_mat_vec_bias(mat, rows, cols, vec, bias);
+}
+
+// ── Matrix 类型安全重载 ────────────────────────────────────────
+/// 矩阵 × 向量（内嵌形状检查）
+inline auto mat_vec(const Matrix& mat, const Tensor& vec) -> Tensor {
+    assert(mat.cols == static_cast<int>(vec.size()) &&
+           "mat_vec: 矩阵列数必须等于向量长度");
+    return mat_vec(mat.data, mat.rows, mat.cols, vec);
+}
+
+/// 矩阵 × 向量 + 偏置（内嵌形状检查）
+inline auto mat_vec_bias(const Matrix& mat,
+                          const Tensor& vec,
+                          const Tensor& bias) -> Tensor {
+    assert(mat.cols == static_cast<int>(vec.size()) &&
+           "mat_vec_bias: 矩阵列数必须等于向量长度");
+    assert(mat.rows == static_cast<int>(bias.size()) &&
+           "mat_vec_bias: 矩阵行数必须等于偏置长度");
+    return mat_vec_bias(mat.data, mat.rows, mat.cols, vec, bias);
+}
+
+/// 矩阵 + 外积更新（注意：外积参数顺序与 Matrix 形状无直接对应关系，
+/// 使用旧 API 以避免语义混淆）
+inline void mat_add_outer(std::vector<float>& mat,
+                           float lr,
+                           const Tensor& a,
+                           const Tensor& b) {
+    if (a.size() * b.size() < 4096 || !cuda_available()) {
+        for (size_t i = 0; i < a.size(); ++i) {
+            for (size_t j = 0; j < b.size(); ++j) {
+                mat[i * b.size() + j] += lr * a[i] * b[j];
+            }
+        }
+        return;
+    }
+    cuda_mat_add_outer(mat, lr, a, b);
 }
 
 }  // namespace ai_learning::core

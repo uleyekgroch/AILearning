@@ -34,16 +34,16 @@ PredictiveCodingEngine::PredictiveCodingEngine(
         return dist(rng) * std;
     };
 
-    w1_.resize(inp * h1);
+    w1_ = Matrix(h1, inp);
     b1_.resize(h1, 0.0f);
-    w2_.resize(h1 * h2);
+    w2_ = Matrix(h2, h1);
     b2_.resize(h2, 0.0f);
-    w3_.resize(h2 * out);
+    w3_ = Matrix(out, h2);
     b3_.resize(out, 0.0f);
 
-    for (auto& w : w1_) w = he_init(inp);
-    for (auto& w : w2_) w = he_init(h1);
-    for (auto& w : w3_) w = he_init(h2);
+    for (auto& w : w1_.data) w = he_init(inp);
+    for (auto& w : w2_.data) w = he_init(h1);
+    for (auto& w : w3_.data) w = he_init(h2);
 }
 
 // ── 前向传播 ────────────────────────────────────────────────────
@@ -60,11 +60,11 @@ auto PredictiveCodingEngine::predict(
         input.resize(input_dim_, 0.0f);
     }
 
-    auto z1 = mat_vec_bias(w1_, cfg_.hidden1_dim, input_dim_, input, b1_);
+    auto z1 = mat_vec_bias(w1_, input, b1_);
     auto h1 = tensor_relu(z1);
-    auto z2 = mat_vec_bias(w2_, cfg_.hidden2_dim, cfg_.hidden1_dim, h1, b2_);
+    auto z2 = mat_vec_bias(w2_, h1, b2_);
     auto h2 = tensor_relu(z2);
-    auto output = mat_vec_bias(w3_, cfg_.obs_dim, cfg_.hidden2_dim, h2, b3_);
+    auto output = mat_vec_bias(w3_, h2, b3_);
     return output;
 }
 
@@ -151,24 +151,34 @@ auto PredictiveCodingEngine::get_avg_inference_steps() const -> double {
 // ── 序列化 ──────────────────────────────────────────────────────
 
 auto PredictiveCodingEngine::save_detailed_state() const -> DetailedState {
-    return {w1_, b1_, w2_, b2_, w3_, b3_};
+    DetailedState state;
+    state.w1 = w1_.data;
+    state.b1 = b1_;
+    state.w2 = w2_.data;
+    state.b2 = b2_;
+    state.w3 = w3_.data;
+    state.b3 = b3_;
+    return state;
 }
 
 void PredictiveCodingEngine::load_detailed_state(const DetailedState& state) {
-    w1_ = state.w1; b1_ = state.b1;
-    w2_ = state.w2; b2_ = state.b2;
-    w3_ = state.w3; b3_ = state.b3;
+    w1_ = Matrix(state.w1, cfg_.hidden1_dim, input_dim_);
+    b1_ = state.b1;
+    w2_ = Matrix(state.w2, cfg_.hidden2_dim, cfg_.hidden1_dim);
+    b2_ = state.b2;
+    w3_ = Matrix(state.w3, cfg_.obs_dim, cfg_.hidden2_dim);
+    b3_ = state.b3;
 }
 
 auto PredictiveCodingEngine::save_state() const -> PredictiveEngineState {
     PredictiveEngineState s;
     s.weights.reserve(w1_.size() + b1_.size() + w2_.size() + b2_.size() +
                         w3_.size() + b3_.size());
-    s.weights.insert(s.weights.end(), w1_.begin(), w1_.end());
+    s.weights.insert(s.weights.end(), w1_.data.begin(), w1_.data.end());
     s.weights.insert(s.weights.end(), b1_.begin(), b1_.end());
-    s.weights.insert(s.weights.end(), w2_.begin(), w2_.end());
+    s.weights.insert(s.weights.end(), w2_.data.begin(), w2_.data.end());
     s.weights.insert(s.weights.end(), b2_.begin(), b2_.end());
-    s.weights.insert(s.weights.end(), w3_.begin(), w3_.end());
+    s.weights.insert(s.weights.end(), w3_.data.begin(), w3_.data.end());
     s.weights.insert(s.weights.end(), b3_.begin(), b3_.end());
     s.shape = {static_cast<int>(w1_.size()), static_cast<int>(b1_.size()),
                static_cast<int>(w2_.size()), static_cast<int>(b2_.size()),
@@ -179,19 +189,19 @@ auto PredictiveCodingEngine::save_state() const -> PredictiveEngineState {
 void PredictiveCodingEngine::load_state(const PredictiveEngineState& state) {
     if (state.shape.size() != 6) return;
     size_t off = 0;
-    auto copy = [&](std::vector<float>& dst, int sz) {
+    auto copy_vec = [&](std::vector<float>& dst, int sz) {
         if (off + static_cast<size_t>(sz) <= state.weights.size()) {
             dst.assign(state.weights.begin() + off,
                        state.weights.begin() + off + sz);
         }
         off += sz;
     };
-    copy(w1_, state.shape[0]);
-    copy(b1_, state.shape[1]);
-    copy(w2_, state.shape[2]);
-    copy(b2_, state.shape[3]);
-    copy(w3_, state.shape[4]);
-    copy(b3_, state.shape[5]);
+    copy_vec(w1_.data, state.shape[0]);
+    copy_vec(b1_, state.shape[1]);
+    copy_vec(w2_.data, state.shape[2]);
+    copy_vec(b2_, state.shape[3]);
+    copy_vec(w3_.data, state.shape[4]);
+    copy_vec(b3_, state.shape[5]);
 }
 
 // ── 内部方法 ─────────────────────────────────────────────────────
@@ -223,9 +233,9 @@ auto PredictiveCodingEngine::infer_beliefs_(
     auto cv = static_cast<float>(cfg_.clip_value);
 
     // 前向初始化
-    auto z1 = mat_vec_bias(w1_, cfg_.hidden1_dim, input_dim_, input, b1_);
+    auto z1 = mat_vec_bias(w1_, input, b1_);
     auto mu_h1 = tensor_relu(z1);
-    auto z2 = mat_vec_bias(w2_, cfg_.hidden2_dim, cfg_.hidden1_dim, mu_h1, b2_);
+    auto z2 = mat_vec_bias(w2_, mu_h1, b2_);
     auto mu_h2 = tensor_relu(z2);
 
     // 迭代推理
@@ -236,9 +246,9 @@ auto PredictiveCodingEngine::infer_beliefs_(
         auto prev_h1 = mu_h1;
         auto prev_h2 = mu_h2;
 
-        z1 = mat_vec_bias(w1_, cfg_.hidden1_dim, input_dim_, input, b1_);
-        z2 = mat_vec_bias(w2_, cfg_.hidden2_dim, cfg_.hidden1_dim, mu_h1, b2_);
-        auto pred_out = mat_vec_bias(w3_, cfg_.obs_dim, cfg_.hidden2_dim, mu_h2, b3_);
+        z1 = mat_vec_bias(w1_, input, b1_);
+        z2 = mat_vec_bias(w2_, mu_h1, b2_);
+        auto pred_out = mat_vec_bias(w3_, mu_h2, b3_);
 
         auto eps_out = tensor_clamp(tensor_sub(actual, pred_out), -cv, cv);
         auto eps_h2 = tensor_clamp(tensor_sub(mu_h2, tensor_relu(z2)), -cv, cv);
@@ -246,13 +256,13 @@ auto PredictiveCodingEngine::infer_beliefs_(
 
         auto relu_d2 = tensor_relu_deriv(z2);
         auto feedback_h2 = tensor_clamp(
-            vec_mat(eps_out, w3_, cfg_.hidden2_dim, cfg_.obs_dim), -cv, cv);
+            vec_mat(eps_out, w3_.data, w3_.cols, w3_.rows), -cv, cv);
         feedback_h2 = tensor_mul(feedback_h2, relu_d2);
 
         auto relu_d1 = tensor_relu_deriv(z1);
         auto e_h2_scaled = tensor_clamp(tensor_mul(eps_h2, relu_d2), -cv, cv);
         auto feedback_h1 = tensor_clamp(
-            vec_mat(e_h2_scaled, w2_, cfg_.hidden1_dim, cfg_.hidden2_dim), -cv, cv);
+            vec_mat(e_h2_scaled, w2_.data, w2_.cols, w2_.rows), -cv, cv);
         feedback_h1 = tensor_mul(feedback_h1, relu_d1);
 
         auto update_h1 = tensor_clamp(
@@ -273,9 +283,9 @@ auto PredictiveCodingEngine::infer_beliefs_(
     inference_steps_log_.push_back(steps);
 
     // 最终残差
-    z1 = mat_vec_bias(w1_, cfg_.hidden1_dim, input_dim_, input, b1_);
-    z2 = mat_vec_bias(w2_, cfg_.hidden2_dim, cfg_.hidden1_dim, mu_h1, b2_);
-    auto pred_out = mat_vec_bias(w3_, cfg_.obs_dim, cfg_.hidden2_dim, mu_h2, b3_);
+    z1 = mat_vec_bias(w1_, input, b1_);
+    z2 = mat_vec_bias(w2_, mu_h1, b2_);
+    auto pred_out = mat_vec_bias(w3_, mu_h2, b3_);
     auto eps_out = tensor_sub(actual, pred_out);
     auto eps_h2 = tensor_sub(mu_h2, tensor_relu(z2));
     auto eps_h1 = tensor_sub(mu_h1, tensor_relu(z1));
@@ -294,25 +304,25 @@ void PredictiveCodingEngine::update_weights_(const InferenceResult& r) {
     auto wc = static_cast<float>(cfg_.clip_value);
 
     // W3 += lr * outer(mu_h2, eps_out)
-    mat_add_outer(w3_, lr, r.mu_h2, r.epsilon_out);
+    mat_add_outer(w3_.data, lr, r.mu_h2, r.epsilon_out);
     for (size_t i = 0; i < b3_.size(); ++i) {
         b3_[i] = std::clamp(b3_[i] + lr * r.epsilon_out[i], -wc, wc);
     }
-    for (auto& w : w3_) w = std::clamp(w, -wc, wc);
+    for (auto& w : w3_.data) w = std::clamp(w, -wc, wc);
 
     // W2 += lr * outer(mu_h1, grad_h2)
-    mat_add_outer(w2_, lr, r.mu_h1, grad_h2);
+    mat_add_outer(w2_.data, lr, r.mu_h1, grad_h2);
     for (size_t i = 0; i < b2_.size(); ++i) {
         b2_[i] = std::clamp(b2_[i] + lr * grad_h2[i], -wc, wc);
     }
-    for (auto& w : w2_) w = std::clamp(w, -wc, wc);
+    for (auto& w : w2_.data) w = std::clamp(w, -wc, wc);
 
     // W1 += lr * outer(input, grad_h1)
-    mat_add_outer(w1_, lr, r.input, grad_h1);
+    mat_add_outer(w1_.data, lr, r.input, grad_h1);
     for (size_t i = 0; i < b1_.size(); ++i) {
         b1_[i] = std::clamp(b1_[i] + lr * grad_h1[i], -wc, wc);
     }
-    for (auto& w : w1_) w = std::clamp(w, -wc, wc);
+    for (auto& w : w1_.data) w = std::clamp(w, -wc, wc);
 }
 
 auto PredictiveCodingEngine::check_convergence_(

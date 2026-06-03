@@ -12,6 +12,7 @@
 #pragma once
 
 #include "ai_learning/learning/ipredictive_engine.hpp"
+#include "ai_learning/core/types.hpp"
 
 #include <vector>
 #include <deque>
@@ -111,12 +112,12 @@ private:
                                     double threshold) -> double;
 
     // 网络权重（flat row-major）
-    std::vector<float> w1_;  // (input_dim × h1)
-    std::vector<float> b1_;  // (h1)
-    std::vector<float> w2_;  // (h1 × h2)
-    std::vector<float> b2_;  // (h2)
-    std::vector<float> w3_;  // (h2 × obs_dim)
-    std::vector<float> b3_;  // (obs_dim)
+    ai_learning::core::Matrix w1_;  // (input_dim × h1)
+    std::vector<float> b1_;          // (h1)
+    ai_learning::core::Matrix w2_;  // (h1 × h2)
+    std::vector<float> b2_;          // (h2)
+    ai_learning::core::Matrix w3_;  // (h2 × obs_dim)
+    std::vector<float> b3_;          // (obs_dim)
 
     // 配置
     PredictiveCodingConfig cfg_;
