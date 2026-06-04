@@ -14,6 +14,7 @@
 #include "ai_learning/consciousness/self_model.hpp"
 #include "ai_learning/domain/knowledge/knowledge_graph.hpp"
 #include "ai_learning/learning/dependency_parser.hpp"
+#include "ai_learning/learning/distributional_semantics.hpp"
 #include "ai_learning/learning/knowledge_extractor.hpp"
 #include "ai_learning/learning/word_segmenter.hpp"
 
@@ -123,8 +124,14 @@ private:
     auto reason_from_kg_(const std::string& question) const
         -> std::string;
 
-    /// 常识库查询（简单模式匹配）
+    /// 常识库查询（KG 直接命中：按问句意图挑选关系类型组合作答）
     auto query_commonsense_(const std::string& question) const
+        -> std::string;
+
+    /// 语义联想兜底：当符号管线（KG/STDP/海马）都无法命中时，用自学的分布
+    /// 语义空间（PPMI 共现，零大模型）给出"X 通常与 A、B 一同出现"式的常识联想，
+    /// 取代直接回答"不知道"。非已学概念返回空。
+    [[nodiscard]] auto query_semantic_(const std::string& question) const
         -> std::string;
 
     // 依赖
@@ -153,6 +160,10 @@ private:
     WordSegmenter segmenter_;
     DependencyGrammarInducer dep_parser_;
     bool parse_enabled_ = false;
+
+    // 自学分布语义空间（PPMI 共现，零大模型）：随 learn_from_text 增量填充，
+    // 供 query_semantic_ 在符号管线落空时做常识式语义联想。
+    DistributionalSemantics semantics_;
 
     // 自我模型（意识级自我表征，随学习闭环在线更新）
     consciousness::SelfModel self_model_;

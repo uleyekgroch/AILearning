@@ -293,6 +293,11 @@ add_executable(ai_learning_selfmodel_eval selfmodel_eval.cpp)
 target_link_libraries(ai_learning_selfmodel_eval PRIVATE ai_learning)
 target_include_directories(ai_learning_selfmodel_eval PRIVATE include)
 
+# ── 客观常识库填充评测（零大模型，KG 直接命中 + 自学语义联想兜底）──────────
+add_executable(ai_learning_commonsense_eval commonsense_eval.cpp)
+target_link_libraries(ai_learning_commonsense_eval PRIVATE ai_learning)
+target_include_directories(ai_learning_commonsense_eval PRIVATE include)
+
 # ── 调试程序 ────────────────────────────────────────────────────
 add_executable(debug_main debug_main.cpp)
 target_link_libraries(debug_main PRIVATE ai_learning)
