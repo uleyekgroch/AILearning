@@ -226,3 +226,66 @@ TEST_CASE("TextLearner: 训练后启用句法树抽取并产出完整短语主�
         }
     REQUIRE(found);
 }
+
+// ── 自我模型接入学习闭环（3.3 高级模块接闭环）─────────────────────
+
+TEST_CASE("SelfModel: 学习前自我未成形") {
+    KnowledgeGraph kg;
+    TextLearner learner(kg);
+
+    // 未学习：无自我信念；问「你了解X」应坦诚不了解（不会凭空声称了解）
+    REQUIRE(learner.self_model().stats().self_beliefs == 0);
+    auto ans = learner.think("你了解数学吗");
+    REQUIRE(ans.find("不太了解") != std::string::npos);
+}
+
+TEST_CASE("SelfModel: 学习驱动自我信念与自我指涉问答") {
+    KnowledgeGraph kg;
+    TextLearner learner(kg);
+
+    // 反复学习「数学」领域（>=7 次以越过慢更新阈值），并学些别的
+    for (int i = 0; i < 10; ++i) {
+        learner.learn_from_text("数学是一门学科");
+        learner.learn_from_text("数学很重要");
+    }
+
+    SECTION("学习写入自我信念，自我效能在合法区间") {
+        REQUIRE(learner.self_model().stats().self_beliefs > 0);
+        double eff = learner.self_model().self_efficacy();
+        REQUIRE(eff >= 0.0);
+        REQUIRE(eff <= 1.0);
+    }
+
+    SECTION("持续学习成为稳定自我特质") {
+        bool has_learn_trait = false;
+        for (const auto& b : learner.self_model().self_concept())
+            if (b.trait.find("持续学习") != std::string::npos &&
+                b.confidence > 0.5)
+                has_learn_trait = true;
+        REQUIRE(has_learn_trait);
+    }
+
+    SECTION("你是谁：由自我模型作答，体现学习者身份") {
+        auto who = learner.think("你是谁");
+        REQUIRE(who.find("学习") != std::string::npos);
+    }
+
+    SECTION("你了解X吗：学过的肯定、没学过的坦诚不了解") {
+        auto known = learner.think("你了解数学吗");
+        REQUIRE(known.find("数学") != std::string::npos);
+
+        auto unknown = learner.think("你了解量子物理吗");
+        REQUIRE(unknown.find("不太了解") != std::string::npos);
+    }
+}
+
+TEST_CASE("SelfModel: 非自我指涉问题不被自我路径劫持") {
+    KnowledgeGraph kg;
+    TextLearner learner(kg);
+    learner.learn_from_text("人工智能是计算机科学的一个分支");
+
+    // 不含「你/自己」的定义性问题应走常规路径，而非自我作答
+    auto ans = learner.think("什么是人工智能");
+    REQUIRE(ans.find("认识自己") == std::string::npos);
+    REQUIRE(ans.find("自评确信度") == std::string::npos);
+}

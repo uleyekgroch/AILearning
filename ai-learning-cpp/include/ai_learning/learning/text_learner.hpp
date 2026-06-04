@@ -11,6 +11,7 @@
  */
 #pragma once
 
+#include "ai_learning/consciousness/self_model.hpp"
 #include "ai_learning/domain/knowledge/knowledge_graph.hpp"
 #include "ai_learning/learning/dependency_parser.hpp"
 #include "ai_learning/learning/knowledge_extractor.hpp"
@@ -62,7 +63,22 @@ public:
         return parse_enabled_;
     }
 
+    /// 自我模型（随每次 learn_from_text 在线更新，供自我指涉问答）
+    [[nodiscard]] auto self_model() const
+        -> const consciousness::SelfModel& {
+        return self_model_;
+    }
+
 private:
+    /// 把本次学习写入自我模型：当下体验 + 自我信念(领域/实体) + 自传记忆。
+    /// 这让 SelfModel 真正进入学习闭环，而非陈列端点。
+    void update_self_model_(const std::string& text, const std::string& source,
+                            const TextLearnResult& result);
+
+    /// 自我指涉问答（你是谁/你了解X吗/你学到了什么）；非自我问题返回空。
+    [[nodiscard]] auto answer_self_referential_(const std::string& q) const
+        -> std::string;
+
     /// 基于依存树的论元抽取（已训练时使用，否则返回空交由窗口法兜底）
     [[nodiscard]] auto extract_triples_parsed_(const std::string& text) const
         -> std::vector<Triple>;
@@ -137,6 +153,9 @@ private:
     WordSegmenter segmenter_;
     DependencyGrammarInducer dep_parser_;
     bool parse_enabled_ = false;
+
+    // 自我模型（意识级自我表征，随学习闭环在线更新）
+    consciousness::SelfModel self_model_;
 };
 
 }  // namespace ai_learning::learning
