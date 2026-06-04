@@ -278,6 +278,11 @@ add_executable(ai_learning_multimodal_eval multimodal_eval.cpp)
 target_link_libraries(ai_learning_multimodal_eval PRIVATE ai_learning)
 target_include_directories(ai_learning_multimodal_eval PRIVATE include)
 
+# ── 客观依存归纳评测（零大模型，无监督句法 + 论元抽取 vs 硬窗口）──────
+add_executable(ai_learning_parse_eval parse_eval.cpp)
+target_link_libraries(ai_learning_parse_eval PRIVATE ai_learning)
+target_include_directories(ai_learning_parse_eval PRIVATE include)
+
 # ── 调试程序 ────────────────────────────────────────────────────
 add_executable(debug_main debug_main.cpp)
 target_link_libraries(debug_main PRIVATE ai_learning)
