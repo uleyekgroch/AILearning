@@ -7,6 +7,8 @@
 #include "ai_learning/domain/domain_events.hpp"
 
 #include <algorithm>
+#include <map>
+#include <set>
 #include <sstream>
 #include <chrono>
 
@@ -109,7 +111,127 @@ auto TextLearner::learn_from_text(const std::string& text,
         stats_["failed"]++;
     }
 
+    // 10. 写入自我模型（学习闭环：每次学习都更新「我在学什么/我了解什么」）
+    update_self_model_(text, source, result);
+
     return result;
+}
+
+// ── 自我模型：学习闭环写入 + 自我指涉问答 ───────────────────────
+
+void TextLearner::update_self_model_(const std::string& text,
+                                     const std::string& source,
+                                     const TextLearnResult& result) {
+    using consciousness::AutobiographicalMemory;
+    using consciousness::CoreExperience;
+    using consciousness::SelfBelief;
+
+    // (1) 当下体验：我正在学习、在想什么、感觉如何（按是否验证通过）
+    CoreExperience exp;
+    exp.what_am_i_doing = "学习文本知识";
+    exp.what_am_i_thinking =
+        result.entities.empty() ? "新输入" : result.entities.front();
+    exp.what_am_i_feeling = result.verification_passed ? "理解了" : "还有点困惑";
+    exp.attention_focus = result.entities.empty() ? 0.3 : 0.7;
+    self_model_.experience_now(exp);
+
+    // (2) 自我信念：每次学习强化「持续学习」；每个学到的实体强化「了解X」。
+    //     update_self_belief 为慢更新(0.9/0.1)，反复学习同一领域→确信度上升，
+    //     这正是「自我效能随经验增长」的可量化闭环。
+    self_model_.update_self_belief(
+        SelfBelief{"持续学习", 1.0, source, true});
+    int n = 0;
+    for (const auto& e : result.entities) {
+        if (n++ >= 5) break;  // 每句至多强化前几个实体，避免噪声淹没
+        self_model_.update_self_belief(
+            SelfBelief{"了解" + e, 1.0, text.substr(0, 40), true});
+    }
+
+    // (3) 自传记忆：验证通过且抽到三元组的，记一条带「教训」的情景记忆
+    if (result.verification_passed && !result.triples.empty()) {
+        const auto& t = result.triples.front();
+        AutobiographicalMemory mem;
+        mem.narrative = text.substr(0, 40);
+        mem.importance = result.verification_score;
+        mem.lesson_learned = t.subject + t.relation + t.object;
+        self_model_.remember(mem);
+    }
+}
+
+auto TextLearner::answer_self_referential_(const std::string& q) const
+    -> std::string {
+    const bool self_q =
+        q.find("你") != std::string::npos || q.find("自己") != std::string::npos;
+    if (!self_q) return "";  // 非自我指涉问题，交回常规路径
+
+    // 「你了解/知道/会 X 吗」：在自我信念里找主题（trait 形如「了解X」），
+    // 命中且确信度足够→正面回答并给出自评确信度，否则坦诚不了解。
+    const bool ask_know = q.find("了解") != std::string::npos ||
+                          q.find("知道") != std::string::npos ||
+                          q.find("会") != std::string::npos;
+    const bool ask_what = q.find("什么") != std::string::npos ||
+                          q.find("啥") != std::string::npos;
+
+    if (ask_know && !ask_what) {
+        // 按 UTF-8 码点切分（无监督实体多为碎片，按「字覆盖」而非整词匹配更稳）
+        auto to_cps = [](const std::string& s) {
+            std::vector<std::string> cps;
+            for (size_t i = 0; i < s.size();) {
+                unsigned char c = static_cast<unsigned char>(s[i]);
+                size_t len = (c < 0x80) ? 1 : (c < 0xE0) ? 2 : (c < 0xF0) ? 3 : 4;
+                cps.push_back(s.substr(i, len));
+                i += len;
+            }
+            return cps;
+        };
+
+        // 已学会的「字」→ 最高自评确信度（来自正向「了解X」信念）
+        const std::string prefix = "了解";
+        std::map<std::string, double> learned;
+        for (const auto& b : self_model_.self_concept()) {
+            if (!b.is_positive || b.confidence <= 0.3 ||
+                b.trait.size() <= prefix.size() ||
+                b.trait.compare(0, prefix.size(), prefix) != 0)
+                continue;
+            for (const auto& cp : to_cps(b.trait.substr(prefix.size())))
+                learned[cp] = std::max(learned[cp], b.confidence);
+        }
+
+        // 从问句中剥离疑问/指代虚词，剩下的 CJK 字即为被问主题
+        static const std::set<std::string> stop = {
+            "你", "自", "己", "我", "了", "解", "知", "道", "会", "吗", "嘛",
+            "呢", "的", "是", "请", "问", "什", "么", "啥", "，", "。",
+            "？", "?", " "};
+        std::string topic;
+        std::vector<std::string> topic_cps;
+        for (const auto& cp : to_cps(q)) {
+            if (cp.size() < 3 || stop.count(cp)) continue;  // 仅留 CJK 内容字
+            topic += cp;
+            topic_cps.push_back(cp);
+        }
+
+        if (!topic_cps.empty()) {
+            double min_conf = 1.0;
+            bool all_covered = true;
+            for (const auto& cp : topic_cps) {
+                auto it = learned.find(cp);
+                if (it == learned.end()) { all_covered = false; break; }
+                min_conf = std::min(min_conf, it->second);
+            }
+            if (all_covered) {
+                return "我了解" + topic + "（自评确信度" +
+                       std::to_string(static_cast<int>(min_conf * 100)) + "%）";
+            }
+            return "关于" + topic + "，我目前还不太了解，需要继续学习";
+        }
+        return "你想问的，我目前还不太了解，需要继续学习";
+    }
+
+    // 「你学到了什么/你知道些什么」：汇报自我认识
+    if (ask_what) return self_model_.reflect_on_self();
+
+    // 「你是谁」等：当下自我同一性
+    return self_model_.who_am_i_now();
 }
 
 // ── 无监督分词 + 依存解析：训练与抽取 ───────────────────────────
@@ -159,6 +281,10 @@ auto TextLearner::extract_triples_parsed_(const std::string& text) const
 
 auto TextLearner::think(const std::string& question) const
     -> std::string {
+    // 路径 -1: 自我指涉问答（你是谁/你了解X吗），由在线更新的自我模型作答
+    auto self_ans = answer_self_referential_(question);
+    if (!self_ans.empty()) return self_ans;
+
     // 路径 0: 常识库查询
     auto common = query_commonsense_(question);
     if (!common.empty()) return common;
