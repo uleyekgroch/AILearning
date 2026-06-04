@@ -402,6 +402,22 @@ auto Learner::perceive(
     return encoder_.encode(raw_input);
 }
 
+auto Learner::ground_image(const std::string& symbol,
+                           const std::vector<std::uint8_t>& gray_pixels,
+                           int width, int height) -> int {
+    // 复用已持有的 GroundingModule（此前从未进入闭环）。VisualGroundingSystem
+    // 仅是无状态包装：图像编码无预训练，持久状态都落在 grounding_ 里。
+    perception::VisualGroundingSystem vg(grounding_);
+    return vg.learn_symbol(symbol, gray_pixels, width, height);
+}
+
+auto Learner::recognize_image(const std::vector<std::uint8_t>& gray_pixels,
+                              int width, int height)
+    -> std::pair<std::string, float> {
+    perception::VisualGroundingSystem vg(grounding_);
+    return vg.recognize(gray_pixels, width, height);
+}
+
 auto Learner::choose_action(const std::vector<float>& obs) -> int {
     auto curiosity = engine_->get_curiosity();
 

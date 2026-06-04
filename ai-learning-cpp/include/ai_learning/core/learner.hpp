@@ -62,8 +62,10 @@
 #include "ai_learning/social/tutoring_system.hpp"
 #include "ai_learning/learning/mirror_neuron.hpp"
 #include "ai_learning/perception/haptic_encoder.hpp"
+#include "ai_learning/perception/visual_grounding.hpp"
 
 #include <chrono>
+#include <cstdint>
 #include <deque>
 #include <map>
 #include <memory>
@@ -145,6 +147,21 @@ public:
     /// 感知原始输入（使用多模态编码器）
     auto perceive(const std::map<std::string, std::vector<float>>& raw_input)
         -> std::vector<float>;
+
+    // ── 多模态接地（文本↔图片，零预训练）────────────────────────
+    // 复用既有 GroundingModule，把"从零感知编码"的图像向量与文字符号绑定，
+    // 让符号从视觉经验获得接地（而非依赖预训练视觉大模型）。
+
+    /// 学习：把一张灰度图（width*height 个 8 位像素）与文字符号绑定，
+    /// 返回该图的感知聚类 ID（失败返回 -1）。
+    auto ground_image(const std::string& symbol,
+                      const std::vector<std::uint8_t>& gray_pixels,
+                      int width, int height) -> int;
+
+    /// 识别：给一张新灰度图，返回最匹配的已学符号及相似度（无匹配返回 {"",0}）。
+    auto recognize_image(const std::vector<std::uint8_t>& gray_pixels,
+                         int width, int height)
+        -> std::pair<std::string, float>;
 
     /// 选择动作（好奇心驱动）
     auto choose_action(const std::vector<float>& obs) -> int;
