@@ -12,7 +12,9 @@
 #pragma once
 
 #include "ai_learning/domain/knowledge/knowledge_graph.hpp"
+#include "ai_learning/learning/dependency_parser.hpp"
 #include "ai_learning/learning/knowledge_extractor.hpp"
+#include "ai_learning/learning/word_segmenter.hpp"
 
 #include <map>
 #include <string>
@@ -49,7 +51,22 @@ public:
         return stats_;
     }
 
+    /// 用已累积语料（learn_from_text 自动累积）(重新)训练无监督分词器 +
+    /// 依存解析器，并启用「分词→依存树→论元」抽取路径替代硬窗口。
+    /// 喂入足够文本后调用；未调用时维持原有(实体接地+窗口)抽取，行为不变。
+    /// @return 是否成功启用（语料不足时返回 false）
+    auto train_dependency_parser() -> bool;
+
+    /// 当前是否已启用基于句法树的论元抽取
+    [[nodiscard]] auto dependency_parsing_enabled() const -> bool {
+        return parse_enabled_;
+    }
+
 private:
+    /// 基于依存树的论元抽取（已训练时使用，否则返回空交由窗口法兜底）
+    [[nodiscard]] auto extract_triples_parsed_(const std::string& text) const
+        -> std::vector<Triple>;
+
     /// 验证学到的知识
     auto verify_knowledge_(const std::string& text,
                            const std::vector<std::string>& entities,
@@ -113,6 +130,12 @@ private:
 
     // 统计
     std::map<std::string, int> stats_;
+
+    // 无监督分词 + 依存解析（默认关闭；train_dependency_parser() 后启用）
+    std::vector<std::string> corpus_raw_;  // learn_from_text 累积的原始文本
+    WordSegmenter segmenter_;
+    DependencyGrammarInducer dep_parser_;
+    bool parse_enabled_ = false;
 };
 
 }  // namespace ai_learning::learning
