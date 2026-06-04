@@ -189,7 +189,7 @@ private:
     int n_draft_tokens_ = 4;
 
     auto generate_(const std::string& full_prompt) -> std::string;
-    auto generate_from_cache_() -> std::string;
+    auto generate_from_cache_(int gen_limit) -> std::string;
 };
 
 #else

@@ -119,7 +119,7 @@ jobs:
         shell: pwsh
         run: |
           cd ai-learning-cpp/build-ci
-          .\ai_learning_tests.exe --colour-mode ansi
+          .\Release\ai_learning_tests.exe --colour-mode ansi
 
   # ── Code quality ─────────────────────────────────────────────────
   lint:

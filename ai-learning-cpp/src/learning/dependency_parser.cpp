@@ -504,6 +504,10 @@ auto extract_triples_from_parse(
             int h = parsed.heads[d];
             if (h <= p) { obj = d; break; }
         }
+        // 兜底：边界中心词找不到时（长句树结构有噪声），退为谓词紧邻词，
+        // 保证有侧词就不漏抽（取其依存子树作为论元短语）。
+        if (subj < 0 && p > 0) subj = p - 1;
+        if (obj < 0 && p < n - 1) obj = p + 1;
         if (subj < 0 || obj < 0) continue;
 
         auto [slo, shi] = subtree_span(parsed, subj, p);

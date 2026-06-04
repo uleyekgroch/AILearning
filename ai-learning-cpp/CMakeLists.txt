@@ -283,6 +283,11 @@ add_executable(ai_learning_parse_eval parse_eval.cpp)
 target_link_libraries(ai_learning_parse_eval PRIVATE ai_learning)
 target_include_directories(ai_learning_parse_eval PRIVATE include)
 
+# ── 客观无监督分词 + 端到端抽取评测（零大模型）────────────────────────
+add_executable(ai_learning_segment_eval segment_eval.cpp)
+target_link_libraries(ai_learning_segment_eval PRIVATE ai_learning)
+target_include_directories(ai_learning_segment_eval PRIVATE include)
+
 # ── 调试程序 ────────────────────────────────────────────────────
 add_executable(debug_main debug_main.cpp)
 target_link_libraries(debug_main PRIVATE ai_learning)
