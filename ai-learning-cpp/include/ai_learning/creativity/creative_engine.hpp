@@ -20,7 +20,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <functional>
 #include <map>
+#include <optional>
 #include <random>
 #include <set>
 #include <string>
@@ -160,13 +162,39 @@ public:
         return config_;
     }
 
+    // ═══════════════════════════════════════════════════════════
+    // 语义接地（依赖倒置）
+    // ═══════════════════════════════════════════════════════════
+
+    /// 语义距离 provider：返回 [0,1] 距离；返回 nullopt 表示无法判定，
+    /// 此时回退到字符级 Jaccard。注入后，创造力评估改由真实分布语义驱动。
+    using SemanticDistanceFn =
+        std::function<std::optional<double>(const std::string&,
+                                            const std::string&)>;
+
+    /// 注入语义距离 provider（如 Learner 用 DistributionalSemantics 余弦相似度）
+    void set_semantic_distance_provider(SemanticDistanceFn fn) {
+        semantic_distance_fn_ = std::move(fn);
+    }
+
+    /// 是否已接入外部语义层（用于测试/诊断）
+    [[nodiscard]] auto has_semantic_provider() const -> bool {
+        return static_cast<bool>(semantic_distance_fn_);
+    }
+
 private:
     CreativityConfig config_;
     mutable std::mt19937 rng_;
     int total_ideas_ = 0;
+    SemanticDistanceFn semantic_distance_fn_;
 
-    /// 语义距离
-    static auto semantic_distance_(const std::string& a, const std::string& b) -> double;
+    /// 语义距离：优先用注入的 provider（真实嵌入语义），否则回退字符级 Jaccard
+    auto semantic_distance_(const std::string& a, const std::string& b) const
+        -> double;
+
+    /// 字符级 Jaccard 距离（UTF-8 码点级），作为无语义 provider 时的回退
+    static auto char_jaccard_distance_(const std::string& a,
+                                       const std::string& b) -> double;
 
     /// 激活传播
     auto spread_activation_(const std::string& seed,
@@ -263,9 +291,11 @@ inline auto CreativeEngine::bisociate(
             idea.type = CreativityType::kBisociation;
             idea.idea = "像" + cb.name + "一样" + ca.name;
             idea.sources = {ca.name, cb.name};
-            idea.novelty = 0.8;  // 双关联想天然新颖
-            idea.usefulness = 0.5;
-            idea.surprise = 0.7;
+            // 由真实语义距离驱动：跨域越远 → 越新颖/意外，越近 → 越可用。
+            double dist = semantic_distance_(ca.name, cb.name);
+            idea.novelty = dist;
+            idea.usefulness = 1.0 - 0.5 * dist;
+            idea.surprise = dist;
             idea.explanation = "将" + domain_b + "领域的" + cb.name
                              + "概念引入" + domain_a + "领域";
             ideas.push_back(idea);
@@ -403,6 +433,19 @@ inline auto CreativeEngine::assess_surprise(
 }
 
 inline auto CreativeEngine::semantic_distance_(
+    const std::string& a, const std::string& b) const -> double {
+    // 优先使用注入的真实嵌入语义 provider；其返回 nullopt（如概念不在语义
+    // 空间中）时回退到字符级 Jaccard，保证无 provider 时行为与既有一致。
+    if (a == b) return 0.0;
+    if (semantic_distance_fn_) {
+        if (auto d = semantic_distance_fn_(a, b); d.has_value()) {
+            return std::clamp(*d, 0.0, 1.0);
+        }
+    }
+    return char_jaccard_distance_(a, b);
+}
+
+inline auto CreativeEngine::char_jaccard_distance_(
     const std::string& a, const std::string& b) -> double {
     // 基于 UTF-8 字符集合的 Jaccard 距离：1 - |A∩B| / |A∪B|。
     // 注意：旧实现按字节同位比较，对 UTF-8 多字节（如中文）完全失真；
