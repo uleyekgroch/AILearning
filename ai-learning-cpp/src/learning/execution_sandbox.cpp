@@ -23,6 +23,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <signal.h>
+#include <fcntl.h>
 #endif
 
 namespace ai_learning::learning {
@@ -68,13 +69,13 @@ auto LocalProcessSandbox::execute(const std::string& code,
     // 3. 执行
     std::string run_cmd = "\"" + exe_path + "\"";
     result = run_process_(run_cmd, config_.timeout_ms);
-    result.success = (result.exit_code == 0);
-    result.error_type = result.success ? "none" : "runtime_error";
 
-    // 4. 检查超时
-    if (result.elapsed_ms >= config_.timeout_ms) {
-        result.error_type = "timeout";
+    // 4. 判定结果：超时由 run_process_ 可靠标记（终止进程组），其余按退出码区分
+    if (result.error_type == "timeout") {
         result.success = false;
+    } else {
+        result.success = (result.exit_code == 0);
+        result.error_type = result.success ? "none" : "runtime_error";
     }
 
     // 5. 截断输出
@@ -268,28 +269,95 @@ auto LocalProcessSandbox::run_process_(const std::string& command,
 
 #else
 
-/// POSIX 实现：fork + exec + pipe + waitpid 超时
+/// POSIX 实现：fork + exec + pipe + 轮询 waitpid 实现真正的超时终止。
+/// 子进程置于独立进程组，超时后向整个进程组发 SIGKILL，避免死循环代码挂死调用方。
 auto LocalProcessSandbox::run_process_(const std::string& command,
-                                         [[maybe_unused]] int timeout_ms) const
+                                         int timeout_ms) const
     -> ExecutionResult {
     ExecutionResult result;
     auto t0 = std::chrono::high_resolution_clock::now();
 
-    FILE* pipe = popen((command + " 2>&1").c_str(), "r");
-    if (!pipe) {
+    int pipefd[2];
+    if (pipe(pipefd) != 0) {
         result.exit_code = -1;
+        result.error_type = "io_error";
         return result;
     }
 
-    char buffer[1024];
-    while (fgets(buffer, sizeof(buffer), pipe)) {
-        result.stdout_output += buffer;
+    pid_t pid = fork();
+    if (pid < 0) {
+        close(pipefd[0]);
+        close(pipefd[1]);
+        result.exit_code = -1;
+        result.error_type = "io_error";
+        return result;
     }
-    result.exit_code = pclose(pipe);
+
+    if (pid == 0) {
+        // 子进程：独立进程组 + stdout/stderr 重定向到管道写端
+        setpgid(0, 0);
+        dup2(pipefd[1], STDOUT_FILENO);
+        dup2(pipefd[1], STDERR_FILENO);
+        close(pipefd[0]);
+        close(pipefd[1]);
+        execl("/bin/sh", "sh", "-c", command.c_str(),
+              static_cast<char*>(nullptr));
+        _exit(127);  // exec 失败
+    }
+
+    // 父进程
+    setpgid(pid, pid);  // 与子进程竞争性地设置进程组，确保整组可被终止
+    close(pipefd[1]);
+
+    int flags = fcntl(pipefd[0], F_GETFL, 0);
+    fcntl(pipefd[0], F_SETFL, flags | O_NONBLOCK);
+
+    auto drain_pipe = [&]() {
+        char buffer[1024];
+        ssize_t n;
+        while ((n = read(pipefd[0], buffer, sizeof(buffer))) > 0) {
+            result.stdout_output.append(buffer, static_cast<size_t>(n));
+        }
+    };
+
+    bool timed_out = false;
+    int status = 0;
+    while (true) {
+        pid_t w = waitpid(pid, &status, WNOHANG);
+        drain_pipe();
+
+        if (w == pid) {
+            if (WIFEXITED(status)) {
+                result.exit_code = WEXITSTATUS(status);
+            } else if (WIFSIGNALED(status)) {
+                result.exit_code = 128 + WTERMSIG(status);
+            }
+            break;
+        }
+
+        auto now = std::chrono::high_resolution_clock::now();
+        double elapsed =
+            std::chrono::duration<double, std::milli>(now - t0).count();
+        if (timeout_ms > 0 && elapsed >= timeout_ms) {
+            kill(-pid, SIGKILL);  // 终止整个进程组
+            waitpid(pid, &status, 0);
+            timed_out = true;
+            result.exit_code = 124;  // 与 coreutils timeout 一致
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+    }
+
+    drain_pipe();  // 收尾再排空一次
+    close(pipefd[0]);
+
     result.stderr_output = result.stdout_output;  // 合并模式下相同
 
     auto t1 = std::chrono::high_resolution_clock::now();
     result.elapsed_ms = std::chrono::duration<double, std::milli>(t1 - t0).count();
+
+    if (timed_out) result.error_type = "timeout";
 
     return result;
 }

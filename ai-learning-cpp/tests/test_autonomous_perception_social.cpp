@@ -11,6 +11,8 @@
 #include "ai_learning/domain/environment/simple_environment.hpp"
 #include "ai_learning/domain/social/social_agent.hpp"
 
+#include <nlohmann/json.hpp>
+
 #include <cmath>
 #include <fstream>
 #include <map>
@@ -365,22 +367,13 @@ TEST_CASE("Persistence: 保存文件格式正确", "[persistence]") {
     std::ifstream f("test_format.txt");
     REQUIRE(f.is_open());
 
-    std::string content;
-    bool has_meta = false;
-    bool has_config = false;
-    bool has_kg = false;
-
-    std::string line;
-    while (std::getline(f, line)) {
-        if (line == "[meta]") has_meta = true;
-        if (line == "[config]") has_config = true;
-        if (line == "[knowledge_graph]") has_kg = true;
-    }
-
-    REQUIRE(has_meta);
-    REQUIRE(has_config);
-    REQUIRE(has_kg);
-
+    // 快照为紧凑 JSON，校验关键顶层段是否存在
+    nlohmann::json snap = nlohmann::json::parse(f);
     f.close();
+
+    REQUIRE(snap.contains("meta"));
+    REQUIRE(snap.contains("config"));
+    REQUIRE(snap.contains("knowledge_graph"));
+
     std::remove("test_format.txt");
 }

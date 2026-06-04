@@ -36,6 +36,7 @@ jobs:
 
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
@@ -75,12 +76,13 @@ jobs:
       - name: Run tests
         run: |
           cd ai-learning-cpp/build-ci
-          ./ai_learning_tests --colour-mode ansi
+          timeout 900 ./ai_learning_tests --colour-mode ansi
 
   # ── Windows build ────────────────────────────────────────────────
   build-windows:
     name: "Windows / llama.cpp ON"
     runs-on: windows-latest
+    timeout-minutes: 40
 
     steps:
       - name: Checkout
