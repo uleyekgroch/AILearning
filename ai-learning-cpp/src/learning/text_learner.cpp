@@ -30,6 +30,9 @@ auto TextLearner::learn_from_text(const std::string& text,
     -> TextLearnResult {
     TextLearnResult result;
 
+    // 0. 累积原始语料，供 train_dependency_parser() 训练无监督分词/解析
+    corpus_raw_.push_back(text);
+
     // 1. 提取实体
     result.entities = KnowledgeExtractor::extract_entities(text);
 
@@ -38,8 +41,14 @@ auto TextLearner::learn_from_text(const std::string& text,
         kg_.add_entity(Entity(entity_name, "concept", {}, 0.7, source));
     }
 
-    // 2. 提取关系
-    result.triples = KnowledgeExtractor::extract_triples(text, result.entities);
+    // 2. 提取关系：已训练时走「分词→依存树→论元」，否则退回(实体接地+窗口)
+    if (parse_enabled_) {
+        result.triples = extract_triples_parsed_(text);
+    }
+    if (result.triples.empty()) {
+        result.triples =
+            KnowledgeExtractor::extract_triples(text, result.entities);
+    }
 
     // 3. 注入知识图谱（带矛盾检测）
     for (const auto& triple : result.triples) {
@@ -97,6 +106,49 @@ auto TextLearner::learn_from_text(const std::string& text,
     }
 
     return result;
+}
+
+// ── 无监督分词 + 依存解析：训练与抽取 ───────────────────────────
+
+auto TextLearner::train_dependency_parser() -> bool {
+    if (corpus_raw_.size() < 8) return false;  // 语料过少不训练
+
+    segmenter_.fit(corpus_raw_);
+
+    // 用学到的分词把语料切成词序列，喂给 DMV 依存归纳器
+    std::vector<std::vector<std::string>> seg_corpus;
+    for (const auto& raw : corpus_raw_) {
+        for (auto& run : segmenter_.segment_runs(raw)) {
+            if (run.size() >= 2) seg_corpus.push_back(std::move(run));
+        }
+    }
+    if (seg_corpus.size() < 4) return false;
+
+    dep_parser_.train(seg_corpus);
+    parse_enabled_ = dep_parser_.is_trained();
+    return parse_enabled_;
+}
+
+auto TextLearner::extract_triples_parsed_(const std::string& text) const
+    -> std::vector<Triple> {
+    std::vector<Triple> out;
+    if (!parse_enabled_) return out;
+
+    // KnowledgeExtractor::relation_patterns() 为 (relation, cue)；
+    // extract_triples_from_parse 需 (cue, relation)，此处交换
+    std::vector<std::pair<std::string, std::string>> cues;
+    for (const auto& [rel, cue] : KnowledgeExtractor::relation_patterns()) {
+        cues.emplace_back(cue, rel);
+    }
+
+    for (const auto& run : segmenter_.segment_runs(text)) {
+        if (run.size() < 3) continue;  // 太短无主谓宾结构
+        auto parsed = dep_parser_.parse(run);
+        for (auto& t : extract_triples_from_parse(parsed, cues)) {
+            out.push_back(std::move(t));
+        }
+    }
+    return out;
 }
 
 // ── 思考/回答 ────────────────────────────────────────────────────

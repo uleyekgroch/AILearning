@@ -462,6 +462,11 @@ auto KnowledgeExtractor::extract_keywords(const std::string& text)
 
 // ── 关系模式表 ───────────────────────────────────────────────────
 
+auto KnowledgeExtractor::relation_patterns()
+    -> const std::vector<std::pair<std::string, std::string>>& {
+    return relation_patterns_();
+}
+
 auto KnowledgeExtractor::relation_patterns_()
     -> const std::vector<std::pair<std::string, std::string>>& {
     static const std::vector<std::pair<std::string, std::string>> patterns = {

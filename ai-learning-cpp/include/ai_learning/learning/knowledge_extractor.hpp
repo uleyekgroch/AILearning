@@ -71,6 +71,10 @@ public:
     static auto extract_keywords(const std::string& text)
         -> std::vector<std::string>;
 
+    /// 关系模式表 (relation, 表层线索词)，供句法树论元抽取复用线索词集合
+    static auto relation_patterns()
+        -> const std::vector<std::pair<std::string, std::string>>&;
+
 private:
     /// 中文词提取正则
     static auto extract_chinese_words_(const std::string& text, int min_len, int max_len)
