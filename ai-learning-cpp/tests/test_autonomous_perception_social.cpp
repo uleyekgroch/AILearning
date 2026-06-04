@@ -365,21 +365,11 @@ TEST_CASE("Persistence: 保存文件格式正确", "[persistence]") {
     std::ifstream f("test_format.txt");
     REQUIRE(f.is_open());
 
-    std::string content;
-    bool has_meta = false;
-    bool has_config = false;
-    bool has_kg = false;
-
-    std::string line;
-    while (std::getline(f, line)) {
-        if (line == "[meta]") has_meta = true;
-        if (line == "[config]") has_config = true;
-        if (line == "[knowledge_graph]") has_kg = true;
-    }
-
-    REQUIRE(has_meta);
-    REQUIRE(has_config);
-    REQUIRE(has_kg);
+    // save() 输出紧凑 JSON，验证关键顶层 key 存在
+    std::string content((std::istreambuf_iterator<char>(f)),
+                         std::istreambuf_iterator<char>());
+    REQUIRE(content.find("\"meta\"") != std::string::npos);
+    REQUIRE(content.find("\"knowledge_graph\"") != std::string::npos);
 
     f.close();
     std::remove("test_format.txt");

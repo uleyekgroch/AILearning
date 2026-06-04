@@ -318,14 +318,15 @@ auto LlamaCppLLMProvider::prefill(const std::string& prompt) -> int {
     return n_prompt;
 }
 
-auto LlamaCppLLMProvider::generate_from_cache(int /*max_tokens*/) -> std::string {
+auto LlamaCppLLMProvider::generate_from_cache(int max_tokens) -> std::string {
     if (!ctx_ || !model_) return "[llama.cpp not initialized]";
     if (cached_n_prompt_ == 0) return "[no prefill cache]";
     std::lock_guard<std::mutex> lock(mutex_);
-    return generate_from_cache_();
+    const int limit = (max_tokens > 0) ? max_tokens : max_tokens_;
+    return generate_from_cache_(limit);
 }
 
-auto LlamaCppLLMProvider::generate_from_cache_() -> std::string {
+auto LlamaCppLLMProvider::generate_from_cache_(int gen_limit) -> std::string {
     // Sampler
     llama_sampler* smpl = llama_sampler_chain_init({});
     llama_sampler_chain_add(smpl, llama_sampler_init_top_k(40));
@@ -335,7 +336,6 @@ auto LlamaCppLLMProvider::generate_from_cache_() -> std::string {
 
     std::string result;
     int n_cur = cached_n_prompt_;
-    const int gen_limit = max_tokens_;
 
     for (int i = 0; i < gen_limit; ++i) {
         const llama_token next = llama_sampler_sample(smpl, to_ctx(ctx_), -1);
@@ -455,7 +455,7 @@ auto LlamaCppLLMProvider::generate_(const std::string& full_prompt)
     cached_prompt_ = full_prompt;
     cached_n_prompt_ = n_prompt;
 
-    return generate_from_cache_();
+    return generate_from_cache_(max_tokens_);
 }
 
 #endif  // AI_LEARNING_WITH_LLAMA_CPP
