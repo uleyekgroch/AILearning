@@ -291,9 +291,55 @@ auto TextLearner::reason_from_kg_(const std::string& question) const
 
 auto TextLearner::query_commonsense_(const std::string& question) const
     -> std::string {
-    // 简单实现：查 KG 中是否有直接答案
-    // 完整版需要 CommonsenseKB 模块
-    (void)question;
+    // 基于"自学知识图谱"的常识式作答（零大模型）。
+    // 不再恒返回空：识别问句意图（定义/因果/位置），在 KG 里检索对应类型的
+    // 关系，组合成自然语句。这与"原句回放"和"三元组裸拼接"不同——它按问句意图
+    // 挑选关系类型并重新组织表达，因此放在 think() 最前面，可优先于海马原句回放。
+    auto contains = [&](const char* kw) {
+        return question.find(kw) != std::string::npos;
+    };
+
+    const bool is_definition =
+        contains("是什么") || contains("什么是") || contains("是谁") ||
+        contains("定义") || contains("是一种");
+    const bool is_causal =
+        contains("为什么") || contains("为何") || contains("原因") ||
+        contains("会怎样") || contains("结果");
+    const bool is_location = contains("在哪") || contains("哪里") || contains("位于");
+
+    if (!is_definition && !is_causal && !is_location) return "";
+
+    auto entities = KnowledgeExtractor::extract_entities(question);
+    for (const auto& entity : entities) {
+        if (!kg_.has_entity(entity)) continue;
+        auto rels = kg_.get_relations_of(entity);
+        if (rels.empty()) continue;
+
+        // 按意图优先匹配的关系类型
+        std::vector<std::string> want;
+        if (is_definition) want = {"是", "属于", "称为", "叫做", "包括", "包含"};
+        else if (is_causal) want = {"导致", "产生", "构成"};
+        else /* location */ want = {"位于"};
+
+        for (const auto& w : want) {
+            for (const auto& r : rels) {
+                if (r.get().type() != w) continue;
+                const auto& obj = r.get().target_id();
+                if (obj.empty() || obj == entity) continue;
+
+                if (is_definition) {
+                    if (w == "称为" || w == "叫做") {
+                        return entity + " 又称 " + obj + "（基于已学知识）";
+                    }
+                    return entity + " " + w + " " + obj + "（基于已学知识）";
+                }
+                if (is_causal) {
+                    return entity + " 会 " + w + " " + obj + "（基于已学知识）";
+                }
+                return entity + " 位于 " + obj + "（基于已学知识）";
+            }
+        }
+    }
     return "";
 }
 

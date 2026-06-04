@@ -1079,11 +1079,36 @@ void Learner::run_conscious_loop(int ticks) {
                     // 将推演结果存入记忆，或者产生新的情绪
                     auto nearest = ds_.find_nearest(pred, 1);
                     if (!nearest.empty()) {
+                        const std::string& related = nearest[0].first;
                         consciousness::WorkspaceThought insight;
                         insight.source_module = "predictive_engine";
-                        insight.symbolic_content = "啊！我想到 " + target + " 可能和 " + nearest[0].first + " 有关！";
+                        insight.symbolic_content = "啊！我想到 " + target + " 可能和 " + related + " 有关！";
                         insight.surprise_value = 0.8;
                         workspace_.submit_thought(insight);
+
+                        // ★ 让 CreativeEngine 真正进入核心意识闭环：
+                        // 以"自学分布语义空间"为素材，对这次预测顿悟做一次远距联想，
+                        // 并把有价值的创意写入自传体记忆。这样创造力模块不再只是
+                        // REST 陈列品，而是消费预测编码 + 分布语义的产物。
+                        std::vector<creativity::ConceptNode> knowledge;
+                        for (const auto& nb : ds_.most_similar(target, 5, /*exclude_ngram_overlap=*/true)) {
+                            creativity::ConceptNode node;
+                            node.name = nb.cpt_b;
+                            node.activation = nb.similarity;
+                            knowledge.push_back(node);
+                        }
+                        creativity::ConceptNode na; na.name = target; knowledge.push_back(na);
+                        creativity::ConceptNode nr; nr.name = related; knowledge.push_back(nr);
+
+                        auto idea = creative_engine_.remote_associate(target, related, knowledge);
+                        if (idea) {
+                            consciousness::AutobiographicalMemory cmem;
+                            cmem.narrative = "我用想象力把「" + target + "」和「" + related +
+                                             "」联系起来：" + idea->idea;
+                            cmem.emotional_intensity = idea->surprise;
+                            cmem.importance = idea->novelty;
+                            self_model_.remember(cmem);
+                        }
                     }
                 }
             } else if (focus->source_module == "predictive_engine" && !focus->symbolic_content.empty()) {
