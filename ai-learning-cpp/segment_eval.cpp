@@ -16,6 +16,7 @@
 #include "ai_learning/learning/knowledge_extractor.hpp"
 #include "ai_learning/learning/text_learner.hpp"
 #include "ai_learning/learning/word_segmenter.hpp"
+#include "ai_learning/testing/test_corpora.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -72,77 +73,8 @@ auto main() -> int {
     std::cout << "=== 无监督分词 + 端到端抽取评测 (零大模型) ===\n\n";
 
     // ── 用模板自动生成语料（同时拿到 gold 分词）──────────────────
-    std::vector<std::string> persons = {"学生", "老师", "医生", "工人", "农民"};
-    std::vector<std::string> subjects = {"数学", "物理", "化学", "历史", "地理"};
-    std::vector<std::string> animals = {"猫", "狗", "老虎", "兔子"};
-    std::vector<std::string> cats_person = {"人类"};
-    std::vector<std::string> cats_subject = {"学科", "知识"};
-    std::vector<std::string> cats_animal = {"动物"};
-    std::vector<std::string> mods = {"聪明", "勤奋", "优秀", "可爱",
-                                     "重要", "有趣", "年轻"};
-    std::vector<std::string> verbs = {"喜欢", "学习", "研究", "讨厌"};
-
-    std::vector<std::string> pronouns = {"我", "他", "她", "你"};
-    std::vector<std::string> degree = {"很", "非常", "比较", "特别"};
-
-    std::vector<std::vector<std::string>> gold_corpus;  // 每句的 gold 词序列
-    auto add = [&](std::vector<std::string> ws) {
-        gold_corpus.push_back(std::move(ws));
-    };
-    // 关键：让每个内容词出现在多种左右上下文里（边界熵才够大），
-    // 这正是真实语言的特征；过于规整的模板会让词总黏在同一邻字而被误判为碎片。
-
-    // X 是 类 / 类 包括 X（让"类"既在右边界又有左右变化）
-    for (const auto& p : persons) {
-        add({p, "是", "人类"});
-        add({"人类", "包括", p});
-    }
-    for (const auto& s : subjects) {
-        add({s, "是", "学科"});
-        add({s, "是", "知识"});
-        add({"学科", "包括", s});
-    }
-    for (const auto& a : animals) {
-        add({a, "是", "动物"});
-        add({"动物", "包括", a});
-    }
-    // 修饰 的 X 是 类
-    for (const auto& m : mods) {
-        for (const auto& p : persons) add({m, "的", p, "是", "人类"});
-        for (const auto& s : subjects) add({m, "的", s, "是", "学科"});
-        for (const auto& a : animals) add({m, "的", a, "是", "动物"});
-    }
-    // 主语 + 程度 + 修饰（让 mod 右侧不总是"的"，出现在句尾/不同邻字）
-    for (const auto& p : persons)
-        for (const auto& d : degree)
-            for (const auto& m : mods) add({p, d, m});
-    for (const auto& s : subjects)
-        for (const auto& d : degree) add({s, d, "重要"});
-    // 代词 + 动词 + 宾语（让动词/宾语左侧多样）
-    for (const auto& pr : pronouns)
-        for (const auto& v : verbs)
-            for (const auto& s : subjects) add({pr, v, s});
-    for (const auto& p : persons)
-        for (const auto& v : verbs)
-            for (const auto& s : subjects) add({p, v, s});
-    for (const auto& pr : pronouns)
-        for (const auto& v : verbs)
-            for (const auto& a : animals) add({pr, v, a});
-    // 重复若干轮累积统计
-    {
-        auto base = gold_corpus;
-        for (int rep = 0; rep < 3; ++rep)
-            for (auto& s : base) gold_corpus.push_back(s);
-    }
-
-    // 原始无空格语料
-    std::vector<std::string> raw_corpus;
-    raw_corpus.reserve(gold_corpus.size());
-    for (const auto& ws : gold_corpus) {
-        std::string j;
-        for (const auto& w : ws) j += w;
-        raw_corpus.push_back(j);
-    }
+    auto gold_corpus = ai_learning::testing::make_gold_corpus();
+    auto raw_corpus = ai_learning::testing::gold_to_raw(gold_corpus);
 
     SegmenterConfig scfg;
     scfg.max_word_len = 2;  // 本语料词汇以 1~2 字为主（中文最常见）
@@ -319,29 +251,7 @@ auto main() -> int {
 
     // ── E. 3+ 字复合词发现 + 虚词消歧（默认配置 L=6，零词典）──────────
     std::cout << "\n[E] 3+ 字复合词 + 虚词消歧（默认配置 max_word_len=6）\n";
-    std::vector<std::string> comp_base = {
-        "人工智能改变世界",   "我了解人工智能",     "人工智能很强大",
-        "他害怕人工智能",     "人工智能需要数据",   "计算机科学很有趣",
-        "我喜欢计算机科学",   "他研究计算机科学",   "计算机科学包含很多方向",
-        "机器学习是热门方向", "我在学机器学习",     "机器学习应用广泛",
-        "公司使用机器学习",   "深度学习效果很好",   "他擅长深度学习",
-        "深度学习改变了行业", "自然语言处理很难",   "我研究自然语言处理",
-        "自然语言处理有用",   "这是一本书",         "那是一只猫",
-        "他是医生",           "水是透明的",         "花是红的",
-        "天空是蓝的",         "我吃了饭",           "他走了",
-        "下雨了",             "花开了",             "桌子上的书",
-        "老师的话",           "妈妈的爱",           "他在家里",
-        "猫在沙发上",         "书在桌子上",         "鸟在天上飞",
-        "小鸟在唱歌",         "大海很辽阔",         "孩子在公园玩",
-        "苹果很甜",           "香蕉是黄的",         "橙子很酸",
-        // 让"的"出现在句中、后接多种名词（右侧自由度足够 → 被判为虚词）
-        "美丽的花朵",         "红色的苹果",         "聪明的孩子",
-        "勤劳的农民",         "遥远的地方",         "温暖的阳光",
-        "高大的树木",         "干净的房间",
-    };
-    std::vector<std::string> comp_corpus;
-    for (int rep = 0; rep < 8; ++rep)
-        for (const auto& s : comp_base) comp_corpus.push_back(s);
+    auto comp_corpus = ai_learning::testing::make_compound_corpus();
 
     WordSegmenter cseg;  // 默认配置：max_word_len=6 + 虚词自动发现
     cseg.fit(comp_corpus);
