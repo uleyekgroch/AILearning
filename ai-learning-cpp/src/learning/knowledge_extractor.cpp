@@ -215,6 +215,38 @@ auto extract_right_cjk(const std::string& text, size_t pos, int max_chars)
     return result;
 }
 
+/// 在 entities 中找"结束字节恰好等于 end_byte"的实体（即紧贴在该位置左侧）。
+/// 多个命中取最长（最具体）的那个。用于把关系论元落到"已学到的实体单元"上，
+/// 而不是从关系词左右硬截固定字数。
+auto entity_ending_at(const std::string& text,
+                      const std::vector<std::string>& entities,
+                      size_t end_byte) -> std::string {
+    std::string best;
+    for (const auto& e : entities) {
+        if (e.empty() || e.size() > end_byte) continue;
+        if (text.compare(end_byte - e.size(), e.size(), e) == 0 &&
+            e.size() > best.size()) {
+            best = e;
+        }
+    }
+    return best;
+}
+
+/// 在 entities 中找"起始字节恰好等于 start_byte"的实体（即紧贴在该位置右侧）。
+auto entity_starting_at(const std::string& text,
+                        const std::vector<std::string>& entities,
+                        size_t start_byte) -> std::string {
+    std::string best;
+    for (const auto& e : entities) {
+        if (e.empty() || start_byte + e.size() > text.size()) continue;
+        if (text.compare(start_byte, e.size(), e) == 0 &&
+            e.size() > best.size()) {
+            best = e;
+        }
+    }
+    return best;
+}
+
 }  // namespace
 
 // ── 中文实体提取 ─────────────────────────────────────────────────
@@ -275,23 +307,38 @@ auto KnowledgeExtractor::extract_chinese_words_(
 
 auto KnowledgeExtractor::extract_triples(
     const std::string& text,
-    [[maybe_unused]] const std::vector<std::string>& entities)
+    const std::vector<std::string>& entities)
     -> std::vector<Triple> {
     std::vector<Triple> triples;
 
     for (const auto& pattern : relation_patterns_()) {
         auto pos = text.find(pattern.second);
         while (pos != std::string::npos) {
-            auto subject = extract_left_cjk(text, pos, 6);
             auto right_start = pos + pattern.second.size();
-            auto object = extract_right_cjk(text, right_start, 6);
+
+            // 语义化论元定位：优先把主/宾语对齐到"已学到的实体单元"
+            // （entities 由分词+统计涌现，边界是学出来的），而不是从关系词
+            // 左右硬截固定 6 字。命中实体边界 → 高置信；否则回退窗口截取
+            // （保召回、低置信），并在置信度上区分二者。
+            std::string subject = entity_ending_at(text, entities, pos);
+            std::string object = entity_starting_at(text, entities, right_start);
+            double confidence = 0.85;
+
+            if (subject.empty()) {
+                subject = extract_left_cjk(text, pos, 6);
+                confidence = 0.6;
+            }
+            if (object.empty()) {
+                object = extract_right_cjk(text, right_start, 6);
+                confidence = std::min(confidence, 0.6);
+            }
 
             if (cjk_count(subject) >= 2 && cjk_count(object) >= 2) {
                 Triple t;
                 t.subject = subject;
                 t.relation = pattern.first;
                 t.object = object;
-                t.confidence = 0.8;
+                t.confidence = confidence;
                 triples.push_back(std::move(t));
             }
 
