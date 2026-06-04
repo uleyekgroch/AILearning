@@ -58,16 +58,29 @@ static std::string to_lower(const std::string& s) {
 
 static std::vector<std::string> tokenize_chinese(const std::string& text) {
     std::vector<std::string> chars;
+    // contig[i]==true 表示 chars[i] 与 chars[i-1] 在原文中紧邻（中间无空格/标点/
+    // 被过滤的停用词）。仅在连续 CJK 串内部生成 n-gram，避免产生跨词边界的
+    // 伪 n-gram（如 "苹果 水果" 误合成 "果水"），这类碎片会污染语义信号。
+    std::vector<bool> contig;
     std::string buffer;
     bool in_ascii = false;
+    bool break_pending = true;  // 下一个 token 是否与上一个存在边界（起始为真）
+
+    auto push_tok = [&](const std::string& tok) {
+        chars.push_back(tok);
+        contig.push_back(!break_pending);
+        break_pending = false;
+    };
 
     auto flush_ascii = [&]() {
         if (in_ascii && !buffer.empty()) {
             if (buffer.size() > 1 &&
                 cn_stopwords().count(buffer) == 0 &&
                 en_stopwords().count(to_lower(buffer)) == 0) {
-                chars.push_back(buffer);
+                break_pending = true;   // ASCII 词与两侧 CJK 不连续
+                push_tok(buffer);
             }
+            break_pending = true;
             buffer.clear();
             in_ascii = false;
         }
@@ -83,14 +96,13 @@ static std::vector<std::string> tokenize_chinese(const std::string& text) {
             if (i + byte_len <= text.size()) {
                 auto ch = text.substr(i, byte_len);
                 if (cn_stopwords().count(ch) == 0) {
-                    chars.push_back(ch);
+                    push_tok(ch);
+                } else {
+                    break_pending = true;  // 被过滤的停用词造成边界
                 }
             }
             i += byte_len;
         } else {
-            if (!buffer.empty() && !in_ascii) {
-                // 切换到 ASCII 模式前清空非 ASCII 缓冲
-            }
             in_ascii = true;
             if (std::isalnum(uc) || text[i] == '_') {
                 buffer += text[i];
@@ -98,8 +110,10 @@ static std::vector<std::string> tokenize_chinese(const std::string& text) {
                 if (!buffer.empty() && buffer.size() > 1 &&
                     cn_stopwords().count(buffer) == 0 &&
                     en_stopwords().count(to_lower(buffer)) == 0) {
-                    chars.push_back(buffer);
+                    break_pending = true;
+                    push_tok(buffer);
                 }
+                break_pending = true;  // 标点/空格造成边界
                 buffer.clear();
                 in_ascii = false;
             }
@@ -111,11 +125,12 @@ static std::vector<std::string> tokenize_chinese(const std::string& text) {
         if (buffer.size() > 1 &&
             cn_stopwords().count(buffer) == 0 &&
             en_stopwords().count(to_lower(buffer)) == 0) {
-            chars.push_back(buffer);
+            break_pending = true;
+            push_tok(buffer);
         }
     }
 
-    // 生成 bigram 和 trigram（仅连续中文字符）
+    // 生成 bigram 和 trigram（仅在连续 CJK 串内部）
     std::vector<std::string> tokens;
     tokens.reserve(chars.size() * 3);
     for (const auto& t : chars) tokens.push_back(t);
@@ -123,13 +138,14 @@ static std::vector<std::string> tokenize_chinese(const std::string& text) {
     int n = static_cast<int>(chars.size());
     for (int i = 0; i < n; ++i) {
         if (!is_cn_char(chars[i])) continue;
-        if (i + 1 < n && is_cn_char(chars[i + 1])) {
+        bool adj1 = i + 1 < n && is_cn_char(chars[i + 1]) && contig[i + 1];
+        if (adj1) {
             auto bigram = chars[i] + chars[i + 1];
             if (cn_stopwords().count(bigram) == 0) {
                 tokens.push_back(bigram);
             }
         }
-        if (i + 2 < n && is_cn_char(chars[i + 1]) && is_cn_char(chars[i + 2])) {
+        if (adj1 && i + 2 < n && is_cn_char(chars[i + 2]) && contig[i + 2]) {
             auto trigram = chars[i] + chars[i + 1] + chars[i + 2];
             if (cn_stopwords().count(trigram) == 0) {
                 tokens.push_back(trigram);

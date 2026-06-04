@@ -142,6 +142,18 @@ cd scripts && ./download_models.sh --model llm   # 仅下载对话模型
 # RTX 4060 Laptop 8GB 推荐 10-15 层，可获得 3.5x 加速
 ./ai_learning_server --llm-model ../models/qwen2.5-3b-instruct-q4_k_m.gguf --gpu-layers 15
 
+# ⚠️ 立场说明（仿人类 vs LLM）：
+#   本系统的「学习内核」（预测编码 + 分布语义 + 知识图谱 + 海马/皮层记忆）
+#   默认完全不依赖任何大模型，纯 CPU、从零自学——这是项目的第一性原理。
+#   LLM（本地 llama.cpp 或云端 DashScope）是**严格可选的对话增强**，默认关闭：
+#     - 本地模型：仅当显式传入 --llm-model <gguf> 时启用；
+#     - 云端 API：仅当显式设置环境变量 DASHSCOPE_API_KEY 时启用，
+#                 源码中**不再硬编码任何密钥**，缺失即安全降级为离线 Stub。
+#   即默认运行路径绝不会偷偷联网调用任何大模型。
+#   云端对话示例（需自备 key，用完请在控制台吊销）：
+#     export DASHSCOPE_API_KEY="你自己的key"
+#     ./ai_learning_server --port 8080
+
 # 健康检查
 curl http://localhost:8080/api/health
 curl http://localhost:8080/api/health/live    # Kubernetes liveness

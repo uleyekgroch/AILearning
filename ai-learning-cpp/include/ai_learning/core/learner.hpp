@@ -62,8 +62,10 @@
 #include "ai_learning/social/tutoring_system.hpp"
 #include "ai_learning/learning/mirror_neuron.hpp"
 #include "ai_learning/perception/haptic_encoder.hpp"
+#include "ai_learning/perception/visual_grounding.hpp"
 
 #include <chrono>
+#include <cstdint>
 #include <deque>
 #include <map>
 #include <memory>
@@ -130,11 +132,36 @@ public:
     auto think(const std::string& question) const
         -> std::string;
 
+    /// 神经↔符号桥：用预测编码引擎学到的连续表示，从一个概念联想到相关概念。
+    ///
+    /// 流程：concept → 分布语义稠密向量(obs_dim) → PC 引擎 predict(前向动作)
+    ///       → 预测出的"下一状态"向量 → find_nearest 映射回符号概念。
+    /// 这让预测编码内核学到的动态真正反哺符号层，而不是只用字符串拼接。
+    /// 返回 (概念, 余弦相似度) 列表，按相似度降序。
+    [[nodiscard]] auto semantic_associate(const std::string& concept_name,
+                                          int top_k = 5) const
+        -> std::vector<std::pair<std::string, double>>;
+
     // ── 感知循环 ─────────────────────────────────────────────────
 
     /// 感知原始输入（使用多模态编码器）
     auto perceive(const std::map<std::string, std::vector<float>>& raw_input)
         -> std::vector<float>;
+
+    // ── 多模态接地（文本↔图片，零预训练）────────────────────────
+    // 复用既有 GroundingModule，把"从零感知编码"的图像向量与文字符号绑定，
+    // 让符号从视觉经验获得接地（而非依赖预训练视觉大模型）。
+
+    /// 学习：把一张灰度图（width*height 个 8 位像素）与文字符号绑定，
+    /// 返回该图的感知聚类 ID（失败返回 -1）。
+    auto ground_image(const std::string& symbol,
+                      const std::vector<std::uint8_t>& gray_pixels,
+                      int width, int height) -> int;
+
+    /// 识别：给一张新灰度图，返回最匹配的已学符号及相似度（无匹配返回 {"",0}）。
+    auto recognize_image(const std::vector<std::uint8_t>& gray_pixels,
+                         int width, int height)
+        -> std::pair<std::string, float>;
 
     /// 选择动作（好奇心驱动）
     auto choose_action(const std::vector<float>& obs) -> int;

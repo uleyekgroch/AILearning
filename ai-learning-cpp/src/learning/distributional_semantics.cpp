@@ -191,7 +191,7 @@ auto DistributionalSemantics::find_nearest(const std::vector<float>& vec, int to
 }
 
 auto DistributionalSemantics::most_similar(
-    const std::string& cpt, int top_k) const
+    const std::string& cpt, int top_k, bool exclude_ngram_overlap) const
     -> std::vector<SimilarityResult>
 {
     auto it = vectors_.find(cpt);
@@ -200,6 +200,12 @@ auto DistributionalSemantics::most_similar(
     std::vector<SimilarityResult> results;
     for (const auto& [other, vec] : vectors_) {
         if (other == cpt) continue;
+        // 过滤同源 n-gram 碎片（一个串包含另一个）
+        if (exclude_ngram_overlap &&
+            (other.find(cpt) != std::string::npos ||
+             cpt.find(other) != std::string::npos)) {
+            continue;
+        }
 
         SimilarityResult sr;
         sr.cpt_a = cpt;

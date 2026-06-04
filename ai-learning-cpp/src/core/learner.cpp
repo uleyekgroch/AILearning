@@ -23,6 +23,16 @@ namespace ai_learning::core {
 using namespace learning;
 using namespace domain::knowledge;
 
+namespace {
+/// 是否为同源 n-gram 碎片（一个串包含另一个），如 "数学研" vs "数学"。
+/// 中文分词会产生 unigram/bigram/trigram，这类碎片会污染语义近邻排序，
+/// 在"概念联想"语境下应过滤掉，只保留真正不同的概念。
+auto is_ngram_fragment(const std::string& a, const std::string& b) -> bool {
+    if (a == b) return true;
+    return a.find(b) != std::string::npos || b.find(a) != std::string::npos;
+}
+}  // namespace
+
 // ── 构造 ────────────────────────────────────────────────────────
 
 Learner::Learner(const LearnerConfig& config)
@@ -330,7 +340,58 @@ auto Learner::think(const std::string& question) const
         }
     }
 
+    // 路径 5: 神经↔符号桥（用自学的分布语义 + 预测编码联想作答）
+    // 当符号管线无法直接命中时，退而用"系统自己学到的语义空间"回答，
+    // 而不是直接放弃。这里全程不依赖任何外部大模型。
+    for (const auto& entity : entities) {
+        if (!ds_.has_cpt(entity)) continue;
+
+        // (a) 分布语义近邻：基于上下文共现分布的相似概念（过滤同源碎片）
+        auto neighbors = ds_.most_similar(entity, 3, /*exclude_ngram_overlap=*/true);
+        // (b) 预测编码联想：PC 引擎从概念向量预测出的相关概念
+        auto assoc = semantic_associate(entity, 3);
+
+        std::string sem;
+        if (!neighbors.empty()) {
+            sem += entity + " 在语义上与 ";
+            for (size_t i = 0; i < neighbors.size(); ++i) {
+                if (i > 0) sem += "、";
+                sem += neighbors[i].cpt_b;
+            }
+            sem += " 相近（基于上下文分布）";
+        }
+        if (!assoc.empty()) {
+            sem += sem.empty() ? "" : "；";
+            sem += "预测编码联想到 " + assoc.front().first;
+        }
+        if (sem.size() > 5) return sem;
+    }
+
     return answer;
+}
+
+auto Learner::semantic_associate(const std::string& concept_name,
+                                 int top_k) const
+    -> std::vector<std::pair<std::string, double>> {
+    // 1. 取概念在自学分布语义空间中的稠密向量（维度对齐 PC 引擎的 obs_dim）
+    auto vec_opt = ds_.get_dense_vector(concept_name, config_.obs_dim);
+    if (!vec_opt || !engine_) return {};
+
+    // 2. 用预测编码引擎做一次前向预测（"下一个会想到什么"）
+    std::vector<float> action(config_.action_dim, 0.0f);
+    if (config_.action_dim > 0) action[0] = 1.0f;  // 前向动作
+    auto predicted = engine_->predict(*vec_opt, action);
+    if (predicted.empty()) return {};
+
+    // 3. 把预测出的连续向量映射回最接近的符号概念（过滤掉概念本身的同源碎片）
+    auto nearest = ds_.find_nearest(predicted, top_k + 5);
+    std::vector<std::pair<std::string, double>> result;
+    for (const auto& cand : nearest) {
+        if (is_ngram_fragment(concept_name, cand.first)) continue;
+        result.push_back(cand);
+        if (static_cast<int>(result.size()) >= top_k) break;
+    }
+    return result;
 }
 
 // ── 感知循环 ─────────────────────────────────────────────────────
@@ -339,6 +400,22 @@ auto Learner::perceive(
     const std::map<std::string, std::vector<float>>& raw_input)
     -> std::vector<float> {
     return encoder_.encode(raw_input);
+}
+
+auto Learner::ground_image(const std::string& symbol,
+                           const std::vector<std::uint8_t>& gray_pixels,
+                           int width, int height) -> int {
+    // 复用已持有的 GroundingModule（此前从未进入闭环）。VisualGroundingSystem
+    // 仅是无状态包装：图像编码无预训练，持久状态都落在 grounding_ 里。
+    perception::VisualGroundingSystem vg(grounding_);
+    return vg.learn_symbol(symbol, gray_pixels, width, height);
+}
+
+auto Learner::recognize_image(const std::vector<std::uint8_t>& gray_pixels,
+                              int width, int height)
+    -> std::pair<std::string, float> {
+    perception::VisualGroundingSystem vg(grounding_);
+    return vg.recognize(gray_pixels, width, height);
 }
 
 auto Learner::choose_action(const std::vector<float>& obs) -> int {
@@ -1018,11 +1095,36 @@ void Learner::run_conscious_loop(int ticks) {
                     // 将推演结果存入记忆，或者产生新的情绪
                     auto nearest = ds_.find_nearest(pred, 1);
                     if (!nearest.empty()) {
+                        const std::string& related = nearest[0].first;
                         consciousness::WorkspaceThought insight;
                         insight.source_module = "predictive_engine";
-                        insight.symbolic_content = "啊！我想到 " + target + " 可能和 " + nearest[0].first + " 有关！";
+                        insight.symbolic_content = "啊！我想到 " + target + " 可能和 " + related + " 有关！";
                         insight.surprise_value = 0.8;
                         workspace_.submit_thought(insight);
+
+                        // ★ 让 CreativeEngine 真正进入核心意识闭环：
+                        // 以"自学分布语义空间"为素材，对这次预测顿悟做一次远距联想，
+                        // 并把有价值的创意写入自传体记忆。这样创造力模块不再只是
+                        // REST 陈列品，而是消费预测编码 + 分布语义的产物。
+                        std::vector<creativity::ConceptNode> knowledge;
+                        for (const auto& nb : ds_.most_similar(target, 5, /*exclude_ngram_overlap=*/true)) {
+                            creativity::ConceptNode node;
+                            node.name = nb.cpt_b;
+                            node.activation = nb.similarity;
+                            knowledge.push_back(node);
+                        }
+                        creativity::ConceptNode na; na.name = target; knowledge.push_back(na);
+                        creativity::ConceptNode nr; nr.name = related; knowledge.push_back(nr);
+
+                        auto idea = creative_engine_.remote_associate(target, related, knowledge);
+                        if (idea) {
+                            consciousness::AutobiographicalMemory cmem;
+                            cmem.narrative = "我用想象力把「" + target + "」和「" + related +
+                                             "」联系起来：" + idea->idea;
+                            cmem.emotional_intensity = idea->surprise;
+                            cmem.importance = idea->novelty;
+                            self_model_.remember(cmem);
+                        }
                     }
                 }
             } else if (focus->source_module == "predictive_engine" && !focus->symbolic_content.empty()) {
