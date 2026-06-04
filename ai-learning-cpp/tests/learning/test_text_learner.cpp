@@ -130,3 +130,99 @@ TEST_CASE("TextLearner: 矛盾检测") {
         REQUIRE(result.entities.empty() == false);
     }
 }
+
+// ── 无监督分词 + 依存解析在线管线对接 ───────────────────────────
+
+namespace {
+
+/// 生成内容词多上下文的无空格语料（同 segment_eval），供解析器训练。
+auto make_parse_corpus() -> std::vector<std::string> {
+    std::vector<std::string> persons = {"学生", "老师", "医生", "工人", "农民"};
+    std::vector<std::string> subjects = {"数学", "物理", "化学", "历史", "地理"};
+    std::vector<std::string> animals = {"猫", "狗", "老虎", "兔子"};
+    std::vector<std::string> mods = {"聪明", "勤奋", "优秀", "可爱",
+                                     "重要", "有趣", "年轻"};
+    std::vector<std::string> verbs = {"喜欢", "学习", "研究", "讨厌"};
+    std::vector<std::string> pronouns = {"我", "他", "她", "你"};
+    std::vector<std::string> degree = {"很", "非常", "比较", "特别"};
+
+    std::vector<std::vector<std::string>> g;
+    auto add = [&](std::vector<std::string> ws) { g.push_back(std::move(ws)); };
+    for (const auto& p : persons) {
+        add({p, "是", "人类"});
+        add({"人类", "包括", p});
+    }
+    for (const auto& s : subjects) {
+        add({s, "是", "学科"});
+        add({s, "是", "知识"});
+        add({"学科", "包括", s});
+    }
+    for (const auto& a : animals) {
+        add({a, "是", "动物"});
+        add({"动物", "包括", a});
+    }
+    for (const auto& m : mods) {
+        for (const auto& p : persons) add({m, "的", p, "是", "人类"});
+        for (const auto& s : subjects) add({m, "的", s, "是", "学科"});
+        for (const auto& a : animals) add({m, "的", a, "是", "动物"});
+    }
+    for (const auto& p : persons)
+        for (const auto& d : degree)
+            for (const auto& m : mods) add({p, d, m});
+    for (const auto& s : subjects)
+        for (const auto& d : degree) add({s, d, "重要"});
+    for (const auto& pr : pronouns)
+        for (const auto& v : verbs)
+            for (const auto& s : subjects) add({pr, v, s});
+    for (const auto& p : persons)
+        for (const auto& v : verbs)
+            for (const auto& s : subjects) add({p, v, s});
+    for (const auto& pr : pronouns)
+        for (const auto& v : verbs)
+            for (const auto& a : animals) add({pr, v, a});
+    {
+        auto base = g;
+        for (int rep = 0; rep < 3; ++rep)
+            for (auto& s : base) g.push_back(s);
+    }
+
+    std::vector<std::string> raw;
+    raw.reserve(g.size());
+    for (const auto& ws : g) {
+        std::string j;
+        for (const auto& w : ws) j += w;
+        raw.push_back(j);
+    }
+    return raw;
+}
+
+}  // namespace
+
+TEST_CASE("TextLearner: 依存解析默认关闭、语料不足训练失败") {
+    KnowledgeGraph kg;
+    TextLearner learner(kg);
+
+    REQUIRE_FALSE(learner.dependency_parsing_enabled());
+    learner.learn_from_text("猫是动物");
+    REQUIRE_FALSE(learner.train_dependency_parser());  // 语料过少
+    REQUIRE_FALSE(learner.dependency_parsing_enabled());
+}
+
+TEST_CASE("TextLearner: 训练后启用句法树抽取并产出完整短语主语") {
+    KnowledgeGraph kg;
+    TextLearner learner(kg);
+    for (const auto& line : make_parse_corpus())
+        learner.learn_from_text(line, "test");
+
+    REQUIRE(learner.train_dependency_parser());
+    REQUIRE(learner.dependency_parsing_enabled());
+
+    auto res = learner.learn_from_text("聪明的学生是人类");
+    bool found = false;
+    for (const auto& t : res.triples)
+        if (t.relation == "是" && t.object == "人类" &&
+            t.subject.find("学生") != std::string::npos) {
+            found = true;
+        }
+    REQUIRE(found);
+}
