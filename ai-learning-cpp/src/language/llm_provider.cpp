@@ -69,19 +69,25 @@ OpenAICompatibleProvider::OpenAICompatibleProvider(
     const std::string& api_key,
     const std::string& model)
     : base_url_(base_url), model_(model) {
-    // API Key 优先级：构造参数 > 环境变量 > 硬编码默认值
+    // API Key 优先级：构造参数 > 环境变量。
+    // 绝不在源码中硬编码密钥（安全 + 符合"默认零云端依赖"的纯仿人类立场）。
+    // 若两者都缺失，api_key_ 留空，complete() 会安全降级而非偷偷联网。
     if (!api_key.empty()) {
         api_key_ = api_key;
     } else {
         const char* env_key = std::getenv("DASHSCOPE_API_KEY");
-        api_key_ = (env_key != nullptr) ? env_key
-                    : "sk-b68b1187aba542c3b2fec09cdc02634c";
+        api_key_ = (env_key != nullptr) ? env_key : "";
     }
 }
 
 auto OpenAICompatibleProvider::complete(const std::string& prompt,
                                         const std::string& system_prompt)
     -> std::string {
+    // 安全降级：未配置 API Key 时绝不联网，明确告知调用方。
+    if (api_key_.empty()) {
+        return "[LLM 未配置：请设置 DASHSCOPE_API_KEY 环境变量后重试]";
+    }
+
     // 构建 OpenAI 兼容请求体
     nlohmann::json messages = nlohmann::json::array();
 

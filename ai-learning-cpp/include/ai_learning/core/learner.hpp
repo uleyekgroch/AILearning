@@ -130,6 +130,16 @@ public:
     auto think(const std::string& question) const
         -> std::string;
 
+    /// 神经↔符号桥：用预测编码引擎学到的连续表示，从一个概念联想到相关概念。
+    ///
+    /// 流程：concept → 分布语义稠密向量(obs_dim) → PC 引擎 predict(前向动作)
+    ///       → 预测出的"下一状态"向量 → find_nearest 映射回符号概念。
+    /// 这让预测编码内核学到的动态真正反哺符号层，而不是只用字符串拼接。
+    /// 返回 (概念, 余弦相似度) 列表，按相似度降序。
+    [[nodiscard]] auto semantic_associate(const std::string& concept_name,
+                                          int top_k = 5) const
+        -> std::vector<std::pair<std::string, double>>;
+
     // ── 感知循环 ─────────────────────────────────────────────────
 
     /// 感知原始输入（使用多模态编码器）

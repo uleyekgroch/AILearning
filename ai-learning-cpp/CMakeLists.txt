@@ -256,6 +256,11 @@ target_link_libraries(ai_learning_benchmark PRIVATE ai_learning)
 add_executable(ai_learning_benchmark_engines benchmark_engines.cpp)
 target_link_libraries(ai_learning_benchmark_engines PRIVATE ai_learning)
 
+# ── 客观语义评测（零大模型，量化自学语义能力）─────────────────────
+add_executable(ai_learning_semantic_eval semantic_eval.cpp)
+target_link_libraries(ai_learning_semantic_eval PRIVATE ai_learning)
+target_include_directories(ai_learning_semantic_eval PRIVATE include)
+
 # ── 调试程序 ────────────────────────────────────────────────────
 add_executable(debug_main debug_main.cpp)
 target_link_libraries(debug_main PRIVATE ai_learning)

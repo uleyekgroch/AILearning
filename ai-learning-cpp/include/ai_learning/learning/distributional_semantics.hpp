@@ -123,8 +123,14 @@ public:
         -> SimilarityResult;
 
     /// 找到最相似的概念
+    ///
+    /// @param exclude_ngram_overlap  为 true 时过滤与查询概念同源的 n-gram 碎片
+    ///        （一个串包含另一个，如 "数学研" vs "数学"）。中文分词会产生大量
+    ///        unigram/bigram/trigram，这类碎片会污染语义近邻排序；在"概念联想"
+    ///        语境下应排除，只保留真正不同的概念。默认 false 以保持向后兼容。
     auto most_similar(const std::string& cpt,
-                      int top_k = 10) const
+                      int top_k = 10,
+                      bool exclude_ngram_overlap = false) const
         -> std::vector<SimilarityResult>;
 
     /// 语义类比：A 之于 B，如同 C 之于 ?

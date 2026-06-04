@@ -26,7 +26,10 @@ from typing import Dict, List, Optional
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # ── 配置 ──────────────────────────────────────────────────
-API_KEY = 'sk-b68b1187aba542c3b2fec09cdc02634c'
+# 绝不硬编码密钥：仅从环境变量读取。
+API_KEY = os.environ.get('DASHSCOPE_API_KEY', '')
+if not API_KEY:
+    raise SystemExit('请先设置 DASHSCOPE_API_KEY 环境变量再运行此脚本')
 BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1'
 MODEL = 'qwen-turbo-latest'  # 最快，适合大批量
 DATA_DIR = Path('data/knowledge')

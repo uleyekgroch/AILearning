@@ -23,6 +23,16 @@ namespace ai_learning::core {
 using namespace learning;
 using namespace domain::knowledge;
 
+namespace {
+/// 是否为同源 n-gram 碎片（一个串包含另一个），如 "数学研" vs "数学"。
+/// 中文分词会产生 unigram/bigram/trigram，这类碎片会污染语义近邻排序，
+/// 在"概念联想"语境下应过滤掉，只保留真正不同的概念。
+auto is_ngram_fragment(const std::string& a, const std::string& b) -> bool {
+    if (a == b) return true;
+    return a.find(b) != std::string::npos || b.find(a) != std::string::npos;
+}
+}  // namespace
+
 // ── 构造 ────────────────────────────────────────────────────────
 
 Learner::Learner(const LearnerConfig& config)
@@ -330,7 +340,58 @@ auto Learner::think(const std::string& question) const
         }
     }
 
+    // 路径 5: 神经↔符号桥（用自学的分布语义 + 预测编码联想作答）
+    // 当符号管线无法直接命中时，退而用"系统自己学到的语义空间"回答，
+    // 而不是直接放弃。这里全程不依赖任何外部大模型。
+    for (const auto& entity : entities) {
+        if (!ds_.has_cpt(entity)) continue;
+
+        // (a) 分布语义近邻：基于上下文共现分布的相似概念（过滤同源碎片）
+        auto neighbors = ds_.most_similar(entity, 3, /*exclude_ngram_overlap=*/true);
+        // (b) 预测编码联想：PC 引擎从概念向量预测出的相关概念
+        auto assoc = semantic_associate(entity, 3);
+
+        std::string sem;
+        if (!neighbors.empty()) {
+            sem += entity + " 在语义上与 ";
+            for (size_t i = 0; i < neighbors.size(); ++i) {
+                if (i > 0) sem += "、";
+                sem += neighbors[i].cpt_b;
+            }
+            sem += " 相近（基于上下文分布）";
+        }
+        if (!assoc.empty()) {
+            sem += sem.empty() ? "" : "；";
+            sem += "预测编码联想到 " + assoc.front().first;
+        }
+        if (sem.size() > 5) return sem;
+    }
+
     return answer;
+}
+
+auto Learner::semantic_associate(const std::string& concept_name,
+                                 int top_k) const
+    -> std::vector<std::pair<std::string, double>> {
+    // 1. 取概念在自学分布语义空间中的稠密向量（维度对齐 PC 引擎的 obs_dim）
+    auto vec_opt = ds_.get_dense_vector(concept_name, config_.obs_dim);
+    if (!vec_opt || !engine_) return {};
+
+    // 2. 用预测编码引擎做一次前向预测（"下一个会想到什么"）
+    std::vector<float> action(config_.action_dim, 0.0f);
+    if (config_.action_dim > 0) action[0] = 1.0f;  // 前向动作
+    auto predicted = engine_->predict(*vec_opt, action);
+    if (predicted.empty()) return {};
+
+    // 3. 把预测出的连续向量映射回最接近的符号概念（过滤掉概念本身的同源碎片）
+    auto nearest = ds_.find_nearest(predicted, top_k + 5);
+    std::vector<std::pair<std::string, double>> result;
+    for (const auto& cand : nearest) {
+        if (is_ngram_fragment(concept_name, cand.first)) continue;
+        result.push_back(cand);
+        if (static_cast<int>(result.size()) >= top_k) break;
+    }
+    return result;
 }
 
 // ── 感知循环 ─────────────────────────────────────────────────────
