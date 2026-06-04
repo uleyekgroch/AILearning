@@ -19,8 +19,17 @@ using namespace domain::knowledge;
 
 // ── 构造 ────────────────────────────────────────────────────────
 
+namespace {
+/// 小语料友好配置：降低概念最低频率门槛，使中等规模语料也能形成概念向量。
+auto make_semantics_config() -> DistributionalSemanticsConfig {
+    DistributionalSemanticsConfig c;
+    c.min_cpt_freq = 2;  // 默认 3 对小语料过严
+    return c;
+}
+}  // namespace
+
 TextLearner::TextLearner(KnowledgeGraph& kg)
-    : kg_(kg) {
+    : kg_(kg), semantics_(make_semantics_config()) {
     stats_["total_learned"] = 0;
     stats_["verified"] = 0;
     stats_["failed"] = 0;
@@ -95,6 +104,9 @@ auto TextLearner::learn_from_text(const std::string& text,
 
     // 6. STDP 学习
     update_stdp_connections_(result.entities);
+
+    // 6b. 增量填充自学分布语义空间（PPMI 共现，零大模型），供语义联想兜底。
+    semantics_.learn_from_text(text);
 
     // 7. 海马记忆存储
     store_hippocampal_episode_(text, result.entities, result.triples);
@@ -286,7 +298,7 @@ auto TextLearner::think(const std::string& question) const
     auto self_ans = answer_self_referential_(question);
     if (!self_ans.empty()) return self_ans;
 
-    // 路径 0: 常识库查询
+    // 路径 0: 常识库查询（KG 直接命中；命中失败时用自学语义空间联想兜底）
     auto common = query_commonsense_(question);
     if (!common.empty()) return common;
 
@@ -522,6 +534,44 @@ auto TextLearner::query_commonsense_(const std::string& question) const
                 return entity + " 位于 " + obj + "（基于已学知识）";
             }
         }
+    }
+
+    // KG 没有意图所需的直接关系 → 用自学的分布语义空间做常识式联想兜底，
+    // 而不是返回空（从而落到海马"原句回放"）。这正是 3.4b「填充常识库」的核心：
+    // 把恒空的常识查询接上系统自己学到的语义共现知识。
+    return query_semantic_(question);
+}
+
+auto TextLearner::query_semantic_(const std::string& question) const
+    -> std::string {
+    // 常识查询里 KG 无直接命中时的语义联想兜底：用自学的 PPMI 分布语义空间
+    // 给出"X 通常与 A、B 一同出现"式回答，而不是返回空。
+    // 全程零大模型——近邻完全来自语料共现统计。
+    auto entities = KnowledgeExtractor::extract_entities(question);
+    for (const auto& entity : entities) {
+        if (!semantics_.has_cpt(entity)) continue;
+
+        // 过滤同源 n-gram 碎片（如"人工智"之于"人工智能"），只保留真正不同的概念。
+        auto neighbors =
+            semantics_.most_similar(entity, 30, /*exclude_ngram_overlap=*/true);
+
+        std::vector<std::string> related;
+        for (const auto& n : neighbors) {
+            if (n.similarity <= 0.1) continue;        // 噪声近邻丢弃
+            if (!kg_.has_entity(n.cpt_b)) continue;   // 只联想真实概念，滤掉 n-gram 碎片
+            if (n.cpt_b == entity) continue;
+            related.push_back(n.cpt_b);
+            if (related.size() >= 3) break;
+        }
+        if (related.empty()) continue;
+
+        std::string answer = entity + " 通常与 ";
+        for (size_t i = 0; i < related.size(); ++i) {
+            if (i > 0) answer += "、";
+            answer += related[i];
+        }
+        answer += " 一同出现（基于已学语义共现）";
+        return answer;
     }
     return "";
 }

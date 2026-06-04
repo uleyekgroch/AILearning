@@ -289,3 +289,70 @@ TEST_CASE("SelfModel: 非自我指涉问题不被自我路径劫持") {
     REQUIRE(ans.find("认识自己") == std::string::npos);
     REQUIRE(ans.find("自评确信度") == std::string::npos);
 }
+
+// ── 常识库填充：KG 落空时用自学语义空间联想兜底（3.4b）──────────────
+
+namespace {
+/// 三种水果共享同一组内容词上下文（无「是/属于」线索），强制走语义兜底；
+/// 上下文一致使水果彼此分布相似度最高、稳定盖过单个属性词。
+void learn_fruit_corpus(TextLearner& learner) {
+    const std::vector<std::string> lines = {
+        "苹果 甜 水果 好吃 营养 健康 多汁 新鲜",
+        "香蕉 甜 水果 好吃 营养 健康 多汁 新鲜",
+        "橙子 甜 水果 好吃 营养 健康 多汁 新鲜",
+    };
+    for (int e = 0; e < 30; ++e)
+        for (const auto& l : lines) learner.learn_from_text(l, "test");
+}
+}  // namespace
+
+TEST_CASE("常识库填充: KG 直接命中优先于语义兜底") {
+    KnowledgeGraph kg;
+    TextLearner learner(kg);
+    learner.learn_from_text("人工智能是计算机科学的一个分支");
+
+    auto ans = learner.think("什么是人工智能");
+    // KG 有「是」关系 → 返回事实，不应退化到语义共现兜底
+    REQUIRE(ans.find("基于已学知识") != std::string::npos);
+    REQUIRE(ans.find("基于已学语义共现") == std::string::npos);
+}
+
+TEST_CASE("常识库填充: KG 无关系时用自学语义联想作答") {
+    KnowledgeGraph kg;
+    TextLearner learner(kg);
+    learn_fruit_corpus(learner);
+
+    auto ans = learner.think("什么是苹果");
+
+    SECTION("返回语义联想而非『不知道』或原句回放") {
+        REQUIRE(ans.find("通常与") != std::string::npos);
+        REQUIRE(ans.find("基于已学语义共现") != std::string::npos);
+        REQUIRE(ans.find("抱歉") == std::string::npos);
+        REQUIRE(ans.find("根据记忆") == std::string::npos);
+    }
+
+    SECTION("联想到同类概念（香蕉/橙子），不混入 n-gram 碎片") {
+        REQUIRE((ans.find("香蕉") != std::string::npos ||
+                 ans.find("橙子") != std::string::npos));
+    }
+}
+
+TEST_CASE("常识库填充: 未学概念不产生幻觉联想") {
+    KnowledgeGraph kg;
+    TextLearner learner(kg);
+    learn_fruit_corpus(learner);
+
+    // 「火星」从未出现在语料 → 语义空间无此概念 → 坦诚不知道
+    auto ans = learner.think("什么是火星");
+    REQUIRE(ans.find("抱歉") != std::string::npos);
+}
+
+TEST_CASE("常识库填充: 无意图问题不触发语义兜底") {
+    KnowledgeGraph kg;
+    TextLearner learner(kg);
+    learn_fruit_corpus(learner);
+
+    // 不含定义/因果/位置意图词 → query_commonsense_ 不会触发语义联想
+    auto ans = learner.think("苹果香蕉");
+    REQUIRE(ans.find("基于已学语义共现") == std::string::npos);
+}
