@@ -91,7 +91,7 @@ TEST_CASE("语义基准: CreativeEngine 创意新颖性由注入语义驱动",
             auto key = std::minmax(a, b);
             if (key.first == "狗" && key.second == "猫") return 0.1;
             if (key.first == "猫" && key.second == "量子") return 0.9;
-            if (key.first == "量子" && key.second == "狗") return 0.9;
+            if (key.first == "狗" && key.second == "量子") return 0.9;
             return std::nullopt;
         });
     REQUIRE(engine.has_semantic_provider());
