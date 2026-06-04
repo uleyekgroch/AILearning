@@ -20,15 +20,25 @@
 #include <cstdint>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
+
+#include "ai_learning/utils/utf8.hpp"
 
 namespace ai_learning::learning {
 
 struct SegmenterConfig {
-    int max_word_len = 4;        ///< 候选词最大字数 L
+    int max_word_len = 6;        ///< 候选词最大字数 L（≥3 可发现复合词）
     int min_count = 3;           ///< 候选多字词最低频
     double min_cohesion = 2.0;   ///< 内部凝固度阈值（自然对数）
     double min_freedom = 0.4;    ///< 左右邻接熵下界（min(左,右)）
+
+    // ── 虚词消歧（自动发现，零词典）──
+    /// 虚词（的/了/是/在/很…）= 高频 + 左右两侧都极"自由"的单字。
+    /// 判定：频次占比 ≥ fw_min_freq 且 min(左熵,右熵) ≥ fw_min_entropy。
+    /// 阈值取在"虚词(min熵≳1.5) 与 内容词素(学/机, min熵≲1.2)"之间。
+    double fw_min_freq = 0.02;     ///< 虚词单字最低频次占比
+    double fw_min_entropy = 1.4;   ///< 虚词左右分支熵下界（取 min(左,右)）
 };
 
 /// 无监督分词器
@@ -59,12 +69,33 @@ public:
         return logp_.count(w) > 0;
     }
 
+    /// 学到的全部多字词（不含单字兜底），用于评测/检视
+    [[nodiscard]] auto multichar_words() const -> std::vector<std::string> {
+        std::vector<std::string> out;
+        for (const auto& [w, lp] : logp_) {
+            (void)lp;
+            if (utils::utf8_chars(w).size() >= 2) out.push_back(w);
+        }
+        return out;
+    }
+
+    /// 某个单字是否被判定为虚词（的/了/是…，无监督自动发现）
+    [[nodiscard]] auto is_function_word(const std::string& ch) const -> bool {
+        return function_words_.count(ch) > 0;
+    }
+
+    /// 自动发现的虚词数量
+    [[nodiscard]] auto function_word_count() const -> std::size_t {
+        return function_words_.size();
+    }
+
 private:
     SegmenterConfig cfg_;
     bool trained_ = false;
     std::size_t multichar_count_ = 0;
     double oov_logp_ = -30.0;
     std::unordered_map<std::string, double> logp_;  ///< 词 → log 概率
+    std::unordered_set<std::string> function_words_;  ///< 自动发现的虚词单字
 
     /// Viterbi 最大概率切分（输入为单字序列）
     [[nodiscard]] auto viterbi_(const std::vector<std::string>& chars) const
