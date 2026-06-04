@@ -142,6 +142,16 @@ Learner::Learner(const LearnerConfig& config,
     unified_engine_.set_predictive_engine(engine_.get());
     unified_engine_.set_distributional_semantics(&ds_);
 
+    // 让 CreativeEngine 用真实分布语义评估创意（依赖倒置）：
+    // 概念都在语义空间中才返回距离，否则回退到字符级 Jaccard。
+    creative_engine_.set_semantic_distance_provider(
+        [this](const std::string& a, const std::string& b)
+            -> std::optional<double> {
+            if (!ds_.has_cpt(a) || !ds_.has_cpt(b)) return std::nullopt;
+            double sim = ds_.similarity(a, b).similarity;  // 余弦 -1~1
+            return 1.0 - std::clamp(sim, 0.0, 1.0);         // → 距离 0~1
+        });
+
     // 初始化预训练嵌入提供者（llama.cpp）
     #ifdef AI_LEARNING_WITH_LLAMA_CPP
     if (!config_.embedding_model_path.empty()) {
