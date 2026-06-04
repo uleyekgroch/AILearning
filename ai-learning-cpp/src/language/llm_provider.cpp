@@ -12,6 +12,10 @@
 #include <sstream>
 #include <string>
 
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
 namespace ai_learning::language {
 
 // ═══════════════════════════════════════════════════════════════════
@@ -128,14 +132,33 @@ auto OpenAICompatibleProvider::exec_curl_(const std::string& url,
                                           const std::string& body_json) const
     -> std::string {
     // 通过 curl 子进程执行 HTTPS POST，避免 OpenSSL 依赖
-    // 将 JSON body 写入临时文件以避免 shell 转义问题
-    std::string tmp_path = std::tmpnam(nullptr);
-
-    // 写入请求体到临时文件
+    // 将 JSON body 写入临时文件以避免 shell 转义问题。
+    // 用 mkstemp(POSIX)/tmpnam_s(Windows) 原子创建，规避 tmpnam 的 TOCTOU 风险。
+    std::string tmp_path;
+#ifdef _WIN32
+    char name_buf[L_tmpnam_s];
+    if (tmpnam_s(name_buf, sizeof(name_buf)) != 0) {
+        return "";
+    }
+    tmp_path = name_buf;
     std::FILE* tmp = std::fopen(tmp_path.c_str(), "w");
     if (!tmp) {
         return "";
     }
+#else
+    char path_template[] = "/tmp/ai_llm_req_XXXXXX";
+    int fd = mkstemp(path_template);
+    if (fd < 0) {
+        return "";
+    }
+    tmp_path = path_template;
+    std::FILE* tmp = fdopen(fd, "w");
+    if (!tmp) {
+        close(fd);
+        std::remove(tmp_path.c_str());
+        return "";
+    }
+#endif
     std::fputs(body_json.c_str(), tmp);
     std::fclose(tmp);
 

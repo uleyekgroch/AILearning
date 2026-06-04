@@ -24,7 +24,16 @@ void Learner::save(const std::string& path) const {
         {"pc_steps", pc_steps_}
     };
 
-    // 2. Predictive Engine Tensors (潜意识神经突触权重)
+    // 2. Config (重建大脑所需的关键配置)
+    snap["config"] = {
+        {"obs_dim", config_.obs_dim},
+        {"action_dim", config_.action_dim},
+        {"hidden_dims", config_.hidden_dims},
+        {"learning_rate", config_.learning_rate},
+        {"initial_stage", config_.initial_stage}
+    };
+
+    // 3. Predictive Engine Tensors (潜意识神经突触权重)
     if (engine_) {
         auto p_state = engine_->save_state();
         snap["predictive_engine"]["weights"] = p_state.weights;
@@ -36,7 +45,7 @@ void Learner::save(const std::string& path) const {
         snap["semantic_engine"]["shape"] = s_state.shape;
     }
 
-    // 3. Knowledge Graph (大脑皮层语义图谱)
+    // 4. Knowledge Graph (大脑皮层语义图谱)
     json kg_json = json::array();
     auto all_ids = kg_.get_all_entity_ids();
     for (const auto& id : all_ids) {

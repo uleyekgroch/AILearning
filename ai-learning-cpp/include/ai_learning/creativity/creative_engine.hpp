@@ -404,15 +404,41 @@ inline auto CreativeEngine::assess_surprise(
 
 inline auto CreativeEngine::semantic_distance_(
     const std::string& a, const std::string& b) -> double {
-    // 简化的语义距离：基于字符串相似度
+    // 基于 UTF-8 字符集合的 Jaccard 距离：1 - |A∩B| / |A∪B|。
+    // 注意：旧实现按字节同位比较，对 UTF-8 多字节（如中文）完全失真；
+    // 这里按完整码点切分，对中英文都给出正确的字符重合度。
     if (a == b) return 0.0;
-    size_t common = 0;
-    for (size_t i = 0; i < std::min(a.size(), b.size()); ++i) {
-        if (a[i] == b[i]) common++;
+
+    auto to_codepoints = [](const std::string& s) -> std::set<std::string> {
+        std::set<std::string> cps;
+        for (size_t i = 0; i < s.size();) {
+            unsigned char c = static_cast<unsigned char>(s[i]);
+            size_t len = 1;
+            if ((c & 0x80) == 0x00) len = 1;        // 0xxxxxxx
+            else if ((c & 0xE0) == 0xC0) len = 2;   // 110xxxxx
+            else if ((c & 0xF0) == 0xE0) len = 3;   // 1110xxxx
+            else if ((c & 0xF8) == 0xF0) len = 4;   // 11110xxx
+            len = std::min(len, s.size() - i);
+            cps.insert(s.substr(i, len));
+            i += len;
+        }
+        return cps;
+    };
+
+    auto set_a = to_codepoints(a);
+    auto set_b = to_codepoints(b);
+    if (set_a.empty() && set_b.empty()) return 0.0;
+
+    size_t intersection = 0;
+    for (const auto& cp : set_a) {
+        if (set_b.count(cp)) ++intersection;
     }
-    double sim = static_cast<double>(common)
-        / std::max(a.size(), b.size());
-    return 1.0 - sim;
+    size_t union_size = set_a.size() + set_b.size() - intersection;
+    if (union_size == 0) return 1.0;
+
+    double similarity = static_cast<double>(intersection)
+        / static_cast<double>(union_size);
+    return 1.0 - similarity;
 }
 
 inline auto CreativeEngine::spread_activation_(
