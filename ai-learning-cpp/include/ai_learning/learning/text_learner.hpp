@@ -133,6 +133,7 @@ private:
 
     // 无监督分词 + 依存解析（默认关闭；train_dependency_parser() 后启用）
     std::vector<std::string> corpus_raw_;  // learn_from_text 累积的原始文本
+    int corpus_capacity_ = 10000;          // 上限，超出淘汰最旧（防无界增长）
     WordSegmenter segmenter_;
     DependencyGrammarInducer dep_parser_;
     bool parse_enabled_ = false;

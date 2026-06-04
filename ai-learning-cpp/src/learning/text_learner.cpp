@@ -30,8 +30,12 @@ auto TextLearner::learn_from_text(const std::string& text,
     -> TextLearnResult {
     TextLearnResult result;
 
-    // 0. 累积原始语料，供 train_dependency_parser() 训练无监督分词/解析
+    // 0. 累积原始语料，供 train_dependency_parser() 训练无监督分词/解析。
+    //    设容量上限，超出淘汰最旧，避免长跑（如 REST 服务）无界增长。
     corpus_raw_.push_back(text);
+    while (static_cast<int>(corpus_raw_.size()) > corpus_capacity_) {
+        corpus_raw_.erase(corpus_raw_.begin());
+    }
 
     // 1. 提取实体
     result.entities = KnowledgeExtractor::extract_entities(text);
