@@ -17,6 +17,7 @@
 #include "ai_learning/learning/text_learner.hpp"
 #include "ai_learning/learning/word_segmenter.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -316,9 +317,67 @@ auto main() -> int {
     check("在线抽取得到词边界完整短语主语", phrase,
           "主='" + ls + "' 宾='" + lo + "'");
 
+    // ── E. 3+ 字复合词发现 + 虚词消歧（默认配置 L=6，零词典）──────────
+    std::cout << "\n[E] 3+ 字复合词 + 虚词消歧（默认配置 max_word_len=6）\n";
+    std::vector<std::string> comp_base = {
+        "人工智能改变世界",   "我了解人工智能",     "人工智能很强大",
+        "他害怕人工智能",     "人工智能需要数据",   "计算机科学很有趣",
+        "我喜欢计算机科学",   "他研究计算机科学",   "计算机科学包含很多方向",
+        "机器学习是热门方向", "我在学机器学习",     "机器学习应用广泛",
+        "公司使用机器学习",   "深度学习效果很好",   "他擅长深度学习",
+        "深度学习改变了行业", "自然语言处理很难",   "我研究自然语言处理",
+        "自然语言处理有用",   "这是一本书",         "那是一只猫",
+        "他是医生",           "水是透明的",         "花是红的",
+        "天空是蓝的",         "我吃了饭",           "他走了",
+        "下雨了",             "花开了",             "桌子上的书",
+        "老师的话",           "妈妈的爱",           "他在家里",
+        "猫在沙发上",         "书在桌子上",         "鸟在天上飞",
+        "小鸟在唱歌",         "大海很辽阔",         "孩子在公园玩",
+        "苹果很甜",           "香蕉是黄的",         "橙子很酸",
+        // 让"的"出现在句中、后接多种名词（右侧自由度足够 → 被判为虚词）
+        "美丽的花朵",         "红色的苹果",         "聪明的孩子",
+        "勤劳的农民",         "遥远的地方",         "温暖的阳光",
+        "高大的树木",         "干净的房间",
+    };
+    std::vector<std::string> comp_corpus;
+    for (int rep = 0; rep < 8; ++rep)
+        for (const auto& s : comp_base) comp_corpus.push_back(s);
+
+    WordSegmenter cseg;  // 默认配置：max_word_len=6 + 虚词自动发现
+    cseg.fit(comp_corpus);
+
+    bool comp4 = cseg.in_lexicon("人工智能") && cseg.in_lexicon("机器学习") &&
+                 cseg.in_lexicon("深度学习");
+    bool comp56 = cseg.in_lexicon("计算机科学") &&
+                  cseg.in_lexicon("自然语言处理");
+    // 偏移碎片（真复合词的滑动子窗口）必须被边界自由度拒绝
+    bool frag_rejected = !cseg.in_lexicon("工智能") &&
+                         !cseg.in_lexicon("器学习") &&
+                         !cseg.in_lexicon("算机科");
+    bool fw_detected = cseg.is_function_word("的") &&
+                       cseg.is_function_word("是") && cseg.is_function_word("在");
+    // 内容词素（学/科/机）虽高频但一侧上下文受限，不应被误判为虚词
+    bool content_not_fw = !cseg.is_function_word("学") &&
+                          !cseg.is_function_word("科") &&
+                          !cseg.is_function_word("机");
+    // 切分时复合词应整体保留，不被切碎
+    auto cs = cseg.segment("他在学机器学习");
+    bool seg_keep =
+        std::find(cs.begin(), cs.end(), std::string("机器学习")) != cs.end();
+
+    check("3+ 字复合词进词表 (人工智能/机器学习/深度学习)", comp4);
+    check("5~6 字复合词进词表 (计算机科学/自然语言处理)", comp56);
+    check("偏移碎片被拒 (工智能/器学习/算机科)", frag_rejected);
+    check("虚词自动发现 (的/是/在)", fw_detected,
+          "fw_count=" + std::to_string(cseg.function_word_count()));
+    check("内容词素不被误判为虚词 (学/科/机)", content_not_fw);
+    check("切分保留完整复合词 (机器学习)", seg_keep);
+
     std::cout << "\n=== 客观分数: " << g_passed << " / " << g_total << " ===\n";
 
     bool hard = F1 >= 0.80 && words_ok && junk_ok && parse_obj_ok == N &&
-                parse_subj_contains == N && trained && after && phrase;
+                parse_subj_contains == N && trained && after && phrase &&
+                comp4 && comp56 && frag_rejected && fw_detected &&
+                content_not_fw && seg_keep;
     return hard ? 0 : 1;
 }

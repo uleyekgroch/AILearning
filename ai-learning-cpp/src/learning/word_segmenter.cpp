@@ -93,15 +93,28 @@ void WordSegmenter::fit(const std::vector<std::string>& corpus) {
             for (int len = 1; len <= L && start + len <= m; ++len) {
                 std::string w = join(r, start, start + len);
                 ++count[w];
-                if (len >= 2) {
-                    lctx[w][start > 0 ? r[start - 1] : "^"]++;
-                    rctx[w][start + len < m ? r[start + len] : "$"]++;
-                }
+                // 记录左右邻接分布（含单字，供虚词检测的分支熵）
+                lctx[w][start > 0 ? r[start - 1] : "^"]++;
+                rctx[w][start + len < m ? r[start + len] : "$"]++;
             }
     }
     if (T == 0) {
         trained_ = true;
         return;
+    }
+
+    // 虚词消歧：自动发现虚词单字（零词典）。虚词（的/了/是/在/很…）的统计特征
+    // 是"高频 + 左右两侧都极自由"——它们能黏在几乎任何字前后，故左右分支熵都很高。
+    // 内容词素（学/科/机…）虽也高频，但至少一侧上下文受限（如"科"几乎只接"学"），
+    // 故 min(左熵,右熵) 明显更低。据此用 min(lH,rH) 阈值把二者分开，避免误伤
+    // -学 / 科- 类合法复合词。真实复合词不以虚词开头/结尾，据此排除跨词碎片。
+    function_words_.clear();
+    for (const auto& [w, c] : count) {
+        if (utils::utf8_chars(w).size() != 1) continue;
+        double freq = static_cast<double>(c) / static_cast<double>(T);
+        if (freq < cfg_.fw_min_freq) continue;
+        double both = std::min(entropy(lctx[w]), entropy(rctx[w]));
+        if (both >= cfg_.fw_min_entropy) function_words_.insert(w);
     }
 
     // 词表：全部单字（兜底）+ 满足凝固度/自由度/频次的多字词
@@ -115,6 +128,14 @@ void WordSegmenter::fit(const std::vector<std::string>& corpus) {
         if (c < cfg_.min_count) continue;
 
         auto chars = utils::utf8_chars(w);
+
+        // 虚词消歧（仅 len≥3）：复合词不以虚词开头/结尾，排除跨词碎片。
+        // len≤2 完全保持原行为，确保既有评测/单测不回归。
+        const bool fw_edge = len >= 3 &&
+            (function_words_.count(chars.front()) ||
+             function_words_.count(chars.back()));
+        if (fw_edge) continue;
+
         // 内部凝固度：所有切分点都需"抱团"
         double cohesion = 1e18;
         for (int k = 1; k < len; ++k) {
@@ -131,9 +152,11 @@ void WordSegmenter::fit(const std::vector<std::string>& corpus) {
         }
         if (cohesion < cfg_.min_cohesion) continue;
 
-        // 边界自由度：左右邻接熵都要够大
-        double freedom = std::min(entropy(lctx[w]), entropy(rctx[w]));
-        if (freedom < cfg_.min_freedom) continue;
+        // 边界自由度：左右邻接熵都要够大。这一条天然排除"偏移碎片"——
+        // 如「工智能」总被「人」紧贴在左，左熵≈0 → 被拒；而真复合词
+        // 「人工智能」左右都能接多种字 → 通过。长词同理，无需放宽。
+        double lH = entropy(lctx[w]), rH = entropy(rctx[w]);
+        if (std::min(lH, rH) < cfg_.min_freedom) continue;
 
         lex[w] = c;
     }

@@ -5,6 +5,7 @@
 
 #include "ai_learning/learning/text_learner.hpp"
 #include "ai_learning/domain/domain_events.hpp"
+#include "ai_learning/utils/utf8.hpp"
 
 #include <algorithm>
 #include <map>
@@ -144,14 +145,14 @@ void TextLearner::update_self_model_(const std::string& text,
     for (const auto& e : result.entities) {
         if (n++ >= 5) break;  // 每句至多强化前几个实体，避免噪声淹没
         self_model_.update_self_belief(
-            SelfBelief{"了解" + e, 1.0, text.substr(0, 40), true});
+            SelfBelief{"了解" + e, 1.0, utils::utf8_truncate(text, 20), true});
     }
 
     // (3) 自传记忆：验证通过且抽到三元组的，记一条带「教训」的情景记忆
     if (result.verification_passed && !result.triples.empty()) {
         const auto& t = result.triples.front();
         AutobiographicalMemory mem;
-        mem.narrative = text.substr(0, 40);
+        mem.narrative = utils::utf8_truncate(text, 20);
         mem.importance = result.verification_score;
         mem.lesson_learned = t.subject + t.relation + t.object;
         self_model_.remember(mem);

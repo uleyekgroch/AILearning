@@ -92,6 +92,33 @@ auto cfg2() -> SegmenterConfig {
     return c;
 }
 
+/// 含 3~6 字技术复合词 + 多上下文虚词的无空格语料（默认配置 L=6 用）。
+auto make_compound_corpus() -> std::vector<std::string> {
+    std::vector<std::string> base = {
+        "人工智能改变世界",   "我了解人工智能",     "人工智能很强大",
+        "他害怕人工智能",     "人工智能需要数据",   "计算机科学很有趣",
+        "我喜欢计算机科学",   "他研究计算机科学",   "计算机科学包含很多方向",
+        "机器学习是热门方向", "我在学机器学习",     "机器学习应用广泛",
+        "公司使用机器学习",   "深度学习效果很好",   "他擅长深度学习",
+        "深度学习改变了行业", "自然语言处理很难",   "我研究自然语言处理",
+        "自然语言处理有用",   "这是一本书",         "那是一只猫",
+        "他是医生",           "水是透明的",         "花是红的",
+        "天空是蓝的",         "我吃了饭",           "他走了",
+        "下雨了",             "花开了",             "桌子上的书",
+        "老师的话",           "妈妈的爱",           "他在家里",
+        "猫在沙发上",         "书在桌子上",         "鸟在天上飞",
+        "小鸟在唱歌",         "大海很辽阔",         "孩子在公园玩",
+        "苹果很甜",           "香蕉是黄的",         "橙子很酸",
+        "美丽的花朵",         "红色的苹果",         "聪明的孩子",
+        "勤劳的农民",         "遥远的地方",         "温暖的阳光",
+        "高大的树木",         "干净的房间",
+    };
+    std::vector<std::string> c;
+    for (int rep = 0; rep < 8; ++rep)
+        for (const auto& s : base) c.push_back(s);
+    return c;
+}
+
 }  // namespace
 
 TEST_CASE("WordSegmenter: 未训练/空输入安全", "[segmenter]") {
@@ -144,6 +171,82 @@ TEST_CASE("WordSegmenter: segment_runs 按非 CJK 边界分段", "[segmenter]") 
 
     auto runs = seg.segment_runs("学生, 数学");
     REQUIRE(runs.size() == 2);  // 逗号+空格切成两段
+}
+
+TEST_CASE("WordSegmenter: 3+ 字复合词发现，偏移碎片被拒", "[segmenter]") {
+    WordSegmenter seg;  // 默认 max_word_len=6
+    seg.fit(make_compound_corpus());
+
+    SECTION("真复合词进词表（3~6 字）") {
+        REQUIRE(seg.in_lexicon("人工智能"));
+        REQUIRE(seg.in_lexicon("机器学习"));
+        REQUIRE(seg.in_lexicon("深度学习"));
+        REQUIRE(seg.in_lexicon("计算机科学"));
+        REQUIRE(seg.in_lexicon("自然语言处理"));
+    }
+    SECTION("偏移碎片被边界自由度拒绝") {
+        // 这些是真复合词的滑动子窗口，一侧总被同一字紧贴 → 左/右熵≈0
+        REQUIRE_FALSE(seg.in_lexicon("工智能"));
+        REQUIRE_FALSE(seg.in_lexicon("器学习"));
+        REQUIRE_FALSE(seg.in_lexicon("算机科"));
+        REQUIRE_FALSE(seg.in_lexicon("然语言"));
+    }
+    SECTION("切分保留完整复合词，不切碎") {
+        auto w = seg.segment("他在学机器学习");
+        REQUIRE(contains(w, "机器学习"));
+        // 拼接无损
+        std::string j;
+        for (const auto& x : w) j += x;
+        REQUIRE(j == "他在学机器学习");
+    }
+}
+
+TEST_CASE("WordSegmenter: 虚词自动发现，内容词素不误判", "[segmenter]") {
+    WordSegmenter seg;
+    seg.fit(make_compound_corpus());
+
+    SECTION("高频且左右皆自由的单字判为虚词") {
+        REQUIRE(seg.is_function_word("的"));
+        REQUIRE(seg.is_function_word("是"));
+        REQUIRE(seg.is_function_word("在"));
+        REQUIRE(seg.function_word_count() >= 3);
+    }
+    SECTION("高频但一侧上下文受限的内容词素不判为虚词") {
+        // 学/科/机 在 科学/机器… 里一侧紧贴固定字 → min(左熵,右熵) 偏低
+        REQUIRE_FALSE(seg.is_function_word("学"));
+        REQUIRE_FALSE(seg.is_function_word("科"));
+        REQUIRE_FALSE(seg.is_function_word("机"));
+    }
+    SECTION("3+ 字复合词不以虚词开头/结尾（边界过滤仅作用于 len>=3）") {
+        // 设计约定：len<=2 完全保持既有行为，虚词边界过滤只对 len>=3 生效，
+        // 因为长复合词才是本次要保护、不被跨词虚词污染的目标。
+        for (const auto& w : seg.multichar_words()) {
+            auto cs = ai_learning::utils::utf8_chars(w);
+            if (cs.size() < 3) continue;
+            REQUIRE_FALSE(seg.is_function_word(cs.front()));
+            REQUIRE_FALSE(seg.is_function_word(cs.back()));
+        }
+    }
+}
+
+TEST_CASE("WordSegmenter: 默认配置不改变短词(len<=2)既有行为", "[segmenter]") {
+    // 回归保护：len≤2 完全走原路径；用 cfg2(L=2) 与默认(L=6) 对同一 2 字词料
+    // 比较——2 字词的收录不应因放开 L 而改变。
+    auto corpus = make_raw_corpus();
+    WordSegmenter s2(cfg2());
+    s2.fit(corpus);
+    SegmenterConfig c6;
+    c6.min_count = 3;
+    c6.min_cohesion = 1.5;
+    c6.min_freedom = 0.3;  // 同 cfg2 但 max_word_len=6（默认）
+    WordSegmenter s6(c6);
+    s6.fit(corpus);
+    for (const auto& w : {"学生", "数学", "动物", "老师"}) {
+        REQUIRE(s2.in_lexicon(w) == s6.in_lexicon(w));
+    }
+    for (const auto& j : {"是人", "的学", "是动"}) {
+        REQUIRE_FALSE(s6.in_lexicon(j));
+    }
 }
 
 TEST_CASE("KnowledgeExtractor::relation_patterns 非空且含「是」", "[extractor]") {

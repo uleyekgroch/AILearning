@@ -86,4 +86,15 @@ inline auto utf8_chars(const std::string& text) -> std::vector<std::string> {
     return result;
 }
 
+/// 按"字符数"截断（保证不切碎多字节 UTF-8 字符）。
+inline auto utf8_truncate(const std::string& text, size_t max_chars)
+    -> std::string {
+    std::string out;
+    size_t n = 0;
+    utf8_foreach(text, [&](const std::string& ch, size_t) {
+        if (n++ < max_chars) out += ch;
+    });
+    return out;
+}
+
 }  // namespace ai_learning::utils
