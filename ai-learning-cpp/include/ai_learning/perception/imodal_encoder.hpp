@@ -154,10 +154,10 @@ private:
 // MultiModalEncoder — 聚合多种编码器
 // ═══════════════════════════════════════════════════════════════════
 
-/// 多模态编码器聚合器 — 根据模态类型路由到对应编码器
-class MultiModalEncoder : public IModalEncoder {
+/// 媒体编码器聚合器 — 根据模态类型路由到对应编码器
+class MediaEncoder : public IModalEncoder {
 public:
-    MultiModalEncoder() = default;
+    MediaEncoder() = default;
 
     /// 注册图像编码器
     void register_image(std::shared_ptr<class IImageEncoder> enc) {

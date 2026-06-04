@@ -154,6 +154,42 @@ auto DistributionalSemantics::similarity(
     return result;
 }
 
+auto DistributionalSemantics::find_nearest(const std::vector<float>& vec, int top_k) const
+    -> std::vector<std::pair<std::string, double>> {
+    std::vector<std::pair<std::string, double>> results;
+    int dims = static_cast<int>(vec.size());
+
+    for (const auto& [cpt, cpt_vec] : vectors_) {
+        auto dense_opt = get_dense_vector(cpt, dims);
+        if (!dense_opt) continue;
+
+        const auto& target_vec = *dense_opt;
+        // 计算余弦相似度
+        double dot = 0.0, norm_a = 0.0, norm_b = 0.0;
+        for (size_t i = 0; i < vec.size() && i < target_vec.size(); ++i) {
+            dot += vec[i] * target_vec[i];
+            norm_a += vec[i] * vec[i];
+            norm_b += target_vec[i] * target_vec[i];
+        }
+
+        if (norm_a > 0 && norm_b > 0) {
+            double sim = dot / (std::sqrt(norm_a) * std::sqrt(norm_b));
+            results.emplace_back(cpt, sim);
+        }
+    }
+
+    std::partial_sort(results.begin(),
+                      results.begin() + std::min(top_k, static_cast<int>(results.size())),
+                      results.end(),
+                      [](const auto& a, const auto& b) { return a.second > b.second; });
+
+    if (static_cast<int>(results.size()) > top_k) {
+        results.resize(top_k);
+    }
+
+    return results;
+}
+
 auto DistributionalSemantics::most_similar(
     const std::string& cpt, int top_k) const
     -> std::vector<SimilarityResult>

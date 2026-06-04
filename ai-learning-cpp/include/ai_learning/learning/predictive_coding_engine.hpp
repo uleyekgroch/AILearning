@@ -32,6 +32,8 @@ struct PredictiveCodingConfig {
     double clip_value            = 3.0;
     double curiosity_alpha       = 0.5;
     double curiosity_beta        = 0.5;
+    double sparsity_penalty      = 0.01;  // 稀疏性惩罚，增加神经表征容量
+    double precision_lr          = 0.01;  // 精度矩阵的学习率
 };
 
 /// 推理中间结果
@@ -121,6 +123,11 @@ private:
     std::vector<float> b2_;          // (h2)
     ai_learning::core::Matrix w3_;  // (h2 × obs_dim)
     std::vector<float> b3_;          // (obs_dim)
+
+    // 注意力 / 精度加权 (Precision Weighting, 对应 $\Pi$)
+    std::vector<float> pi_h1_;       // (h1)
+    std::vector<float> pi_h2_;       // (h2)
+    std::vector<float> pi_out_;      // (obs_dim)
 
     // 配置
     PredictiveCodingConfig cfg_;

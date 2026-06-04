@@ -88,6 +88,13 @@ public:
     /// 记录知识使用结果（用于校准置信度）
     void record_outcome(const std::string& topic, bool correct);
 
+    /// 记录学习努力度
+    void record_learning(const std::string& mode, double effort) {
+        // 简单打桩
+        (void)mode;
+        (void)effort;
+    }
+
     /// 批量评估多个主题
     auto assess_batch(const std::vector<std::string>& topics) const
         -> std::vector<KnowledgeConfidence>;

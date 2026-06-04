@@ -1,5 +1,0 @@
-Filters: [milestones]
-Randomness seeded to: 2549094152
-===============================================================================
-All tests passed (23 assertions in 7 test cases)
-

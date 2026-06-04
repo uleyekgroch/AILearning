@@ -1,123 +1,133 @@
 /**
  * @file learner_io.cpp
- * @brief Learner 持久化 — save / load 序列化实现
+ * @brief Learner 持久化 — 生产级 JSON Checkpoint (序列化/反序列化)
  */
 
 #include "ai_learning/core/learner.hpp"
-
+#include <nlohmann/json.hpp>
 #include <fstream>
-#include <string>
+#include <iostream>
+
+using json = nlohmann::json;
 
 namespace ai_learning::core {
 
 void Learner::save(const std::string& path) const {
+    json snap;
+
+    // 1. Meta (元数据)
+    snap["meta"] = {
+        {"version", "2.0"},
+        {"stage", stage_},
+        {"stage_index", stage_index_},
+        {"total_steps", total_steps_},
+        {"pc_steps", pc_steps_}
+    };
+
+    // 2. Predictive Engine Tensors (潜意识神经突触权重)
+    if (engine_) {
+        auto p_state = engine_->save_state();
+        snap["predictive_engine"]["weights"] = p_state.weights;
+        snap["predictive_engine"]["shape"] = p_state.shape;
+    }
+    if (semantic_engine_) {
+        auto s_state = semantic_engine_->save_state();
+        snap["semantic_engine"]["weights"] = s_state.weights;
+        snap["semantic_engine"]["shape"] = s_state.shape;
+    }
+
+    // 3. Knowledge Graph (大脑皮层语义图谱)
+    json kg_json = json::array();
+    auto all_ids = kg_.get_all_entity_ids();
+    for (const auto& id : all_ids) {
+        auto ent_opt = kg_.get_entity(id);
+        if (!ent_opt) continue;
+        const auto& ent = ent_opt->get();
+        json e_json;
+        e_json["id"] = ent.id();
+        e_json["type"] = ent.type();
+        e_json["confidence"] = ent.confidence();
+        
+        json rel_json = json::array();
+        auto rels = kg_.get_relations_of(id, "out");
+        for (const auto& r_ref : rels) {
+            const auto& r = r_ref.get();
+            rel_json.push_back({
+                {"target", r.target_id()},
+                {"type", r.type()},
+                {"confidence", r.confidence()}
+            });
+        }
+        e_json["relations"] = rel_json;
+        kg_json.push_back(e_json);
+    }
+    snap["knowledge_graph"] = kg_json;
+
+    // 保存到磁盘
     std::ofstream out(path);
-    if (!out.is_open()) return;
-
-    // -- 元数据 --
-    out << "[meta]\n";
-    out << "version=1\n";
-    out << "stage=" << stage_ << "\n";
-    out << "stage_index=" << stage_index_ << "\n";
-    out << "total_steps=" << total_steps_ << "\n";
-
-    // -- 配置 --
-    out << "[config]\n";
-    out << "obs_dim=" << config_.obs_dim << "\n";
-    out << "action_dim=" << config_.action_dim << "\n";
-    out << "learning_rate=" << config_.learning_rate << "\n";
-
-    // -- 知识图谱 --
-    out << "[knowledge_graph]\n";
-    out << "entities=" << kg_.entity_count() << "\n";
-    out << "relations=" << kg_.relation_count() << "\n";
-
-    // -- 统计学习 --
-    out << "[statistics]\n";
-    out << "hippocampal_episodes=" << hippocampal_.size() << "\n";
-    out << "cortical_facts=" << cortical_.size() << "\n";
-    out << "learning_progress=" << engine_->get_learning_progress() << "\n";
-    out << "curiosity=" << engine_->get_curiosity() << "\n";
-
-    // -- 误差历史 --
-    out << "[error_history]\n";
-    out << "count=" << error_history_.size() << "\n";
-    int cnt = 0;
-    for (auto e : error_history_) {
-        out << "e" << cnt << "=" << e << "\n";
-        ++cnt;
-    }
-
-    // -- 模态权重 --
-    out << "[modality_weights]\n";
-    for (const auto& [mod, w] : encoder_.get_modality_weights()) {
-        out << mod << "=" << w << "\n";
-    }
-
-    // -- 嵌入学习 --
-    if (config_.embedding_learning_enabled) {
-        out << "[embeddings]\n";
-        auto ds_stats = ds_.stats();
-        out << "ds_concepts=" << ds_stats.cpts_represented << "\n";
-        out << "ds_dimensions=" << ds_stats.total_dimensions << "\n";
-        out << "ds_texts_processed=" << ds_stats.texts_processed << "\n";
-        out << "embedding_vocab_size=" << embedding_trainer_.vocab_size() << "\n";
-        out << "embedding_trained=" << (embedding_trainer_.is_trained() ? 1 : 0) << "\n";
-        out << "consolidation_count=" << consolidation_count_ << "\n";
+    if (out.is_open()) {
+        out << snap.dump(); // 紧凑格式，节省空间
+        std::cout << "[IO] 成功保存脑快照至: " << path << " (包含 " << all_ids.size() << " 个概念节点)\n";
+    } else {
+        std::cerr << "[IO] 保存失败: 无法打开文件 " << path << "\n";
     }
 }
 
 void Learner::load(const std::string& path) {
     std::ifstream in(path);
-    if (!in.is_open()) return;
+    if (!in.is_open()) {
+        std::cerr << "[IO] 无法加载脑快照: " << path << " (作为全新大脑启动)\n";
+        return;
+    }
 
-    std::string section;
-    std::string line;
-    while (std::getline(in, line)) {
-        // 空行跳过
-        if (line.empty()) continue;
+    try {
+        json snap = json::parse(in);
 
-        // 检测节
-        if (line[0] == '[') {
-            section = line.substr(1, line.size() - 2);
-            continue;
+        // 1. Meta
+        if (snap.contains("meta")) {
+            stage_ = snap["meta"].value("stage", "sensorimotor");
+            total_steps_ = snap["meta"].value("total_steps", 0);
         }
 
-        auto eq = line.find('=');
-        if (eq == std::string::npos) continue;
-        auto key = line.substr(0, eq);
-        auto val = line.substr(eq + 1);
+        // 2. Predictive Engine
+        if (engine_ && snap.contains("predictive_engine")) {
+            learning::PredictiveEngineState p_state;
+            p_state.weights = snap["predictive_engine"]["weights"].get<std::vector<float>>();
+            p_state.shape = snap["predictive_engine"]["shape"].get<std::vector<int>>();
+            engine_->load_state(p_state);
+        }
+        if (semantic_engine_ && snap.contains("semantic_engine")) {
+            learning::PredictiveEngineState s_state;
+            s_state.weights = snap["semantic_engine"]["weights"].get<std::vector<float>>();
+            s_state.shape = snap["semantic_engine"]["shape"].get<std::vector<int>>();
+            semantic_engine_->load_state(s_state);
+        }
 
-        if (section == "meta") {
-            if (key == "stage") {
-                stage_ = val;
-                for (int i = 0; i < static_cast<int>(kStageOrder.size()); ++i) {
-                    if (kStageOrder[i] == stage_) {
-                        stage_index_ = i;
-                        break;
-                    }
+        // 3. Knowledge Graph
+        if (snap.contains("knowledge_graph")) {
+            for (const auto& item : snap["knowledge_graph"]) {
+                domain::knowledge::Entity ent(
+                    item["id"].get<std::string>(),
+                    item["type"].get<std::string>(),
+                    {}, // 略去属性恢复
+                    item["confidence"].get<double>(),
+                    "loaded_memory"
+                );
+                kg_.add_entity(ent);
+                
+                for (const auto& rel : item["relations"]) {
+                    kg_.add_relation(domain::knowledge::Relation(
+                        item["id"].get<std::string>(),
+                        rel["target"].get<std::string>(),
+                        rel["type"].get<std::string>(),
+                        rel["confidence"].get<double>()
+                    ));
                 }
-            } else if (key == "total_steps") {
-                total_steps_ = std::stoi(val);
-            }
-        } else if (section == "error_history") {
-            if (key[0] == 'e') {
-                error_history_.push_back(std::stof(val));
-                // 限制历史长度
-                if (error_history_.size() > 1000) {
-                    error_history_.pop_front();
-                }
-            }
-        } else if (section == "modality_weights") {
-            encoder_.update_weight(key, std::stod(val) -
-                encoder_.get_modality_weights().count(key)
-                ? (encoder_.get_modality_weights().at(key))
-                : 0.0);
-        } else if (section == "embeddings") {
-            if (key == "consolidation_count") {
-                consolidation_count_ = std::stoi(val);
             }
         }
+        std::cout << "[IO] 成功唤醒加载脑快照: " << path << " (恢复了 " << kg_.entity_count() << " 个概念)\n";
+    } catch (const std::exception& e) {
+        std::cerr << "[IO] 脑快照加载失败 (文件损坏?): " << e.what() << "\n";
     }
 }
 

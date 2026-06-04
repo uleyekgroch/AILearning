@@ -36,7 +36,7 @@ inline auto global_log_level() -> LogLevel {
 }
 
 /// 设置全局日志级别
-inline auto set_global_log_level(LogLevel lvl) -> void {
+inline auto set_global_log_level(LogLevel /*lvl*/) -> void {
     // 通过 mutable static hack（实际使用中通常通过 config 传递）
     global_log_level();  // force init
     // 注：生产代码应通过 atomic 或 mutex，此处为简化

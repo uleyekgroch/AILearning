@@ -110,6 +110,11 @@ public:
     auto learn_batch(const std::vector<std::string>& texts)
         -> int;  ///< 返回总新增概念数
 
+    /// 从浮点向量寻找最相似的概念（用于神经推理）
+    auto find_nearest(const std::vector<float>& vec,
+                      int top_k = 1) const
+        -> std::vector<std::pair<std::string, double>>;
+
     // ── 语义查询 ──────────────────────────────────────
 
     /// 计算两个概念的语义相似度（余弦相似度）

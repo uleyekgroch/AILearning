@@ -74,6 +74,14 @@ auto AutonomousLearningLoop::one_iteration(
     result.selected_policy = policy.name;
     result.expected_free_energy = policy.expected_free_energy;
 
+    // ★v2.1: 将主动推理选择的策略反馈到学习计划
+    if (!policy.actions.empty()) {
+        for (const auto& action : policy.actions) {
+            result.plan.steps.insert(result.plan.steps.begin(), "AI-driven: " + action);
+        }
+        result.plan.strategy = policy.name;
+    }
+
     // 可选：从资源提供者获取材料
     if (resource_provider) {
         auto resources = resource_provider->search(result.goal.topic);
@@ -84,6 +92,23 @@ auto AutonomousLearningLoop::one_iteration(
 
     // Phase 4: 学习执行 → 动手学
     auto outcome = execute_learning_(result.plan, strategy);
+
+    // ★v2.2: 将学习结果作为观测反馈给主动推理引擎（闭合感知-行动环）
+    if (active_inference_ && outcome.progress > 0.0) {
+        std::vector<float> observation = {
+            static_cast<float>(outcome.progress),
+            static_cast<float>(outcome.surprise),
+            outcome.mastery_improved ? 1.0f : 0.0f
+        };
+        std::vector<float> predicted = {
+            static_cast<float>(result.expected_free_energy),
+            0.5f,  // 预期惊喜
+            static_cast<float>(result.motivation_before)
+        };
+        auto posterior = active_inference_->perceive(observation, predicted);
+        // 信息增益作为元认知信号
+        result.information_gain = std::abs(posterior.probability - posterior.prior);
+    }
 
     // Phase 5: 反思 → 学到了什么
     result.reflection = reflect_(outcome, result.goal);

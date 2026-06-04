@@ -1,15 +1,72 @@
+# ═══ 根目录：只保留 ai-learning-cpp/，忽略其他所有内容 ═══
+
+# 忽略根目录所有文件
+/*
+!/.gitignore
+!/ai-learning-cpp/
+
+# ═══ ai-learning-cpp 内的忽略规则 ═══
+
+# 构建产物
+ai-learning-cpp/build/
+ai-learning-cpp/build-wsl/
+ai-learning-cpp/build-win/
+ai-learning-cpp/build-cuda/
+ai-learning-cpp/build-server/
+ai-learning-cpp/build-test/
+ai-learning-cpp/_deps/
+ai-learning-cpp/models/
+
+# 二进制/对象文件
+*.o
+*.obj
+*.exe
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.out
+
+# CMake 生成文件
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CPackConfig.cmake
+CPackSourceConfig.cmake
+CTestTestfile.cmake
+DartConfiguration.tcl
+Makefile
+compile_commands.json
+Testing/
+
+# IDE/编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.claude/
+
+# 环境与日志
+.env
+*.log
+
+# 模型文件（体积大）
+*.gguf
+*.bin
+*.onnx
+*.pt
+*.pth
+
+# Python
 __pycache__/
 *.pyc
 *.pyo
 .pytest_cache/
 *.egg-info/
 dist/
-build/
-build-wsl/
-build-win/
-build-cuda/
-build-server/
-build-test/
-.env
-*.log
-.claude/
+
+# 临时文件
+test_learner_state.txt
+wiki_test_report*.json

@@ -20,6 +20,26 @@
 using json = nlohmann::json;
 namespace dto = ai_learning::server::dto;
 
+namespace {
+auto ok_resp(const json& data) -> crow::response {
+    crow::response r;
+    r.code = 200;
+    r.set_header("Content-Type", "application/json");
+    r.body = data.dump();
+    return r;
+}
+
+auto err_resp(int code, const std::string& msg) -> crow::response {
+    crow::response r;
+    r.code = code;
+    r.set_header("Content-Type", "application/json");
+    json err;
+    err["error"] = msg;
+    r.body = err.dump();
+    return r;
+}
+}
+
 void ai_learning::server::register_chat_routes(
     crow::SimpleApp& app,
     core::Learner& learner,

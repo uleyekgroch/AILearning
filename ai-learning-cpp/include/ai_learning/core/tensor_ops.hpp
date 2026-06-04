@@ -138,6 +138,15 @@ inline auto tensor_relu_deriv(const Tensor& a) -> Tensor {
     return cuda_tensor_relu_deriv(a);
 }
 
+/// Sign 函数，用于 L1 正则化 / 稀疏惩罚
+inline auto tensor_sign(const Tensor& a) -> Tensor {
+    auto result = Tensor(a.size());
+    for (size_t i = 0; i < a.size(); ++i) {
+        result[i] = (a[i] > 0.0f) ? 1.0f : ((a[i] < 0.0f) ? -1.0f : 0.0f);
+    }
+    return result;
+}
+
 /// 均方误差 (MSE) — 纯 CPU（reduce 操作，GPU 优势不大）
 inline auto tensor_mse(const Tensor& a, const Tensor& b) -> float {
     float sum = 0.0f;
@@ -208,10 +217,14 @@ inline auto mat_vec(const std::vector<float>& mat,
         }
 #endif
         auto result = Tensor(rows, 0.0f);
+        #pragma omp parallel for
         for (int r = 0; r < rows; ++r) {
+            float sum = 0.0f;
+            #pragma omp simd
             for (int c = 0; c < cols; ++c) {
-                result[r] += mat[r * cols + c] * vec[c];
+                sum += mat[r * cols + c] * vec[c];
             }
+            result[r] = sum;
         }
         return result;
     }
@@ -297,9 +310,13 @@ inline void mat_add_outer(std::vector<float>& mat,
                            const Tensor& a,
                            const Tensor& b) {
     if (a.size() * b.size() < 4096 || !cuda_available()) {
-        for (size_t i = 0; i < a.size(); ++i) {
-            for (size_t j = 0; j < b.size(); ++j) {
-                mat[i * b.size() + j] += lr * a[i] * b[j];
+        int a_size = static_cast<int>(a.size());
+        int b_size = static_cast<int>(b.size());
+        #pragma omp parallel for
+        for (int i = 0; i < a_size; ++i) {
+            #pragma omp simd
+            for (int j = 0; j < b_size; ++j) {
+                mat[i * b_size + j] += lr * a[i] * b[j];
             }
         }
         return;

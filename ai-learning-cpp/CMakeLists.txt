@@ -32,6 +32,13 @@ else()
     message(STATUS "⚠️  CUDA not found — building CPU-only")
 endif()
 
+# ── OpenMP 检测 ──────────────────────────────────────────────────
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+endif()
+
 # ── 编译选项 ────────────────────────────────────────────────────
 if(MSVC)
     add_compile_options(
@@ -152,6 +159,8 @@ else()
     list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/learning/stdp_learning_cuda_stub.cpp")
     list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/reasoning/activation_spread_cuda_stub.cpp")
     list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/learning/analogical_transfer_cuda_stub.cpp")
+    list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/learning/autotelic_generator.cpp")
+    list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/consciousness/global_workspace.cpp")
     list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/core/flash_attention_cuda_stub.cpp")
     list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/domain/knowledge/knowledge_graph_cuda_stub.cpp")
     list(APPEND AI_LEARNING_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/learning/active_experimenter_cuda_stub.cpp")

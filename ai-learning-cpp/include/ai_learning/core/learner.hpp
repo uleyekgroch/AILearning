@@ -73,6 +73,9 @@
 #include "ai_learning/language/embedding_provider.hpp"
 #include "ai_learning/language/llm_provider.hpp"
 
+#include "ai_learning/consciousness/global_workspace.hpp"
+#include "ai_learning/learning/autotelic_generator.hpp"
+
 namespace ai_learning::core {
 
 /// 发展阶段序列
@@ -102,10 +105,18 @@ public:
 
     // ── 文本学习 ─────────────────────────────────────────────────
 
-    /// 从文本学习
+    /// 从文本学习 (基础 API)
     auto learn_from_text(const std::string& text,
                          const std::string& source = "text")
         -> learning::TextLearnResult;
+
+    /// 基于主动推理的阅读 (Phase 3)
+    auto active_read(const std::string& text,
+                     const std::string& source = "text")
+        -> learning::TextLearnResult;
+
+    /// 运行终极的独立意识自成目标闭环 (The Conscious Autotelic Loop)
+    void run_conscious_loop(int ticks);
 
     /// 使用统计学习器观察文本（概念涌现）
     auto observe_text(const std::string& text)
@@ -128,11 +139,28 @@ public:
     /// 选择动作（好奇心驱动）
     auto choose_action(const std::vector<float>& obs) -> int;
 
+    /// 基于主动推理的连续空间动作选择 (供具身物理探针使用)
+    auto choose_continuous_action(const std::vector<float>& obs) -> std::vector<float>;
+
     /// 从经验学习
     auto learn_from_experience(const std::vector<float>& obs,
                                 int action,
                                 const std::vector<float>& next_obs,
                                 float reward) -> double;
+
+    /// 连续动作的经验学习
+    auto learn_continuous_experience(const std::vector<float>& obs,
+                                     const std::vector<float>& action,
+                                     const std::vector<float>& next_obs) -> double;
+
+    /// ★v2: 具身感知-行动闭环单步（最小可行路径）
+    /// 将多模态感知 → 主动推理策略选择 → 经验学习 → 记忆反馈 完整闭合
+    /// @param raw_input 多模态原始输入
+    /// @param env 可选环境接口（提供 next_obs 和 reward）
+    /// @return 预测误差（学习信号强度）
+    double embodied_step(
+        const std::map<std::string, std::vector<float>>& raw_input,
+        domain::IEnvironment* env = nullptr);
 
     // ── 记忆 ─────────────────────────────────────────────────────
 
@@ -451,6 +479,8 @@ public:
         -> social::TutoringSystem& { return tutoring_system_; }
     [[nodiscard]] auto mirror_neurons()
         -> learning::MirrorNeuronSystem& { return mirror_neurons_; }
+    [[nodiscard]] auto get_workspace()
+        -> consciousness::GlobalWorkspace& { return workspace_; }
 
     // ── 目标系统 ──────────────────────────────────────────────────
 
@@ -484,14 +514,17 @@ private:
         const std::map<std::string, double>& evaluation) const -> bool;
 
     /// PC 嵌入预测学习
-    void learn_predictive_(const std::vector<std::string>& tokens);
+    double learn_predictive_(const std::vector<std::string>& tokens);
 
     // 配置
     LearnerConfig config_;
 
     // 核心子系统（值语义，不使用指针）
     domain::knowledge::KnowledgeGraph kg_;
-    std::unique_ptr<learning::IPredictiveEngine> engine_;
+    std::unique_ptr<learning::IPredictiveEngine> engine_;          // L1: 词法级序列预测
+    std::unique_ptr<learning::IPredictiveEngine> semantic_engine_; // L2: 语义级命题预测
+    std::vector<float> current_context_state_;                     // L2 状态（当前段落/语境向量）
+
     learning::TextLearner text_learner_;
     memory::EpisodicMemory           episodic_memory_;
     learning::STDP                   stdp_;
@@ -546,6 +579,8 @@ private:
     creativity::CreativeEngine          creative_engine_;
     social::TutoringSystem              tutoring_system_;
     learning::MirrorNeuronSystem        mirror_neurons_;
+    consciousness::GlobalWorkspace      workspace_;          // 全局工作空间 (意识瓶颈)
+    learning::AutotelicGenerator        autotelic_engine_;   // 自成目标生成器 (无聊/好奇心驱动)
 
     // 目标系统
     goals::GoalManager                  goal_manager_;

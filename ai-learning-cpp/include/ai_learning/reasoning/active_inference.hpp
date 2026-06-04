@@ -250,7 +250,7 @@ inline auto ActiveInferenceEngine::perceive(
 inline auto ActiveInferenceEngine::variational_free_energy(
     const BeliefState& prior,
     const BeliefState& posterior,
-    const std::vector<float>& observation) const -> double {
+    const std::vector<float>& /*observation*/) const -> double {
     // F ≈ D_KL(q(s)||p(s)) - ln p(o|s)
     double kl = kl_divergence_(posterior, prior);
     double accuracy = posterior.prediction_error;
@@ -327,7 +327,7 @@ inline auto ActiveInferenceEngine::select_policy(
 }
 
 inline auto ActiveInferenceEngine::generate_policies(
-    const BeliefState& belief, int horizon) const
+    const BeliefState& /*belief*/, int /*horizon*/) const
     -> std::vector<Policy> {
     std::vector<Policy> policies;
 

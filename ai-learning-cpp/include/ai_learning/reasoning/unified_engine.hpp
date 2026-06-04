@@ -26,6 +26,8 @@ class EpisodicMemory;
 
 namespace ai_learning::learning {
 class StatisticalLearner;
+class IPredictiveEngine;
+class DistributionalSemantics;
 }
 
 namespace ai_learning::language {
@@ -61,6 +63,8 @@ public:
     void set_statistical_learner(learning::StatisticalLearner* sl);
     void set_episodic_memory(memory::EpisodicMemory* em);
     void set_llm_provider(language::ILLMProvider* llm);
+    void set_predictive_engine(learning::IPredictiveEngine* pe);
+    void set_distributional_semantics(learning::DistributionalSemantics* ds);
 
 private:
     // 推理路径
@@ -84,6 +88,10 @@ private:
     auto neural_reasoning(const std::string& question) const
         -> std::vector<ReasoningResult>;
 
+    /// 神经直觉增强 — 使用预测编码引擎与分布语义引擎预测概念
+    auto intuitive_reasoning(const std::string& question) const
+        -> std::vector<ReasoningResult>;
+
     // 辅助
     static auto find_common_patterns(
         const std::vector<std::string>& memories) -> std::vector<std::string>;
@@ -93,6 +101,8 @@ private:
     learning::StatisticalLearner* stat_learner_ = nullptr;
     memory::EpisodicMemory* episodic_ = nullptr;
     language::ILLMProvider* llm_ = nullptr;
+    learning::IPredictiveEngine* predictive_ = nullptr;
+    learning::DistributionalSemantics* ds_ = nullptr;
 
     /// 神经推理触发阈值（最高置信度低于此值时触发）
     static constexpr double kNeuralThreshold = 0.5;

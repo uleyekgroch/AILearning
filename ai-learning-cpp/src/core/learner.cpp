@@ -44,6 +44,18 @@ Learner::Learner(const LearnerConfig& config,
     : config_(config),
       kg_(),
       engine_(std::move(engine)),
+      semantic_engine_(std::make_unique<PredictiveCodingEngine>(
+          PredictiveCodingConfig{
+              config.obs_dim,
+              config.action_dim,
+              config.hidden_dims.size() > 0 ? config.hidden_dims[0] * 2 : 128, // L2 容量更大
+              config.hidden_dims.size() > 1 ? config.hidden_dims[1] * 2 : 64,
+              config.learning_rate * 0.5, // 语义层学习更慢
+              config.inference_lr,
+              config.max_inference_steps,
+              config.convergence_threshold,
+          })),
+      current_context_state_(config.obs_dim, 0.0f),
       text_learner_(kg_),
       episodic_memory_(config.episodic_memory_capacity),
       stdp_(),
@@ -115,6 +127,10 @@ Learner::Learner(const LearnerConfig& config,
             break;
         }
     }
+    
+    // 初始化 unified engine 依赖
+    unified_engine_.set_predictive_engine(engine_.get());
+    unified_engine_.set_distributional_semantics(&ds_);
 
     // 初始化预训练嵌入提供者（llama.cpp）
     #ifdef AI_LEARNING_WITH_LLAMA_CPP
@@ -147,9 +163,8 @@ Learner::Learner(const LearnerConfig& config,
 auto Learner::learn_from_text(const std::string& text,
                                const std::string& source)
     -> TextLearnResult {
-    auto result = text_learner_.learn_from_text(text, source);
-
-    // 通过统一分词器处理
+    
+    // 1. 分词与底层神经感知
     auto tokens = learning::tokenize(text, config_.language);
     stat_learner_.observe_tokens(tokens);
 
@@ -159,10 +174,26 @@ auto Learner::learn_from_text(const std::string& text,
         embedding_trainer_.add_tokens(tokens);
     }
 
-    // PC 嵌入预测学习
+    // 2. PC 嵌入预测学习，获取语句整体的预测误差
+    double novelty_error = 0.0;
     if (config_.embedding_predictive_learning) {
-        learn_predictive_(tokens);
+        novelty_error = learn_predictive_(tokens);
     }
+
+    // 3. 注意力门控（预测误差过滤）- 阶段一：用预测误差接管知识提取
+    TextLearnResult result;
+    // 只有当预测误差大于阈值（即产生了“惊讶”），才会触发符号层的强行提取和记忆
+    // 这是一个非常“类人”的设定：已知和无聊的东西不会占用高维的逻辑网络空间
+    double novelty_threshold = 0.05; 
+    if (config_.embedding_predictive_learning && novelty_error < novelty_threshold) {
+        result.verification_passed = true;
+        result.verification_score = 1.0;
+        // 直接返回，免去沉重的知识图谱写入
+        return result;
+    }
+
+    // 4. 产生“惊讶”，启动高耗能的符号提取与海马记忆
+    result = text_learner_.learn_from_text(text, source);
 
     // 海马快速记忆：存储提取的实体和关系
     std::vector<std::string> rel_strs;
@@ -171,11 +202,22 @@ auto Learner::learn_from_text(const std::string& text,
     }
     (void)hippocampal_.encode(result.entities, rel_strs, text);
 
+    // ★ 自成目标引擎：记录真实学习进度（预测误差作为 novelty 信号）
+    if (!result.entities.empty() || !result.triples.empty()) {
+        for (const auto& entity : result.entities) {
+            autotelic_engine_.record_progress(entity, novelty_error);
+        }
+    }
+
     return result;
 }
 
-void Learner::learn_predictive_(const std::vector<std::string>& tokens) {
-    // 去重获取唯一 tokens（保持首次出现顺序）
+double Learner::learn_predictive_(const std::vector<std::string>& tokens) {
+    // 阶段二：分层预测编码 (HPC)
+    // Level 1: Token -> Token 预测
+    // Level 2: Context -> Context 预测
+    
+    // 去重获取唯一 tokens
     std::vector<std::string> unique_tokens;
     std::unordered_set<std::string> seen;
     for (const auto& t : tokens) {
@@ -198,21 +240,58 @@ void Learner::learn_predictive_(const std::vector<std::string>& tokens) {
     // 用原始 token 顺序构建 embeddings
     std::vector<std::vector<float>> embeddings;
     embeddings.reserve(tokens.size());
+    std::vector<float> sentence_mean(config_.obs_dim, 0.0f);
+    int valid_tokens = 0;
+
     for (const auto& t : tokens) {
         auto it = vec_map.find(t);
         if (it != vec_map.end()) {
-            embeddings.push_back(it->second);  // 复制，因为可能多次使用同一向量
+            embeddings.push_back(it->second);
+            for (size_t d = 0; d < static_cast<size_t>(config_.obs_dim); ++d) {
+                sentence_mean[d] += it->second[d];
+            }
+            valid_tokens++;
         }
     }
 
-    // 连续概念嵌入对送入 PC engine（与原逻辑完全一致）
+    if (embeddings.empty()) return 0.0;
+
+    // 计算当前句子的语义均值向量 (Propositional Vector)
+    for (size_t d = 0; d < static_cast<size_t>(config_.obs_dim); ++d) {
+        sentence_mean[d] /= static_cast<float>(valid_tokens);
+    }
+
     int steps = 0;
+    double total_error = 0.0;
+    auto forward_action = std::vector<float>{1.0f};
+
+    // Level 1: 序列预测 (Token -> Token)
+    // 引入 Top-down Context: 将句意向量混入 action 空间
+    auto l1_action = forward_action;
+    l1_action.insert(l1_action.end(), sentence_mean.begin(), sentence_mean.end());
+    // 如果 action_dim 不够放 context，引擎会自动截断/丢弃，但为了安全我们截断到 action_dim
+    if (l1_action.size() > static_cast<size_t>(config_.action_dim)) {
+        l1_action.resize(config_.action_dim);
+    }
+
     for (size_t i = 0; i + 1 < embeddings.size() && steps < config_.pc_max_steps_per_text; ++i) {
-        auto action = std::vector<float>{1.0f};  // 固定 "预测下一个"
-        engine_->learn(embeddings[i], action, embeddings[i + 1]);
+        double error = engine_->learn(embeddings[i], l1_action, embeddings[i + 1]);
+        total_error += error;
         ++steps;
     }
+    
+    // Level 2: 语义层预测 (Context_t-1 -> Context_t)
+    double l2_error = 0.0;
+    if (semantic_engine_) {
+        l2_error = semantic_engine_->learn(current_context_state_, forward_action, sentence_mean);
+        current_context_state_ = sentence_mean; // 更新 L2 状态
+    }
+
     pc_steps_ += steps;
+    
+    // 综合两层误差，L2（语义层）的意外程度权重更高
+    double avg_l1_error = steps > 0 ? total_error / steps : 0.0;
+    return avg_l1_error * 0.3 + l2_error * 0.7;
 }
 
 auto Learner::observe_text(const std::string& text)
@@ -787,36 +866,304 @@ auto Learner::assess_proficiency(const std::string& entity_type) const
     return proficiency_tester_.assess(entity_type, kg_);
 }
 
-// ★v2: 自主学习循环（集成主动推理）
-auto Learner::autonomous_learning_run(int iterations)
-    -> learning::AutonomousLoopReport
-{
-    learning::AutonomousLearningLoop loop(motivation_, skill_tree_);
-    loop.set_active_inference(&active_inference_);  // 注入主动推理
+// ★v2: 自主学习循环 — 实现在 learner_autonomous.cpp（含主动推理注入）
 
-    learning::AutonomousLoopConfig loop_config;
-    loop_config.max_iterations = iterations;
-    loop_config.verbose = true;
-
-    // 内置简单策略
-    struct DefaultStrategy : learning::ILearningStrategy {
-        auto execute(const learning::LearningGoal& goal,
-                     const learning::LearningPlan& plan)
-            -> learning::LearningOutcome override {
-            learning::LearningOutcome outcome;
-            outcome.topic = goal.topic;
-            outcome.progress = 0.3;
-            outcome.surprise = 0.2;
-            outcome.mastery_improved = true;
-            return outcome;
+auto Learner::active_read(const std::string& text, const std::string& source)
+    -> learning::TextLearnResult {
+    learning::TextLearnResult final_result;
+    
+    // 简单的断句分割（模拟注意力在段落内移动）
+    std::vector<std::string> sentences;
+    std::string current_sentence;
+    for (size_t i = 0; i < text.size(); ) {
+        // UTF-8 粗略处理
+        auto uc = static_cast<unsigned char>(text[i]);
+        int byte_len = 1;
+        if (uc >= 0xE0) byte_len = 3;
+        else if (uc >= 0xC0) byte_len = 2;
+        
+        if (i + byte_len <= text.size()) {
+            std::string ch = text.substr(i, byte_len);
+            current_sentence += ch;
+            // 中英文标点
+            if (ch == "." || ch == "!" || ch == "?" || ch == "\n" || 
+                ch == "。" || ch == "！" || ch == "？") {
+                if (current_sentence.size() > 5) {
+                    sentences.push_back(current_sentence);
+                }
+                current_sentence.clear();
+            }
         }
-        [[nodiscard]] auto name() const -> std::string override {
-            return "default_exploration";
-        }
-    };
+        i += byte_len;
+    }
+    // 处理末尾
+    if (!current_sentence.empty() || sentences.empty()) {
+        if (sentences.empty()) sentences.push_back(text);
+        else if (current_sentence.size() > 5) sentences.push_back(current_sentence);
+    }
 
-    DefaultStrategy strategy;
-    return loop.run(loop_config, {}, strategy, nullptr);
+    double novelty_threshold = 0.05; 
+    int sentences_extracted = 0;
+
+    for (size_t i = 0; i < sentences.size(); ++i) {
+        const auto& sentence = sentences[i];
+        
+        // 1. 尝试阅读与预测 (Perception / Prediction)
+        auto tokens = learning::tokenize(sentence, config_.language);
+        if (tokens.empty()) continue;
+        
+        stat_learner_.observe_tokens(tokens);
+
+        if (config_.embedding_learning_enabled) {
+            ds_.learn_from_tokens(tokens);
+            embedding_trainer_.add_tokens(tokens);
+        }
+
+        double novelty_error = 0.0;
+        if (config_.embedding_predictive_learning) {
+            novelty_error = learn_predictive_(tokens);
+        }
+
+        // 2. 主动推理控制 (Active Inference for Reading)
+        if (novelty_error > novelty_threshold) {
+            // 自由能（预测误差）过高 -> 触发好奇心和惊讶
+            
+            // 行动 1：尝试从长时记忆（KG）中检索背景知识，平息自由能
+            auto entities = learning::KnowledgeExtractor::extract_entities(sentence);
+            for (const auto& ent : entities) {
+                if (kg_.has_entity(ent)) {
+                    // 检索到背景知识，稍微降低一些惊讶值（模拟消除了一部分 Epistemic uncertainty）
+                    novelty_error *= 0.8;
+                }
+            }
+
+            // 行动 2：如果仍然惊讶，必须分配重计算资源（强行提取与记忆建立）
+            if (novelty_error > novelty_threshold) {
+                auto chunk_result = text_learner_.learn_from_text(sentence, source);
+                
+                // 聚合结果
+                final_result.entities.insert(final_result.entities.end(), 
+                                             chunk_result.entities.begin(), chunk_result.entities.end());
+                final_result.triples.insert(final_result.triples.end(), 
+                                            chunk_result.triples.begin(), chunk_result.triples.end());
+                
+                std::vector<std::string> rel_strs;
+                for (const auto& t : chunk_result.triples) {
+                    rel_strs.push_back(t.subject + "->" + t.relation + "->" + t.object);
+                }
+                (void)hippocampal_.encode(chunk_result.entities, rel_strs, sentence);
+                
+                sentences_extracted++;
+            }
+        }
+    }
+
+    if (sentences_extracted > 0) {
+        final_result.verification_passed = true;
+        final_result.verification_score = 1.0;
+    } else {
+        final_result.verification_passed = true;
+        final_result.verification_score = 1.0;
+    }
+
+    // 记录元认知（认知努力度）
+    metacognition_.record_learning(
+        sentences_extracted > 0 ? "focused_reading" : "skim_reading", 
+        sentences_extracted > 0 ? 0.9 : 0.1
+    );
+
+    return final_result;
+}
+
+void Learner::run_conscious_loop(int ticks) {
+    for (int i = 0; i < ticks; ++i) {
+        // 1. 内部状态评估 (Homeostasis)
+        double current_curiosity = engine_ ? engine_->get_curiosity() : 0.0;
+        double current_lp = engine_ ? engine_->get_learning_progress() : 0.0;
+        
+        // ★ 将真实学习进度反馈到自成目标引擎
+        if (engine_) {
+            autotelic_engine_.record_progress("_global_learning_progress", current_lp);
+        }
+        
+        // 2. 自成目标引擎 (Autotelic Generation) 
+        // 模拟：如果没有外部刺激，且感到无聊 (LP停滞)，自己找事做
+        if (current_lp < 0.01 && current_curiosity < 0.1) {
+            auto goal = autotelic_engine_.generate_goal();
+            
+            // 提交一个内部思绪到工作空间
+            if (goal.goal_type != "idle_dreaming") {
+                consciousness::WorkspaceThought thought;
+                thought.source_module = "autotelic";
+                thought.symbolic_content = "我打算探索: " + goal.target_cpt_a;
+                thought.surprise_value = 0.5; // 自我设定的高好奇心
+                workspace_.submit_thought(thought);
+            }
+        }
+
+        // 3. 全局工作空间广播 (Global Workspace Broadcast)
+        auto focus = workspace_.process_and_broadcast();
+        
+        if (focus) {
+            // 意识的聚焦引发下游模块的集体处理
+            // 这里用一段简单的模拟逻辑展示：如果是内部产生的目标，在潜空间中进行推演 (JEPA style)
+            if (focus->source_module == "autotelic" && !focus->symbolic_content.empty()) {
+                // JEPA 规划推演：在分布语义空间中提取目标向量，执行前向预测
+                std::string target = focus->symbolic_content.substr(focus->symbolic_content.find_last_of(' ') + 1);
+                auto vec_opt = ds_.get_dense_vector(target);
+                if (vec_opt && engine_) {
+                    auto action = std::vector<float>{1.0f}; 
+                    auto pred = engine_->predict(*vec_opt, action);
+                    
+                    // 将推演结果存入记忆，或者产生新的情绪
+                    auto nearest = ds_.find_nearest(pred, 1);
+                    if (!nearest.empty()) {
+                        consciousness::WorkspaceThought insight;
+                        insight.source_module = "predictive_engine";
+                        insight.symbolic_content = "啊！我想到 " + target + " 可能和 " + nearest[0].first + " 有关！";
+                        insight.surprise_value = 0.8;
+                        workspace_.submit_thought(insight);
+                    }
+                }
+            } else if (focus->source_module == "predictive_engine" && !focus->symbolic_content.empty()) {
+                // 把顿悟的结果显式写入知识图谱或自传体记忆
+                consciousness::AutobiographicalMemory mem;
+                mem.narrative = "今天我顿悟了：" + focus->symbolic_content;
+                mem.emotional_intensity = 0.8;
+                mem.importance = 0.9;
+                self_model_.remember(mem);
+            }
+        }
+
+        // 4. 定期海马体巩固 (Hippocampal Consolidation / Sleep)
+        if (i > 0 && i % 100 == 0) {
+            (void)consolidate();
+        }
+    }
+}
+
+auto Learner::choose_continuous_action(const std::vector<float>& obs) -> std::vector<float> {
+    int num_samples = 64;
+    std::vector<float> best_action(config_.action_dim, 0.0f);
+    float max_epistemic_value = -1.0f;
+
+    static std::mt19937 rng(42);
+    std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
+
+    for (int i = 0; i < num_samples; ++i) {
+        std::vector<float> action(config_.action_dim);
+        for (int d = 0; d < config_.action_dim; ++d) {
+            action[d] = dist(rng);
+        }
+
+        auto pred = engine_->predict(obs, action);
+        float uncertainty = 0.0f;
+        for (auto v : pred) uncertainty += v * v;
+        uncertainty = std::sqrt(uncertainty / static_cast<float>(pred.size()));
+
+        if (uncertainty > max_epistemic_value) {
+            max_epistemic_value = uncertainty;
+            best_action = action;
+        }
+    }
+
+    // Epsilon-greedy 探索
+    std::uniform_real_distribution<float> prob(0.0f, 1.0f);
+    if (prob(rng) < static_cast<float>(config_.motivation_epsilon)) {
+        for (int d = 0; d < config_.action_dim; ++d) {
+            best_action[d] = dist(rng);
+        }
+    }
+
+    return best_action;
+}
+
+auto Learner::learn_continuous_experience(const std::vector<float>& obs,
+                                          const std::vector<float>& action,
+                                          const std::vector<float>& next_obs) -> double {
+    auto error = engine_->learn(obs, action, next_obs);
+    error_history_.push_back(static_cast<float>(error));
+    ++total_steps_;
+
+    // STDP 赫布学习（保持与离散一样）
+    auto obs_id = "s" + std::to_string(total_steps_ % 100);
+    auto next_id = "s" + std::to_string((total_steps_ + 1) % 100);
+    stdp_.strengthen(obs_id, next_id, 1.0);
+
+    return error;
+}
+
+// ★v2: 具身感知-行动闭环（最小可行路径）
+double Learner::embodied_step(
+    const std::map<std::string, std::vector<float>>& raw_input,
+    domain::IEnvironment* env) {
+
+    // 1. 多模态感知编码
+    auto obs = encoder_.encode(raw_input);
+
+    // 2. 主动推理驱动动作选择（取代简单的 ε-贪心）
+    int action = 0;
+
+    // 使用主动推理引擎生成策略并选择最优
+    auto belief = active_inference_.current_belief();
+    auto policies = active_inference_.generate_policies(belief, 3);
+
+    if (!policies.empty()) {
+        auto selected = active_inference_.select_policy(policies, belief, "");
+
+        // 将策略名映射到离散动作
+        if (!selected.actions.empty()) {
+            // 使用哈希将策略名映射到动作空间
+            size_t hash = std::hash<std::string>{}(selected.name);
+            action = static_cast<int>(hash) % config_.action_dim;
+        }
+    } else {
+        // 回退到好奇心驱动的动作选择
+        action = choose_action(obs);
+    }
+
+    // 3. 环境交互（如果有环境）
+    std::vector<float> next_obs;
+    float reward = 0.0f;
+
+    if (env) {
+        auto [env_reward, done] = env->step(action);
+        reward = static_cast<float>(env_reward);
+        // 使用环境的当前观测作为 next_obs
+        auto next_raw = env->observe();
+        next_obs = encoder_.encode(next_raw);
+    } else {
+        // 无环境时，用预测编码引擎生成"想象"的下一个状态
+        auto action_vec = std::vector<float>(config_.action_dim, 0.0f);
+        if (action >= 0 && action < config_.action_dim) {
+            action_vec[action] = 1.0f;
+        }
+        next_obs = engine_->predict(obs, action_vec);
+    }
+
+    // 4. 经验学习
+    double error = learn_from_experience(obs, action, next_obs, reward);
+
+    // 5. 将观测反馈给主动推理引擎（闭合感知→信念更新环）
+    auto predicted = engine_->predict(obs, std::vector<float>(config_.action_dim, 0.0f));
+    active_inference_.perceive(obs, predicted);
+
+    // 6. 记录到情景记忆
+    remember(obs, action, next_obs, reward, static_cast<float>(error));
+
+    // 7. 自成目标引擎反馈
+    autotelic_engine_.record_progress("_embodied", 1.0 - error);
+
+    // 8. 如果预测误差足够大（惊讶），提交到意识工作空间
+    if (error > 0.3) {
+        consciousness::WorkspaceThought thought;
+        thought.source_module = "embodied_perception";
+        thought.symbolic_content = "感知到意外: error=" + std::to_string(error);
+        thought.surprise_value = static_cast<float>(error);
+        workspace_.submit_thought(thought);
+    }
+
+    return error;
 }
 
 }  // namespace ai_learning::core

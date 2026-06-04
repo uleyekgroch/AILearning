@@ -432,12 +432,18 @@ static auto make_openapi_spec_(const ai_learning::server::ServerConfig& config) 
             {"description", "同时处理多个 prompt，共享模型加载开销"},
             {"requestBody", {
                 {"required", true},
-                {"content", {{"application/json", {
-                    {"schema", {{"type", "object"}, {"properties", {
-                        {"prompts", {{"type", "array"}, {"items", {{"type", "string"}}}}},
-                        {"system_prompts", {{"type", "array"}, {"items", {{"type", "string"}}}}}
-                    }}, {"required", json::array({"prompts"})}}}
-                }}}}}
+                {"content", {
+                    {"application/json", {
+                        {"schema", {
+                            {"type", "object"}, 
+                            {"properties", {
+                                {"prompts", {{"type", "array"}, {"items", {{"type", "string"}}}}},
+                                {"system_prompts", {{"type", "array"}, {"items", {{"type", "string"}}}}}
+                            }}, 
+                            {"required", json::array({"prompts"})}
+                        }}
+                    }}
+                }}
             }},
             {"responses", {{"200", {{"description", "批量推理结果"}}}}}
         }}
@@ -465,14 +471,20 @@ static auto make_openapi_spec_(const ai_learning::server::ServerConfig& config) 
             {"summary", "注册节点"},
             {"requestBody", {
                 {"required", true},
-                {"content", {{"application/json", {
-                    {"schema", {{"type", "object"}, {"properties", {
-                        {"id", {{"type", "string"}}}},
-                        {"endpoint", {{"type", "string"}}}},
-                        {"gpu_info", {{"type", "string"}}}},
-                        {"max_concurrent", {{"type", "integer"}}}
-                    }}, {"required", json::array({"id", "endpoint"})}}}
-                }}}}}
+                {"content", {
+                    {"application/json", {
+                        {"schema", {
+                            {"type", "object"},
+                            {"properties", {
+                                {"id", {{"type", "string"}}},
+                                {"endpoint", {{"type", "string"}}},
+                                {"gpu_info", {{"type", "string"}}},
+                                {"max_concurrent", {{"type", "integer"}}}
+                            }},
+                            {"required", json::array({"id", "endpoint"})}
+                        }}
+                    }}
+                }}
             }},
             {"responses", {{"200", {{"description", "注册成功"}}}}}
         }}

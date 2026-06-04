@@ -84,6 +84,8 @@ auto Learner::autonomous_learning_run(int iterations)
     }
 
     learning::AutonomousLearningLoop loop(motivation_, skill_tree_);
+    loop.set_active_inference(&active_inference_);  // 注入主动推理
+
     LearnerBuiltInStrategy strategy(
         [this](const std::string& text) {
             return learn_from_text(text);
@@ -92,7 +94,18 @@ auto Learner::autonomous_learning_run(int iterations)
     learning::AutonomousLoopConfig config;
     config.max_iterations = iterations;
 
-    return loop.run(config, topics, strategy);
+    auto report = loop.run(config, topics, strategy);
+
+    // ★ 将自主学习的进度反馈到自成目标引擎
+    for (const auto& step : report.history) {
+        if (!step.learned.empty()) {
+            for (const auto& topic : step.learned) {
+                autotelic_engine_.record_progress(topic, step.progress);
+            }
+        }
+    }
+
+    return report;
 }
 
 auto Learner::solve_problem(const std::string& problem_description)

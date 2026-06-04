@@ -353,7 +353,7 @@ inline auto MirrorNeuronSystem::infer_intention_from_sequence(
 
 inline auto MirrorNeuronSystem::infer_emotional_state(
     const ObservedAction& action,
-    const std::string& context)
+    const std::string& /*context*/)
     -> std::map<std::string, double> {
     if (!config_.enable_empathy) return {};
 

@@ -1,5 +1,0 @@
-Filters: [integration]
-Randomness seeded to: 2493697079
-===============================================================================
-All tests passed (10 assertions in 5 test cases)
-

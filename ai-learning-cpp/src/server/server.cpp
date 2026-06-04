@@ -22,6 +22,7 @@
 #include "dto.hpp"
 #include "ai_learning/server/rate_limit_middleware.hpp"
 #include "ai_learning/server/logger.hpp"
+#include "ai_learning/consciousness/workspace_observer.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -64,7 +65,11 @@ ai_learning::server::LearningServer::LearningServer(
     ai_learning::core::Learner& learner,
     ai_learning::server::ServerConfig config)
     : learner_(learner), config_(std::move(config)),
-      shared_state_(std::make_unique<SharedState>()) {}
+      shared_state_(std::make_unique<SharedState>()) {
+          // 注册控制台监听器
+          static ai_learning::consciousness::ConsoleWorkspaceObserver observer;
+          learner_.get_workspace().register_observer(&observer);
+      }
 
 // ── 路由注册 ────────────────────────────────────────────────────
 
@@ -353,6 +358,16 @@ auto ai_learning::server::LearningServer::run() -> void {
             app.stop();
             running_ = false;
         }
+    });
+
+    // 后台心跳意识循环 (The Conscious Autotelic Loop Tick)
+    std::jthread conscious_loop_thread([this]() {
+        std::cout << "[Consciousness] Autotelic conscious loop started in background.\n";
+        while (running_ && !g_shutdown_requested) {
+            learner_.run_conscious_loop(1);
+            std::this_thread::sleep_for(std::chrono::seconds(5)); // 每5秒一个“念头”
+        }
+        std::cout << "[Consciousness] Autotelic conscious loop stopped.\n";
     });
 
     app.port(config_.port).concurrency(

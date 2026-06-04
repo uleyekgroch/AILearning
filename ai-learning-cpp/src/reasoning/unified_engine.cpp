@@ -8,6 +8,8 @@
 #include "ai_learning/domain/knowledge/relation.hpp"
 #include "ai_learning/language/llm_provider.hpp"
 #include "ai_learning/learning/statistical_learner.hpp"
+#include "ai_learning/learning/ipredictive_engine.hpp"
+#include "ai_learning/learning/distributional_semantics.hpp"
 #include "ai_learning/memory/episodic_memory.hpp"
 #include "ai_learning/utils/utf8.hpp"
 
@@ -82,6 +84,9 @@ auto UnifiedReasoningEngine::reason(const std::string& question) const
 
     auto analogical = analogical_reasoning(question);
     results.insert(results.end(), analogical.begin(), analogical.end());
+
+    auto intuitive = intuitive_reasoning(question);
+    results.insert(results.end(), intuitive.begin(), intuitive.end());
 
     auto counterfactual = counterfactual_reasoning(question);
     results.insert(results.end(), counterfactual.begin(), counterfactual.end());
@@ -551,6 +556,55 @@ auto UnifiedReasoningEngine::neural_reasoning(
     }
 
     return {r};
+}
+
+void UnifiedReasoningEngine::set_predictive_engine(
+    learning::IPredictiveEngine* pe) {
+    predictive_ = pe;
+}
+
+void UnifiedReasoningEngine::set_distributional_semantics(
+    learning::DistributionalSemantics* ds) {
+    ds_ = ds;
+}
+
+auto UnifiedReasoningEngine::intuitive_reasoning(const std::string& question) const
+    -> std::vector<ReasoningResult> {
+    std::vector<ReasoningResult> results;
+    if (!predictive_ || !ds_) return results;
+
+    auto keywords = extract_keywords(question);
+    if (keywords.empty()) return results;
+
+    // Use the last keyword as the subject context
+    std::string subject = keywords.back();
+    auto obs_opt = ds_->get_dense_vector(subject);
+    if (!obs_opt) return results;
+
+    // Predict next concept using Predictive Coding Engine
+    std::vector<float> action = {1.0f}; // Default forward prediction action
+    auto predicted_vec = predictive_->predict(*obs_opt, action);
+
+    // Find nearest semantic concepts
+    auto nearest = ds_->find_nearest(predicted_vec, 3);
+    for (const auto& [cpt, sim] : nearest) {
+        // Filter out the subject itself
+        if (cpt == subject) continue;
+        
+        ReasoningResult r;
+        r.content = "直觉联想: " + cpt;
+        r.confidence = std::max(0.0, sim * 0.9); // Scale confidence
+        r.method = "intuitive";
+        r.evidence = {subject, cpt};
+        r.reasoning_chain = {
+            "当前概念: " + subject,
+            "通过预测编码引擎生成潜空间预测向量",
+            "在分布语义空间中寻找最接近的概念: " + cpt
+        };
+        results.push_back(r);
+    }
+
+    return results;
 }
 
 }  // namespace ai_learning::reasoning

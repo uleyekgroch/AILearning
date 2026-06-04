@@ -277,18 +277,22 @@ int main(int argc, char* argv[]) {
     LearnerConfig config;
     config.obs_dim = 128;
     config.embedding_learning_enabled = true;
-    config.embedding_train_interval = 2;
-    config.embedding_epochs = 3;
+    config.embedding_train_interval = 5; // 调大以提升性能
+    config.embedding_epochs = 2;         // 调低以提升性能
     config.embedding_predictive_learning = true;
-    config.pc_max_steps_per_text = 30;
+    config.pc_max_steps_per_text = 20;   // 限制推演步数提升速度
     Learner learner(config);
+
+    // ★ 加载脑快照（如果存在的话，这使得能够断点续传）
+    std::string checkpoint_path = "brain_checkpoint.json";
+    learner.load(checkpoint_path);
 
     LearningStats stats;
     auto t_start = std::chrono::steady_clock::now();
 
     // ── 主学习循环 ──────────────────────────────────────────────
     int articles_since_consolidate = 0;
-    const int CONSOLIDATE_INTERVAL = 100;
+    const int CONSOLIDATE_INTERVAL = 200; // 调大以提升性能
 
     for (size_t fi = 0; fi < files.size(); ++fi) {
         auto articles = parse_wiki_file(files[fi]);
@@ -300,7 +304,8 @@ int main(int argc, char* argv[]) {
             // 组合标题和正文
             std::string input = art.title + "：" + art.text;
 
-            auto result = learner.learn_from_text(input, art.title);
+            // 使用主动阅读机制（The Conscious Autotelic Loop Phase 3）
+            auto result = learner.active_read(input, art.title);
 
             // 累计统计
             stats.total_articles++;
@@ -354,6 +359,9 @@ int main(int argc, char* argv[]) {
     // 最终巩固
     std::cout << "\n最终巩固记忆...\n";
     learner.consolidate();
+    
+    // ★ 退出前保存整个大脑状态
+    learner.save(checkpoint_path);
 
     auto t_end = std::chrono::steady_clock::now();
     stats.elapsed_seconds = std::chrono::duration<double>(t_end - t_start).count();

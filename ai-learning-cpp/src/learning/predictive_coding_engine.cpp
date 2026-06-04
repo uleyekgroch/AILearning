@@ -40,6 +40,11 @@ PredictiveCodingEngine::PredictiveCodingEngine(
     b2_.resize(h2, 0.0f);
     w3_ = Matrix(out, h2);
     b3_.resize(out, 0.0f);
+    
+    // 初始化精度加权 (Precision matrices / vectors)
+    pi_h1_.resize(h1, 1.0f);
+    pi_h2_.resize(h2, 1.0f);
+    pi_out_.resize(out, 1.0f);
 
     for (auto& w : w1_.data) w = he_init(inp);
     for (auto& w : w2_.data) w = he_init(h1);
@@ -254,6 +259,12 @@ auto PredictiveCodingEngine::infer_beliefs_(
         auto eps_h2 = tensor_clamp(tensor_sub(mu_h2, tensor_relu(z2)), -cv, cv);
         auto eps_h1 = tensor_clamp(tensor_sub(mu_h1, tensor_relu(z1)), -cv, cv);
 
+        // ★ 精度加权 (Precision Weighting): Attention 机制的核心
+        // 如果系统对某个维度不确信（方差大，精度小），则该维度的预测误差将被抑制
+        eps_out = tensor_mul(eps_out, pi_out_);
+        eps_h2 = tensor_mul(eps_h2, pi_h2_);
+        eps_h1 = tensor_mul(eps_h1, pi_h1_);
+
         auto relu_d2 = tensor_relu_deriv(z2);
         auto feedback_h2 = tensor_clamp(
             vec_mat(eps_out, w3_.data, w3_.cols, w3_.rows), -cv, cv);
@@ -267,10 +278,18 @@ auto PredictiveCodingEngine::infer_beliefs_(
 
         auto update_h1 = tensor_clamp(
             tensor_sub(eps_h1, feedback_h1), -cv, cv);
+        // 添加 L1 稀疏惩罚项
+        if (cfg_.sparsity_penalty > 0.0) {
+            update_h1 = tensor_add(update_h1, tensor_scale(tensor_sign(mu_h1), static_cast<float>(cfg_.sparsity_penalty)));
+        }
         mu_h1 = tensor_clamp(tensor_sub(mu_h1, tensor_scale(update_h1, lr)), -cv, cv);
 
         auto update_h2 = tensor_clamp(
             tensor_sub(eps_h2, feedback_h2), -cv, cv);
+        // 添加 L1 稀疏惩罚项
+        if (cfg_.sparsity_penalty > 0.0) {
+            update_h2 = tensor_add(update_h2, tensor_scale(tensor_sign(mu_h2), static_cast<float>(cfg_.sparsity_penalty)));
+        }
         mu_h2 = tensor_clamp(tensor_sub(mu_h2, tensor_scale(update_h2, lr)), -cv, cv);
 
         steps = t + 1;
@@ -323,6 +342,24 @@ void PredictiveCodingEngine::update_weights_(const InferenceResult& r) {
         b1_[i] = std::clamp(b1_[i] + lr * grad_h1[i], -wc, wc);
     }
     for (auto& w : w1_.data) w = std::clamp(w, -wc, wc);
+
+    // ★ 精度更新 (Precision Update)
+    // 根据预测误差的平方，动态更新对各个维度的“置信度”。误差越大，精度越低
+    auto update_precision = [this](std::vector<float>& pi, const std::vector<float>& eps) {
+        float plr = static_cast<float>(cfg_.precision_lr);
+        for (size_t i = 0; i < pi.size(); ++i) {
+            // pi = pi - lr * (pi * eps^2 - 1)  (Simplified Gamma update derivation)
+            // Or simpler: moving average of inverse variance
+            float variance = eps[i] * eps[i] + 1e-4f;
+            pi[i] = (1.0f - plr) * pi[i] + plr * (1.0f / variance);
+            // Limit precision to avoid explosion
+            pi[i] = std::clamp(pi[i], 0.1f, 100.0f);
+        }
+    };
+    
+    update_precision(pi_out_, r.epsilon_out);
+    update_precision(pi_h2_, r.epsilon_h2);
+    update_precision(pi_h1_, r.epsilon_h1);
 }
 
 auto PredictiveCodingEngine::check_convergence_(

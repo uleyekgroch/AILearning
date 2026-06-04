@@ -49,6 +49,34 @@ struct InferenceNode {
     std::atomic<int> active_requests{0};  // 当前活跃请求数
     std::atomic<bool> healthy{true};      // 健康状态
     std::chrono::steady_clock::time_point last_heartbeat;
+
+    InferenceNode() = default;
+    InferenceNode(const InferenceNode& other) : id(other.id), endpoint(other.endpoint), gpu_info(other.gpu_info), max_concurrent(other.max_concurrent), active_requests(other.active_requests.load()), healthy(other.healthy.load()), last_heartbeat(other.last_heartbeat) {}
+    InferenceNode(InferenceNode&& other) noexcept : id(std::move(other.id)), endpoint(std::move(other.endpoint)), gpu_info(std::move(other.gpu_info)), max_concurrent(other.max_concurrent), active_requests(other.active_requests.load()), healthy(other.healthy.load()), last_heartbeat(other.last_heartbeat) {}
+    InferenceNode& operator=(const InferenceNode& other) {
+        if (this != &other) {
+            id = other.id;
+            endpoint = other.endpoint;
+            gpu_info = other.gpu_info;
+            max_concurrent = other.max_concurrent;
+            active_requests.store(other.active_requests.load());
+            healthy.store(other.healthy.load());
+            last_heartbeat = other.last_heartbeat;
+        }
+        return *this;
+    }
+    InferenceNode& operator=(InferenceNode&& other) noexcept {
+        if (this != &other) {
+            id = std::move(other.id);
+            endpoint = std::move(other.endpoint);
+            gpu_info = std::move(other.gpu_info);
+            max_concurrent = other.max_concurrent;
+            active_requests.store(other.active_requests.load());
+            healthy.store(other.healthy.load());
+            last_heartbeat = other.last_heartbeat;
+        }
+        return *this;
+    }
 };
 
 /// 分布式推理集群 — 负载均衡器

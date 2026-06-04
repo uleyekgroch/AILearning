@@ -224,6 +224,36 @@ void ai_learning::server::register_core_routes(
         } catch (const std::exception& e) { return err_resp(400, e.what()); }
     });
 
+    // POST /api/embodied/step
+    CROW_ROUTE(app, "/api/embodied/step").methods("POST"_method)
+    ([&](const crow::request& req) -> crow::response {
+        ScopedTimer timer(state.metrics, "embodied_step");
+        try {
+            auto body = json::parse(req.body);
+            if (!body.contains("obs")) return err_resp(400, "missing 'obs' field");
+            auto raw_obs = dto::parse_float_vector(body["obs"]);
+            
+            // 1. 感知
+            std::map<std::string, std::vector<float>> input = {{"visual", raw_obs}};
+            auto obs = learner.perceive(input);
+            
+            // 2. 主动推理动作选择
+            auto action = learner.choose_continuous_action(obs);
+            
+            // 3. 在线经验学习
+            if (body.contains("prev_obs") && body.contains("prev_action")) {
+                 std::map<std::string, std::vector<float>> p_input = {{"visual", dto::parse_float_vector(body["prev_obs"])}};
+                 auto p_obs = learner.perceive(p_input);
+                 auto p_act = dto::parse_float_vector(body["prev_action"]);
+                 
+                 // 连续经验误差计算
+                 learner.learn_continuous_experience(p_obs, p_act, obs);
+            }
+            
+            return ok_resp(json{{"action", action}});
+        } catch (const std::exception& e) { return err_resp(400, e.what()); }
+    });
+
     // POST /api/remember
     CROW_ROUTE(app, "/api/remember").methods("POST"_method)
     ([&](const crow::request& req) -> crow::response {
@@ -322,8 +352,8 @@ void ai_learning::server::register_core_routes(
     // ── K.1+K.1++: 多模态感知（图像 + 音频）──────────────────────────
 
     // 辅助：构建多模态编码器（图像优先 ONNX CLIP，否则 Stub）
-    auto build_multimodal_encoder = []() -> perception::MultiModalEncoder {
-        perception::MultiModalEncoder mme;
+    auto build_multimodal_encoder = []() -> perception::MediaEncoder {
+        perception::MediaEncoder mme;
 
         // 注册图像编码器
 #ifdef AI_LEARNING_WITH_ONNX
