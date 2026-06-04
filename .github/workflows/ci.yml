@@ -74,9 +74,10 @@ jobs:
           cmake --build . --target ai_learning ai_learning_tests --parallel $(nproc)
 
       - name: Run tests
+        timeout-minutes: 5
         run: |
           cd ai-learning-cpp/build-ci
-          timeout 900 ./ai_learning_tests --colour-mode ansi
+          timeout 240 ./ai_learning_tests --colour-mode ansi
 
   # ── Windows build ────────────────────────────────────────────────
   build-windows:
