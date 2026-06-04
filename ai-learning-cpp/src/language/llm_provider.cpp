@@ -318,7 +318,7 @@ auto LlamaCppLLMProvider::prefill(const std::string& prompt) -> int {
     return n_prompt;
 }
 
-auto LlamaCppLLMProvider::generate_from_cache(int max_tokens) -> std::string {
+auto LlamaCppLLMProvider::generate_from_cache(int /*max_tokens*/) -> std::string {
     if (!ctx_ || !model_) return "[llama.cpp not initialized]";
     if (cached_n_prompt_ == 0) return "[no prefill cache]";
     std::lock_guard<std::mutex> lock(mutex_);

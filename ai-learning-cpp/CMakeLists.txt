@@ -54,9 +54,11 @@ if(MSVC)
         add_compile_options(/O2 /DNDEBUG)
     endif()
 else()
+    # Only apply -Wall/-Wextra (non-fatal) globally; -Werror is added per-target
+    # so external dependencies (llama.cpp, Catch2, etc.) are not broken by their
+    # own warnings being treated as errors.
     add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wall>
                         $<$<COMPILE_LANGUAGE:CXX>:-Wextra>
-                        $<$<COMPILE_LANGUAGE:CXX>:-Werror>
                         $<$<COMPILE_LANGUAGE:CXX>:-std=c++20>)
 endif()
 
@@ -170,6 +172,10 @@ endif()
 add_library(ai_learning STATIC ${AI_LEARNING_SOURCES})
 target_include_directories(ai_learning PUBLIC include)
 target_compile_features(ai_learning PRIVATE cxx_std_20)
+# -Werror only for our own code (not external deps)
+if(NOT MSVC)
+    target_compile_options(ai_learning PRIVATE -Werror)
+endif()
 # ai_learning 内部源码依赖 nlohmann/json 和 asio
 target_link_libraries(ai_learning PUBLIC nlohmann_json::nlohmann_json)
 if(asio_SOURCE_DIR)
@@ -216,6 +222,9 @@ target_link_libraries(ai_learning_tests
     PRIVATE ai_learning Catch2::Catch2WithMain
 )
 target_include_directories(ai_learning_tests PRIVATE include)
+if(NOT MSVC)
+    target_compile_options(ai_learning_tests PRIVATE -Werror)
+endif()
 
 # 服务器路由测试可执行文件（需要 Crow + server 头文件 + server 源码）
 if(SERVER_TEST_SOURCES)
@@ -228,6 +237,9 @@ if(SERVER_TEST_SOURCES)
     target_include_directories(ai_learning_server_tests PRIVATE include src/server)
     target_compile_definitions(ai_learning_server_tests PRIVATE ASIO_STANDALONE)
     target_compile_features(ai_learning_server_tests PRIVATE cxx_std_20)
+    if(NOT MSVC)
+        target_compile_options(ai_learning_server_tests PRIVATE -Werror)
+    endif()
     if(WIN32)
         target_link_libraries(ai_learning_server_tests PRIVATE ws2_32 wsock32)
     endif()
